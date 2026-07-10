@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expense Calculator</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --text: #1f2430;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --accent: #2f6fed;
+    --accent-hover: #2459c4;
+    --danger: #d64545;
+    --danger-hover: #b93838;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  header p {
+    color: var(--muted);
+    margin-top: 0.25rem;
+    font-size: 0.95rem;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+  }
+
+  /* --- Form --- */
+  form {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: 0.75rem;
+    align-items: end;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  input, select {
+    padding: 0.55rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: var(--card);
+    color: var(--text);
+    width: 100%;
+  }
+
+  input:focus, select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+    border-color: var(--accent);
+  }
+
+  button {
+    padding: 0.55rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff;
+  }
+
+  button:hover { background: var(--accent-hover); }
+
+  /* --- Summary --- */
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
+
+  .stat .label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .stat .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 0.25rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* --- Category breakdown --- */
+  .breakdown h2, .expenses h2 {
+    font-size: 1.05rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+  }
+
+  .breakdown-row:last-child { border-bottom: none; }
+
+  .breakdown-row .cat-name { font-weight: 600; }
+
+  .breakdown-row .cat-amount {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .breakdown-row .cat-pct {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-left: 0.5rem;
+  }
+
+  /* --- Expense list --- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  th {
+    text-align: left;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--muted);
+    padding: 0.5rem 0.5rem;
+    border-bottom: 2px solid var(--border);
+  }
+
+  td {
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  td.amount, th.amount { text-align: right; font-variant-numeric: tabular-nums; }
+  td.actions, th.actions { text-align: right; width: 1%; }
+
+  .tag {
+    display: inline-block;
+    background: #eef2ff;
+    color: #3b4bbf;
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .delete-btn {
+    background: transparent;
+    color: var(--danger);
+    font-size: 0.85rem;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--danger);
+  }
+
+  .delete-btn:hover { background: var(--danger); color: #fff; }
+
+  .clear-btn {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    font-size: 0.85rem;
+  }
+
+  .clear-btn:hover { background: var(--danger); color: #fff; }
+
+  .expenses-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .expenses-header h2 { margin-bottom: 0; }
+
+  .empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 1.5rem 0;
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 640px) {
+    form { grid-template-columns: 1fr 1fr; }
+    form .field-name { grid-column: 1 / -1; }
+    form button { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Expense Calculator</h1>
+    <p>Track your spending — add expenses and see totals by category. Data is saved in your browser.</p>
+  </header>
+
+  <div class="card">
+    <form id="expense-form">
+      <div class="field field-name">
+        <label for="desc">Description</label>
+        <input type="text" id="desc" placeholder="e.g. Groceries" required>
+      </div>
+      <div class="field">
+        <label for="amount">Amount</label>
+        <input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01" required>
+      </div>
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category">
+          <option>Food</option>
+          <option>Transport</option>
+          <option>Housing</option>
+          <option>Utilities</option>
+          <option>Entertainment</option>
+          <option>Health</option>
+          <option>Shopping</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="date">Date</label>
+        <input type="date" id="date" required>
+      </div>
+      <button type="submit">Add</button>
+    </form>
+  </div>
+
+  <div class="summary">
+    <div class="stat">
+      <div class="label">Total</div>
+      <div class="value" id="stat-total">$0.00</div>
+    </div>
+    <div class="stat">
+      <div class="label">This Month</div>
+      <div class="value" id="stat-month">$0.00</div>
+    </div>
+    <div class="stat">
+      <div class="label">Entries</div>
+      <div class="value" id="stat-count">0</div>
+    </div>
+    <div class="stat">
+      <div class="label">Average</div>
+      <div class="value" id="stat-avg">$0.00</div>
+    </div>
+  </div>
+
+  <div class="card breakdown">
+    <h2>By Category</h2>
+    <div id="breakdown-list"><div class="empty">No expenses yet.</div></div>
+  </div>
+
+  <div class="card expenses">
+    <div class="expenses-header">
+      <h2>Expenses</h2>
+      <button type="button" class="clear-btn" id="clear-all">Clear all</button>
+    </div>
+    <div id="expense-list"><div class="empty">No expenses yet. Add your first one above.</div></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'expense-calculator-entries';
+
+  const form = document.getElementById('expense-form');
+  const descInput = document.getElementById('desc');
+  const amountInput = document.getElementById('amount');
+  const categoryInput = document.getElementById('category');
+  const dateInput = document.getElementById('date');
+  const expenseList = document.getElementById('expense-list');
+  const breakdownList = document.getElementById('breakdown-list');
+  const clearAllBtn = document.getElementById('clear-all');
+
+  const statTotal = document.getElementById('stat-total');
+  const statMonth = document.getElementById('stat-month');
+  const statCount = document.getElementById('stat-count');
+  const statAvg = document.getElementById('stat-avg');
+
+  const fmt = new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: 'USD'
+  });
+
+  let expenses = load();
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+  }
+
+  function todayISO() {
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  function render() {
+    renderStats();
+    renderBreakdown();
+    renderList();
+  }
+
+  function renderStats() {
+    const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+    const currentMonth = todayISO().slice(0, 7);
+    const monthTotal = expenses
+      .filter(e => e.date.startsWith(currentMonth))
+      .reduce((sum, e) => sum + e.amount, 0);
+
+    statTotal.textContent = fmt.format(total);
+    statMonth.textContent = fmt.format(monthTotal);
+    statCount.textContent = String(expenses.length);
+    statAvg.textContent = fmt.format(expenses.length ? total / expenses.length : 0);
+  }
+
+  function renderBreakdown() {
+    if (expenses.length === 0) {
+      breakdownList.innerHTML = '<div class="empty">No expenses yet.</div>';
+      return;
+    }
+
+    const total = expenses.reduce((sum, e) => sum + e.amount, 0);
+    const byCategory = {};
+    for (const e of expenses) {
+      byCategory[e.category] = (byCategory[e.category] || 0) + e.amount;
+    }
+
+    const rows = Object.entries(byCategory)
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, amount]) => {
+        const pct = total > 0 ? (amount / total * 100).toFixed(1) : '0.0';
+        return '<div class="breakdown-row">' +
+          '<span class="cat-name">' + escapeHtml(cat) + '</span>' +
+          '<span class="cat-amount">' + fmt.format(amount) +
+          '<span class="cat-pct">(' + pct + '%)</span></span>' +
+          '</div>';
+      });
+
+    breakdownList.innerHTML = rows.join('');
+  }
+
+  function renderList() {
+    if (expenses.length === 0) {
+      expenseList.innerHTML = '<div class="empty">No expenses yet. Add your first one above.</div>';
+      return;
+    }
+
+    const sorted = [...expenses].sort((a, b) =>
+      b.date.localeCompare(a.date) || b.id - a.id
+    );
+
+    const rows = sorted.map(e =>
+      '<tr>' +
+      '<td>' + escapeHtml(e.date) + '</td>' +
+      '<td>' + escapeHtml(e.description) + '</td>' +
+      '<td><span class="tag">' + escapeHtml(e.category) + '</span></td>' +
+      '<td class="amount">' + fmt.format(e.amount) + '</td>' +
+      '<td class="actions"><button type="button" class="delete-btn" data-id="' + e.id + '">Delete</button></td>' +
+      '</tr>'
+    ).join('');
+
+    expenseList.innerHTML =
+      '<table>' +
+      '<thead><tr>' +
+      '<th>Date</th><th>Description</th><th>Category</th>' +
+      '<th class="amount">Amount</th><th class="actions"></th>' +
+      '</tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+      '</table>';
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const amount = parseFloat(amountInput.value);
+    if (!descInput.value.trim() || !isFinite(amount) || amount <= 0 || !dateInput.value) {
+      return;
+    }
+
+    expenses.push({
+      id: Date.now(),
+      description: descInput.value.trim(),
+      amount: Math.round(amount * 100) / 100,
+      category: categoryInput.value,
+      date: dateInput.value
+    });
+
+    save();
+    render();
+
+    form.reset();
+    dateInput.value = todayISO();
+    descInput.focus();
+  });
+
+  expenseList.addEventListener('click', function (event) {
+    const btn = event.target.closest('.delete-btn');
+    if (!btn) return;
+    const id = Number(btn.dataset.id);
+    expenses = expenses.filter(e => e.id !== id);
+    save();
+    render();
+  });
+
+  clearAllBtn.addEventListener('click', function () {
+    if (expenses.length === 0) return;
+    if (confirm('Delete all ' + expenses.length + ' expenses? This cannot be undone.')) {
+      expenses = [];
+      save();
+      render();
+    }
+  });
+
+  dateInput.value = todayISO();
+  render();
+})();
+</script>
+</body>
+</html>
