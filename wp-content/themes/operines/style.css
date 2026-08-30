@@ -1,0 +1,17 @@
+/*
+Theme Name: Operines
+Theme URI: https://operines.com
+Author: Operines
+Author URI: https://operines.com
+Description: Custom corporate theme for Operines — the UAE AI & business automation company. Editorial, operations-first design system with the "Operating Canvas" visual language. Bilingual-ready (RTL stylesheet included).
+Version: 1.0.0
+Requires at least: 6.4
+Tested up to: 7.1
+Requires PHP: 8.0
+License: Proprietary
+License URI: https://operines.com
+Text Domain: operines
+Tags: custom-theme, corporate, rtl-language-support
+*/
+
+/* All styles are enqueued from assets/css/. This file intentionally holds only the theme header. */
