@@ -69,7 +69,7 @@ $nodes = array(
 					</span>
 				<?php endforeach; ?>
 				<div class="hero-core">
-					<span class="hero-core-name">Operines</span>
+					<img class="hero-core-logo" src="<?php echo esc_url( OPERINES_URI . '/assets/img/operines-logo-light.svg' ); ?>" alt="" width="105" height="25">
 					<span class="hero-core-sub">Intelligence layer</span>
 				</div>
 			</div>

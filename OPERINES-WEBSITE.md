@@ -47,8 +47,11 @@ solution means adding an array entry and re-running the seeder.
 The site never invents proof. These items are placeholder/flagged in code
 (search for `TODO(owner)`):
 
-1. **Official Operines logo** — a typographic mark is used; replace in
-   `inc/template-tags.php::operines_logo()` and `assets/img/operines-logo.svg`.
+1. **Logo** — done: the official Operines wordmark is integrated as a vector
+   recreation (`assets/img/operines-logo.svg` + `operines-logo-light.svg` for
+   dark surfaces, favicon from the "O"). If you have a master vector file
+   (AI/SVG), you can drop it over these paths; the gradient used is
+   `#5a1c72 → #4f1964 → #1a1220`.
 2. **Contact details** — confirm email, add WhatsApp number, phone, office
    address, LinkedIn URL in `inc/data.php::operines_contact()`. WhatsApp CTAs
    appear automatically once the number is set.

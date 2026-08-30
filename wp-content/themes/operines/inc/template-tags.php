@@ -42,20 +42,18 @@ function operines_icon( string $name, int $size = 20 ): string {
 }
 
 /**
- * Brand lockup. NOTE(owner): replace the typographic mark with the official
- * Operines logo file when provided — drop it in assets/img/ and update here.
+ * Brand lockup: the official Operines wordmark (vector recreation of the
+ * brand logo; gradient version on light surfaces, light version on dark).
  */
 function operines_logo( string $context = 'header' ): string {
-	$mark = '<svg class="brand-mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">'
-		. '<rect x="2" y="2" width="28" height="28" rx="9" stroke="currentColor" stroke-width="2.2"/>'
-		. '<circle cx="16" cy="16" r="4.4" fill="currentColor"/>'
-		. '<path d="M16 2v7.2M16 22.8V30" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>'
-		. '</svg>';
+	$light = in_array( $context, array( 'footer', 'dark' ), true );
+	$file  = $light ? 'operines-logo-light.svg' : 'operines-logo.svg';
+	// Intrinsic ratio 4652:1107 — width/height attributes prevent layout shift.
 	return sprintf(
-		'<a class="brand brand--%s" href="%s" aria-label="Operines — home">%s<span class="brand-name">Operines</span></a>',
+		'<a class="brand brand--%s" href="%s"><img class="brand-logo" src="%s" alt="Operines — home" width="126" height="30"></a>',
 		esc_attr( $context ),
 		esc_url( home_url( '/' ) ),
-		$mark
+		esc_url( OPERINES_URI . '/assets/img/' . $file )
 	);
 }
 
