@@ -190,7 +190,7 @@ $nodes = array(
 				<p class="ledger-outro">No copying. No chasing.<br>No forgotten follow-up.</p>
 			</div>
 			<div data-reveal="ledger">
-				<div class="ledger">
+				<div class="ledger" data-ledger-live>
 					<?php foreach ( operines_ledger() as $i => $row ) : ?>
 						<div class="ledger-row" style="--i:<?php echo (int) $i; ?>">
 							<span class="ledger-time"><?php echo esc_html( $row[0] ); ?></span>
@@ -244,6 +244,7 @@ $nodes = array(
 			<h2 id="arch-title">One intelligence layer.<br>Between your customers and your systems.</h2>
 		</div>
 		<div class="arch" data-reveal="up">
+			<span class="arch-pulse" aria-hidden="true"></span>
 			<div class="arch-band">
 				<span class="arch-label">Customers</span>
 				<div class="arch-chips"><span class="arch-chip">Inquiries</span><span class="arch-chip">Orders</span><span class="arch-chip">Requests</span><span class="arch-chip">Documents</span></div>

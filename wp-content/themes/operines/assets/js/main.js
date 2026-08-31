@@ -276,6 +276,106 @@
 		show(0);
 	}
 
+	/* ------------------------------------------------ Hero data packets */
+	// Small dots continuously travel the connector lines into the core,
+	// so the orchestration map reads as a live system, not a diagram.
+	if (heroMap && !reduceMotion) {
+		var nodeEls = heroMap.querySelectorAll('.hero-node');
+		var routes = [];
+		nodeEls.forEach(function (el) {
+			routes.push({
+				x: parseFloat(el.style.left),
+				y: parseFloat(el.style.top)
+			});
+		});
+		var packets = [];
+		var PACKETS = 7;
+		for (var pi = 0; pi < PACKETS; pi++) {
+			var dot = document.createElement('span');
+			dot.className = 'hero-packet';
+			heroMap.appendChild(dot);
+			packets.push({
+				el: dot,
+				route: routes[pi % routes.length],
+				t: Math.random(),
+				speed: 0.0035 + Math.random() * 0.003,
+				inbound: Math.random() > 0.4
+			});
+		}
+		var mapVisible = true;
+		if ('IntersectionObserver' in window) {
+			new IntersectionObserver(function (entries) {
+				mapVisible = entries[0].isIntersecting;
+			}).observe(heroMap);
+		}
+		var animatePackets = function () {
+			if (mapVisible && !document.hidden) {
+				packets.forEach(function (pk) {
+					pk.t += pk.speed;
+					if (pk.t >= 1) {
+						pk.t = 0;
+						pk.route = routes[Math.floor(Math.random() * routes.length)];
+						pk.inbound = Math.random() > 0.35;
+					}
+					var p = pk.inbound ? pk.t : 1 - pk.t;
+					var x = pk.route.x + (50 - pk.route.x) * p;
+					var y = pk.route.y + (50 - pk.route.y) * p;
+					// Fade near the ends so packets appear to enter/leave systems.
+					var fade = Math.min(1, Math.min(pk.t, 1 - pk.t) * 6);
+					pk.el.style.opacity = (0.85 * fade).toFixed(2);
+					pk.el.style.left = x + '%';
+					pk.el.style.top = y + '%';
+				});
+			}
+			requestAnimationFrame(animatePackets);
+		};
+		requestAnimationFrame(animatePackets);
+	}
+
+	/* ------------------------------------------------ Live ledger feed */
+	// After its reveal, the signature ledger keeps flowing like a live log.
+	document.querySelectorAll('[data-ledger-live]').forEach(function (ledger) {
+		if (reduceMotion) return;
+		var rows = Array.prototype.slice.call(ledger.querySelectorAll('.ledger-row'));
+		if (rows.length < 3) return;
+		ledger.classList.add('ledger--live');
+		var events = rows.map(function (r) {
+			return {
+				time: r.querySelector('.ledger-time').textContent,
+				text: r.querySelector('.ledger-event').textContent
+			};
+		});
+		var idx = 0;
+		var started = false;
+		var tickLedger = function () {
+			var ev = events[idx % events.length];
+			idx++;
+			var row = document.createElement('div');
+			row.className = 'ledger-row is-new';
+			row.innerHTML = '<span class="ledger-time">' + ev.time + '</span><span class="ledger-event">' + ev.text + '</span>';
+			var note = ledger.querySelector('.ledger-note');
+			ledger.insertBefore(row, note);
+			requestAnimationFrame(function () {
+				requestAnimationFrame(function () { row.classList.remove('is-new'); });
+			});
+			var current = ledger.querySelectorAll('.ledger-row');
+			if (current.length > rows.length) current[0].remove();
+		};
+		var start = function () {
+			if (started) return;
+			started = true;
+			// Let the initial staggered reveal finish first.
+			window.setTimeout(function () { window.setInterval(tickLedger, 2400); }, rows.length * 300 + 1200);
+		};
+		if ('IntersectionObserver' in window) {
+			new IntersectionObserver(function (entries, obs) {
+				if (entries[0].isIntersecting) { start(); obs.disconnect(); }
+			}, { threshold: 0.3 }).observe(ledger);
+		} else {
+			start();
+		}
+	});
+
 	/* ------------------------------------------------ Animated product conversation */
 	document.querySelectorAll('[data-chat]').forEach(function (chat) {
 		var bubbles = Array.prototype.slice.call(chat.querySelectorAll('.bubble'));
