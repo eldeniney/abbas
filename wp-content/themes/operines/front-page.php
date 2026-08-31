@@ -43,7 +43,7 @@ $nodes = array(
 	<div class="container">
 		<div class="hero-copy">
 			<?php operines_eyebrow( 'AI &amp; Automation — Built for UAE Business' ); ?>
-			<h1>Build a business that <br class="br-wide">runs intelligently.</h1>
+			<h1>Build a business that <br class="br-wide"><span class="grad-text">runs intelligently.</span></h1>
 			<p class="lede">Operines connects your people, processes, data and software with AI agents and intelligent automation — turning disconnected operations into one coordinated system.</p>
 			<div class="btn-row">
 				<?php operines_button( 'Book an AI Automation Audit', home_url( '/book-audit/' ) ); ?>
@@ -62,27 +62,59 @@ $nodes = array(
 				<span class="dot"></span><span class="dot"></span><span class="dot"></span>
 				<span class="hero-frame-title">Operines — one operation, coordinated</span>
 			</div>
-			<div class="hero-frame-body">
-				<div class="hero-map">
-					<svg class="hero-map-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
-						<?php foreach ( $nodes as $key => $n ) : ?>
-							<line class="link-line" data-line="<?php echo esc_attr( $key ); ?>" x1="<?php echo esc_attr( $n[0] ); ?>" y1="<?php echo esc_attr( $n[1] ); ?>" x2="50" y2="50" vector-effect="non-scaling-stroke" />
-						<?php endforeach; ?>
-					</svg>
-					<?php foreach ( $nodes as $key => $n ) : ?>
-						<span class="hero-node" data-node="<?php echo esc_attr( $key ); ?>" style="left:<?php echo esc_attr( $n[0] ); ?>%;top:<?php echo esc_attr( $n[1] ); ?>%">
-							<?php echo operines_icon( $n[3], 14 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $n[2] ); ?>
-						</span>
-					<?php endforeach; ?>
-					<div class="hero-core">
-						<img class="hero-core-logo" src="<?php echo esc_url( OPERINES_URI . '/assets/img/operines-logo-light.svg' ); ?>" alt="" width="105" height="25">
-						<span class="hero-core-sub">Intelligence layer</span>
+			<div class="hero-console">
+				<aside class="console-side">
+					<span class="console-side-logo"><?php echo operines_icon( 'spark', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+					<span class="console-side-item is-active"><?php echo operines_icon( 'nodes', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+					<span class="console-side-item"><?php echo operines_icon( 'whatsapp', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+					<span class="console-side-item"><?php echo operines_icon( 'person', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+					<span class="console-side-item"><?php echo operines_icon( 'chart', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+					<span class="console-side-item"><?php echo operines_icon( 'shield', 17 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				</aside>
+				<div class="console-main">
+					<div class="console-top">
+						<span class="console-title">Operations Center</span>
+						<span class="console-live"><span class="pulse"></span>Live</span>
 					</div>
-				</div>
-				<div class="hero-ticker">
-					<p class="hero-ticker-head"><span class="pulse"></span> Live operation</p>
-					<div class="hero-ticker-rows"></div>
-					<p class="hero-ticker-note">Illustrative sequence — this is how an automated operation behaves.</p>
+					<div class="console-kpis">
+						<div class="console-kpi"><span class="kpi-label">First response</span><span class="kpi-value">0:07<small>s</small></span></div>
+						<div class="console-kpi"><span class="kpi-label">Automations running</span><span class="kpi-value">24</span></div>
+						<div class="console-kpi"><span class="kpi-label">Follow-ups sent today</span><span class="kpi-value">138</span></div>
+						<div class="console-kpi"><span class="kpi-label">Awaiting human approval</span><span class="kpi-value kpi-value--pending">3</span></div>
+					</div>
+					<div class="console-grid">
+						<div class="console-panel">
+							<p class="console-panel-label">Connected systems</p>
+							<div class="hero-map">
+								<svg class="hero-map-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+									<?php foreach ( $nodes as $key => $n ) : ?>
+										<line class="link-line" data-line="<?php echo esc_attr( $key ); ?>" x1="<?php echo esc_attr( $n[0] ); ?>" y1="<?php echo esc_attr( $n[1] ); ?>" x2="50" y2="50" vector-effect="non-scaling-stroke" />
+									<?php endforeach; ?>
+								</svg>
+								<?php foreach ( $nodes as $key => $n ) : ?>
+									<span class="hero-node" data-node="<?php echo esc_attr( $key ); ?>" style="left:<?php echo esc_attr( $n[0] ); ?>%;top:<?php echo esc_attr( $n[1] ); ?>%">
+										<?php echo operines_icon( $n[3], 14 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $n[2] ); ?>
+									</span>
+								<?php endforeach; ?>
+								<div class="hero-core">
+									<img class="hero-core-logo" src="<?php echo esc_url( OPERINES_URI . '/assets/img/operines-logo-light.svg' ); ?>" alt="" width="105" height="25">
+									<span class="hero-core-sub">Intelligence layer</span>
+								</div>
+							</div>
+						</div>
+						<div class="console-panel console-panel--feed">
+							<p class="console-panel-label">Live operation</p>
+							<div class="hero-ticker">
+								<div class="hero-ticker-rows"></div>
+							</div>
+							<div class="console-bars" aria-hidden="true">
+								<?php foreach ( array( 34, 58, 42, 71, 55, 88, 63, 96, 74, 60, 82, 47 ) as $h ) : ?>
+									<i style="--h:<?php echo (int) $h; ?>%"></i>
+								<?php endforeach; ?>
+							</div>
+						</div>
+					</div>
+					<p class="console-note">Product illustration — an Operines-built operation, conceptually.</p>
 				</div>
 			</div>
 		</div>

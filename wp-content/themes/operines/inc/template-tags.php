@@ -46,8 +46,9 @@ function operines_icon( string $name, int $size = 20 ): string {
  * brand logo; gradient version on light surfaces, light version on dark).
  */
 function operines_logo( string $context = 'header' ): string {
-	$light = in_array( $context, array( 'footer', 'dark' ), true );
-	$file  = $light ? 'operines-logo-light.svg' : 'operines-logo.svg';
+	// The site chrome is dark, so the light wordmark is used everywhere;
+	// the gradient version remains for light contexts (schema, documents).
+	$file = 'operines-logo-light.svg';
 	// Intrinsic ratio 4652:1107 — width/height attributes prevent layout shift.
 	return sprintf(
 		'<a class="brand brand--%s" href="%s"><img class="brand-logo" src="%s" alt="Operines — home" width="126" height="30"></a>',
