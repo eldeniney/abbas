@@ -752,6 +752,21 @@ p:last-child { margin-bottom: 0; }
 	.console-side { display: none; }
 }
 
+/* Simple live-operation card (homepage "see it run"). */
+.live-card {
+	max-width: 620px;
+	margin-inline: auto;
+	background: var(--card);
+	border: 1px solid var(--line);
+	border-radius: var(--radius-m);
+	box-shadow: var(--shadow-soft);
+	padding: 1.5rem 1.8rem 1.2rem;
+	min-height: 15rem;
+}
+.live-card .hero-ticker-rows { display: grid; gap: 0.5rem; margin-top: 0.9rem; }
+.live-card .hero-ticker-row { font-size: 1rem; }
+.live-card .ledger-note { margin-top: 1.1rem; }
+
 .systems-strip {
 	margin-top: clamp(2rem, 4vw, 3rem);
 	text-align: center;
