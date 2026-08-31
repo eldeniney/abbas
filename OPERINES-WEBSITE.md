@@ -10,19 +10,32 @@ vanilla-JS file.
 
 ## Deploying to a WordPress install
 
-1. Copy `wp-content/themes/operines/` into the site's `wp-content/themes/`.
-2. Activate the **Operines** theme.
-3. Run the seeder once (creates pages, sets front/posts pages, permalinks,
-   tagline, legal placeholders, and the three initial Insights articles;
-   idempotent — safe to re-run):
+1. Copy `wp-content/themes/operines/` into the site's `wp-content/themes/`
+   (or upload the theme zip via Appearance → Themes → Add New).
+2. Activate the **Operines** theme. **Activation provisions everything
+   automatically**: all 20 pages (including the client portal at
+   `/register/`, `/login/`, `/my-account/`), front/posts page assignment,
+   `/%postname%/` permalinks, timezone, tagline, legal placeholders and the
+   five starter Insights articles. Idempotent — re-activating never
+   duplicates content.
+3. If the theme was already active when you updated its files, switch to
+   another theme and back once to re-provision, or run the seeder directly:
 
    ```bash
    wp eval-file wp-content/themes/operines/bin/seed.php
    ```
 
-   Without WP-CLI: create the pages listed in `bin/seed.php` manually and set
-   Settings → Reading to a static front page (`Home`) with posts page
-   (`Insights`), permalinks to "Post name".
+4. If any page 404s afterwards, visit Settings → Permalinks and click Save
+   once to flush rewrite rules.
+5. For reliable email delivery of the automated messages (welcome, inquiry
+   auto-replies, team alerts, status updates), install an SMTP plugin such
+   as WP Mail SMTP; all mail flows through `inc/emails.php` with no code
+   changes. Team alerts go to Settings → General → Administration Email.
+
+The inquiry inbox lives in wp-admin under **Leads** (statuses New → In
+review → Contacted → Closed, internal notes, optional automated status
+email to the client); client accounts appear under **Users** with the role
+*Operines Client* and never see wp-admin.
 
 No other plugins are required. The theme was developed and tested against
 WordPress 7.1 / PHP 8.4.
