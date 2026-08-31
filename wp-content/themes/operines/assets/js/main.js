@@ -276,6 +276,67 @@
 		show(0);
 	}
 
+	/* ------------------------------------------------ Animated product conversation */
+	document.querySelectorAll('[data-chat]').forEach(function (chat) {
+		var bubbles = Array.prototype.slice.call(chat.querySelectorAll('.bubble'));
+		if (!bubbles.length) return;
+		if (reduceMotion || !('IntersectionObserver' in window)) return; // Show static.
+		chat.classList.add('chat-armed');
+		var played = false;
+		var typing = document.createElement('span');
+		typing.className = 'bubble bubble--typing bubble--out';
+		typing.innerHTML = '<i></i><i></i><i></i>';
+		var play = function () {
+			if (played) return;
+			played = true;
+			var i = 0;
+			var step = function () {
+				if (i >= bubbles.length) return;
+				var b = bubbles[i];
+				var isReply = b.classList.contains('bubble--out');
+				var show = function () {
+					if (typing.parentNode) typing.remove();
+					b.classList.add('is-in');
+					i++;
+					window.setTimeout(step, b.classList.contains('bubble--sys') ? 500 : 850);
+				};
+				if (isReply) {
+					// The agent "types" briefly before replying.
+					chat.insertBefore(typing, b);
+					window.setTimeout(show, 900);
+				} else {
+					show();
+				}
+			};
+			window.setTimeout(step, 300);
+		};
+		var io = new IntersectionObserver(function (entries) {
+			entries.forEach(function (entry) {
+				if (entry.isIntersecting) { play(); io.disconnect(); }
+			});
+		}, { threshold: 0.4 });
+		io.observe(chat);
+	});
+
+	/* ------------------------------------------------ Reading progress (articles) */
+	if (document.querySelector('.article-body')) {
+		var bar = document.createElement('div');
+		bar.className = 'scroll-progress';
+		bar.setAttribute('aria-hidden', 'true');
+		document.body.appendChild(bar);
+		var progressTick = false;
+		var updateProgress = function () {
+			progressTick = false;
+			var doc = document.documentElement;
+			var max = doc.scrollHeight - doc.clientHeight;
+			bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, window.scrollY / max) : 0) + ')';
+		};
+		window.addEventListener('scroll', function () {
+			if (!progressTick) { progressTick = true; requestAnimationFrame(updateProgress); }
+		}, { passive: true });
+		updateProgress();
+	}
+
 	/* ------------------------------------------------ Timestamp for spam time-trap */
 	document.querySelectorAll('input[name="_opts"]').forEach(function (i) {
 		i.value = Math.floor(Date.now() / 1000);

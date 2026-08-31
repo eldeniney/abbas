@@ -24,7 +24,7 @@ operines_page_hero(
 				<button class="explorer-tab" data-filter="<?php echo esc_attr( $dept ); ?>" aria-pressed="false"><?php echo esc_html( $departments[ $dept ]['label'] ); ?></button>
 			<?php endforeach; ?>
 		</div>
-		<div class="uc-grid">
+		<div class="uc-grid stagger">
 			<?php
 			foreach ( operines_use_cases() as $uc ) :
 				list( $title, $desc, $dept, $solution ) = $uc;

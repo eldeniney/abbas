@@ -38,7 +38,7 @@ $cta_url     = $product_url ? $product_url : home_url( '/contact/' );
 		<div data-reveal="up">
 			<div class="product-mock" aria-hidden="true">
 				<div class="product-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="product-mock-title">Operines AI — Conversation view</span></div>
-				<div class="product-chat">
+				<div class="product-chat" data-chat>
 					<span class="bubble bubble--in">السلام عليكم، عندكم توصيل نفس اليوم؟</span>
 					<span class="bubble bubble--out">وعليكم السلام! نعم، التوصيل في دبي خلال نفس اليوم للطلبات قبل الساعة ٢ ظهرًا. هل أجهّز لك الطلب؟</span>
 					<span class="bubble bubble--sys"><?php echo operines_icon( 'check', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>Language detected: Arabic &middot; Customer matched in CRM</span>
@@ -57,7 +57,7 @@ $cta_url     = $product_url ? $product_url : home_url( '/contact/' );
 			<?php operines_eyebrow( 'Inside the platform' ); ?>
 			<h2>Conversation in front. Operation behind.</h2>
 		</div>
-		<div class="grid-3">
+		<div class="grid-3 stagger">
 			<?php
 			$features = array(
 				array( 'whatsapp', 'AI conversations', 'Customers answered instantly on WhatsApp — qualifying, informing and following up in Arabic and English.' ),

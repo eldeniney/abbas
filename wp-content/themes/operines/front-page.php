@@ -56,6 +56,7 @@ $nodes = array(
 			</ul>
 		</div>
 
+		<div class="hero-frame-wrap">
 		<div class="hero-frame" aria-hidden="true">
 			<div class="hero-frame-bar">
 				<span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -86,13 +87,23 @@ $nodes = array(
 			</div>
 		</div>
 
+		</div>
+
 		<div class="systems-strip" role="presentation">
 			<p class="systems-strip-label">Built on the systems you already run</p>
-			<ul class="systems-strip-list">
-				<?php foreach ( array( 'WhatsApp Business', 'Salesforce', 'Zoho', 'Odoo', 'Power BI', 'Microsoft 365', 'n8n', 'Make', 'UiPath' ) as $sys ) : ?>
-					<li><?php echo esc_html( $sys ); ?></li>
-				<?php endforeach; ?>
-			</ul>
+			<div class="systems-marquee">
+				<ul class="systems-strip-list">
+					<?php
+					$systems = array( 'WhatsApp Business', 'Salesforce', 'Zoho', 'Odoo', 'Power BI', 'Microsoft 365', 'n8n', 'Make', 'UiPath', 'Shopify', 'Google Workspace', 'REST APIs' );
+					foreach ( $systems as $sys ) :
+						?>
+						<li><?php echo esc_html( $sys ); ?></li>
+					<?php endforeach; ?>
+					<?php foreach ( $systems as $sys ) : // Duplicate run for the seamless loop. ?>
+						<li aria-hidden="true"><?php echo esc_html( $sys ); ?></li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
 		</div>
 	</div>
 </section>
@@ -100,7 +111,7 @@ $nodes = array(
 <!-- 01b · VALUE PROPS -->
 <section class="section section--tight" aria-label="What Operines delivers">
 	<div class="container">
-		<div class="value-grid">
+		<div class="value-grid stagger">
 			<div class="value-item" data-reveal="up">
 				<span class="value-icon"><?php echo operines_icon( 'spark', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 				<h3>AI agents that work</h3>
@@ -270,7 +281,7 @@ $nodes = array(
 			<h2 id="agents-title">A digital workforce — with job descriptions.</h2>
 			<p class="lede">Not chatbots. Each Operines agent has a role, connected systems, and clear limits: what it decides alone, and what waits for a human.</p>
 		</div>
-		<div class="agents-grid">
+		<div class="agents-grid stagger">
 			<?php
 			$agents = array(
 				array(
@@ -334,7 +345,7 @@ $nodes = array(
 			<?php operines_eyebrow( 'What we build' ); ?>
 			<h2 id="solutions-title">Six ways in. One connected operation.</h2>
 		</div>
-		<div class="sol-grid">
+		<div class="sol-grid stagger">
 			<?php foreach ( operines_solutions() as $slug => $s ) : ?>
 				<a class="sol-tile" href="<?php echo esc_url( home_url( '/solutions/' . $slug . '/' ) ); ?>" data-reveal="up">
 					<span class="sol-no"><?php echo esc_html( $s['no'] ); ?></span>
@@ -362,7 +373,7 @@ $nodes = array(
 		<div data-reveal="up">
 			<div class="product-mock" aria-hidden="true">
 				<div class="product-mock-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="product-mock-title">Operines AI — Live conversations</span></div>
-				<div class="product-chat">
+				<div class="product-chat" data-chat>
 					<span class="bubble bubble--in">Do you deliver to Abu Dhabi? I need 40 units before Thursday.</span>
 					<span class="bubble bubble--out">Yes — delivery to Abu Dhabi takes 48 hours, so a Thursday deadline works. Shall I prepare a quotation for 40 units?</span>
 					<span class="bubble bubble--sys"><?php echo operines_icon( 'check', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>Lead qualified &middot; CRM updated &middot; Sales notified</span>

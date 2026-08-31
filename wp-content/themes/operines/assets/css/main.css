@@ -1605,6 +1605,149 @@ fieldset.audit-step { min-inline-size: 0; max-width: 100%; }
 .muted { color: var(--muted); }
 .small { font-size: 0.88rem; }
 
+/* ---------- 30b. Interaction & motion layer ---------- */
+
+/* Hero entrance: staggered rise on load (transform/opacity only). */
+@media (prefers-reduced-motion: no-preference) {
+	.hero--center .hero-copy > * {
+		opacity: 0;
+		transform: translateY(14px);
+		animation: rise-in 0.65s var(--ease-out) forwards;
+	}
+	.hero--center .hero-copy > :nth-child(1) { animation-delay: 0.05s; }
+	.hero--center .hero-copy > :nth-child(2) { animation-delay: 0.13s; }
+	.hero--center .hero-copy > :nth-child(3) { animation-delay: 0.21s; }
+	.hero--center .hero-copy > :nth-child(4) { animation-delay: 0.29s; }
+	.hero--center .hero-copy > :nth-child(5) { animation-delay: 0.37s; }
+	.hero-frame {
+		opacity: 0;
+		transform: translateY(22px);
+		animation: rise-in 0.8s var(--ease-out) 0.4s forwards;
+	}
+	.systems-strip {
+		opacity: 0;
+		animation: rise-in 0.7s var(--ease-out) 0.75s forwards;
+	}
+}
+@keyframes rise-in {
+	to { opacity: 1; transform: none; }
+}
+
+/* Ambient glow behind the platform frame. */
+.hero-frame-wrap { position: relative; }
+.hero-frame-wrap::before {
+	content: "";
+	position: absolute;
+	inset: 8% -4% -6% -4%;
+	background: radial-gradient(45% 55% at 50% 55%, rgba(79, 25, 100, 0.16), transparent 70%);
+	filter: blur(28px);
+	pointer-events: none;
+}
+.hero-frame-wrap .hero-frame { position: relative; }
+
+/* Active node pulse. */
+@media (prefers-reduced-motion: no-preference) {
+	.hero-node.is-active { animation: node-pop 0.45s var(--ease-out); }
+}
+@keyframes node-pop {
+	0% { transform: translate(-50%, -50%) scale(1); }
+	40% { transform: translate(-50%, -50%) scale(1.08); }
+	100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Systems strip as a marquee. Falls back to a static wrapped row when
+   motion is reduced or JS/animation is unavailable. */
+.systems-marquee { overflow: hidden; }
+.systems-marquee .systems-strip-list {
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	width: max-content;
+	gap: 0 2.6rem;
+	animation: marquee 32s linear infinite;
+}
+.systems-marquee:hover .systems-strip-list { animation-play-state: paused; }
+@keyframes marquee {
+	to { transform: translateX(-50%); }
+}
+[dir="rtl"] .systems-marquee .systems-strip-list { animation-name: marquee-rtl; }
+@keyframes marquee-rtl {
+	to { transform: translateX(50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+	.systems-marquee .systems-strip-list {
+		animation: none;
+		width: auto;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+	.systems-marquee .systems-strip-list [aria-hidden="true"] { display: none; }
+}
+
+/* Staggered grid reveals: children of a .stagger container enter 60ms apart. */
+.stagger > [data-reveal]:nth-child(2) { transition-delay: 60ms; }
+.stagger > [data-reveal]:nth-child(3) { transition-delay: 120ms; }
+.stagger > [data-reveal]:nth-child(4) { transition-delay: 180ms; }
+.stagger > [data-reveal]:nth-child(5) { transition-delay: 240ms; }
+.stagger > [data-reveal]:nth-child(6) { transition-delay: 300ms; }
+
+/* Press feedback (scale within bounds; no layout shift). */
+.btn:active { transform: scale(0.97); }
+.sol-tile:active, .uc-item:active, .explorer-tab:active { transform: scale(0.985); }
+
+/* Header depth once stuck. */
+.site-header.is-stuck { box-shadow: 0 4px 18px rgba(23, 18, 29, 0.06); }
+
+/* FAQ open: content eases in instead of snapping. */
+@media (prefers-reduced-motion: no-preference) {
+	.faq-item[open] .faq-answer { animation: faq-in 0.28s var(--ease-out); }
+}
+@keyframes faq-in {
+	from { opacity: 0; transform: translateY(-4px); }
+	to { opacity: 1; transform: none; }
+}
+
+/* Insight rows: whole-row hover response. */
+.insight-row { transition: background-color 0.2s; border-radius: var(--radius-s); }
+.insight-row:hover { background: linear-gradient(90deg, transparent, var(--paper-2) 8%, var(--paper-2) 92%, transparent); }
+
+/* Animated product conversation. */
+[data-chat] .bubble { transition: opacity 0.3s var(--ease-out), transform 0.3s var(--ease-out); }
+[data-chat].chat-armed .bubble { opacity: 0; transform: translateY(8px); }
+[data-chat] .bubble.is-in { opacity: 1; transform: none; }
+.bubble--typing {
+	display: inline-flex;
+	gap: 4px;
+	align-items: center;
+	padding: 0.7rem 0.9rem;
+}
+.bubble--typing i {
+	width: 6px; height: 6px;
+	border-radius: 50%;
+	background: var(--faint);
+	animation: typing-dot 1s ease-in-out infinite;
+}
+.bubble--typing i:nth-child(2) { animation-delay: 0.15s; }
+.bubble--typing i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typing-dot {
+	0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+	30% { transform: translateY(-3px); opacity: 1; }
+}
+
+/* Reading progress on articles. */
+.scroll-progress {
+	position: fixed;
+	top: 0;
+	inset-inline-start: 0;
+	z-index: 300;
+	height: 3px;
+	width: 100%;
+	transform: scaleX(0);
+	transform-origin: 0 50%;
+	background: linear-gradient(90deg, var(--purple), var(--purple-soft));
+	pointer-events: none;
+}
+[dir="rtl"] .scroll-progress { transform-origin: 100% 50%; }
+
 /* ---------- 31. Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
 	html { scroll-behavior: auto; }

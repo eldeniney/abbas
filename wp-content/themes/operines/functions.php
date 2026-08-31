@@ -18,3 +18,13 @@ require OPERINES_DIR . '/inc/cpt.php';
 require OPERINES_DIR . '/inc/seo.php';
 require OPERINES_DIR . '/inc/forms.php';
 require OPERINES_DIR . '/inc/template-tags.php';
+require OPERINES_DIR . '/inc/seed-functions.php';
+
+/**
+ * Self-provision on activation: create the page tree, set front/posts
+ * pages and permalinks so no menu link ever lands on a 404. Idempotent —
+ * re-activating never duplicates content.
+ */
+// after_switch_theme fires from check_theme_switched() at init:99, i.e.
+// after the CPTs register at init:10 — safe to provision immediately.
+add_action( 'after_switch_theme', 'operines_seed_site' );
