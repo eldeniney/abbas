@@ -18,6 +18,9 @@ require OPERINES_DIR . '/inc/cpt.php';
 require OPERINES_DIR . '/inc/seo.php';
 require OPERINES_DIR . '/inc/forms.php';
 require OPERINES_DIR . '/inc/template-tags.php';
+require OPERINES_DIR . '/inc/emails.php';
+require OPERINES_DIR . '/inc/accounts.php';
+require OPERINES_DIR . '/inc/admin-leads.php';
 require OPERINES_DIR . '/inc/seed-functions.php';
 
 /**

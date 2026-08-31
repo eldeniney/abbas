@@ -36,6 +36,7 @@ $solutions = operines_solutions();
 						<li><a href="<?php echo esc_url( home_url( '/insights/' ) ); ?>">Insights</a></li>
 						<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Contact</a></li>
 						<li><a href="<?php echo esc_url( home_url( '/book-audit/' ) ); ?>">Book an Audit</a></li>
+						<li><a href="<?php echo esc_url( home_url( is_user_logged_in() ? '/my-account/' : '/login/' ) ); ?>"><?php echo is_user_logged_in() ? 'My Account' : 'Client Sign In'; ?></a></li>
 					</ul>
 				</div>
 				<div class="footer-col">

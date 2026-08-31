@@ -48,15 +48,25 @@ function operines_form_redirect( string $fallback, string $status ): void {
 }
 
 /**
- * Store a lead and notify.
+ * Store a lead, link it to a client account, and run the automated
+ * notifications: branded auto-reply to the inquirer + team alert.
  *
  * @param string $type   Lead type label.
- * @param array  $fields Sanitized field => value pairs.
+ * @param array  $fields Sanitized field => value pairs (Name/Email/Phone/Company + specifics).
  */
 function operines_store_lead( string $type, array $fields ): void {
 	$lines = '';
 	foreach ( $fields as $k => $v ) {
 		$lines .= sprintf( "%s: %s\n", $k, $v );
+	}
+
+	$email = strtolower( trim( $fields['Email'] ?? '' ) );
+
+	// Attach to a client account: the signed-in user, or a match by email.
+	$user_id = get_current_user_id();
+	if ( ! $user_id && $email ) {
+		$user    = get_user_by( 'email', $email );
+		$user_id = $user ? (int) $user->ID : 0;
 	}
 
 	$lead_id = wp_insert_post(
@@ -65,14 +75,45 @@ function operines_store_lead( string $type, array $fields ): void {
 			'post_status'  => 'private',
 			'post_title'   => sprintf( '[%s] %s — %s', $type, $fields['Name'] ?? 'Unknown', gmdate( 'Y-m-d H:i' ) ),
 			'post_content' => $lines,
-			'meta_input'   => array( '_operines_lead_type' => $type ),
+			'meta_input'   => array(
+				'_operines_lead_type'    => $type,
+				'_operines_lead_status'  => 'new',
+				'_operines_lead_email'   => $email,
+				'_operines_lead_phone'   => $fields['Phone'] ?? '',
+				'_operines_lead_company' => $fields['Company'] ?? '',
+				'_operines_lead_user'    => $user_id ? $user_id : '',
+			),
 		)
 	);
 
-	wp_mail(
+	// Automated confirmation to the inquirer.
+	if ( $email && 'Onboarding goal' !== $type ) {
+		$is_audit = ( 'Audit request' === $type );
+		operines_send_email(
+			$email,
+			$is_audit ? 'Your AI Automation Audit request — Operines' : 'We received your message — Operines',
+			sprintf( 'Thank you, %s — your %s is with us.', $fields['Name'] ?? '', $is_audit ? 'audit request' : 'message' ),
+			array(
+				$is_audit
+					? 'A consultant is reviewing your answers and will come back within one business day with your automation opportunity map and the recommended first step.'
+					: 'A consultant will reply within one business day. If it is urgent, just reply to this email.',
+				$user_id
+					? 'You can follow the status of this request from your account at any time.'
+					: 'Tip: create a free account to follow the status of your requests and keep your details in one place.',
+			),
+			$user_id
+				? array( 'Track my request', home_url( '/my-account/' ) )
+				: array( 'Create my account', home_url( '/register/' ) )
+		);
+	}
+
+	// Team alert with a direct link into the leads dashboard.
+	operines_send_email(
 		get_option( 'admin_email' ),
-		sprintf( 'Operines website — new %s', $type ),
-		$lines . "\n" . admin_url( 'edit.php?post_type=operines_lead' )
+		sprintf( 'New %s — %s', strtolower( $type ), $fields['Name'] ?? 'Unknown' ),
+		sprintf( 'A new %s arrived from the website.', strtolower( $type ) ),
+		$fields,
+		array( 'Open leads dashboard', admin_url( 'edit.php?post_type=operines_lead' ) )
 	);
 
 	/**

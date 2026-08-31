@@ -74,6 +74,9 @@ function operines_seed_site(): void {
 	operines_seed_page( 'about', 'About' );
 	operines_seed_page( 'contact', 'Contact' );
 	operines_seed_page( 'book-audit', 'Book an AI Automation Audit' );
+	operines_seed_page( 'register', 'Create your account' );
+	operines_seed_page( 'login', 'Sign in' );
+	operines_seed_page( 'my-account', 'My account' );
 
 	// Solution child pages, driven by the data layer.
 	foreach ( operines_solutions() as $slug => $s ) {
