@@ -35,7 +35,7 @@ add_action(
 	'wp_head',
 	function () {
 		$fonts = array(
-			'/assets/fonts/fraunces-300-700-normal-latin.woff2',
+			'/assets/fonts/poppins-700-normal-latin.woff2',
 			'/assets/fonts/inter-100-900-normal-latin.woff2',
 		);
 		foreach ( $fonts as $font ) {

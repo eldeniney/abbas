@@ -19,6 +19,13 @@ $nav = operines_nav();
 <?php wp_body_open(); ?>
 <a class="skip-link" href="#main"><?php esc_html_e( 'Skip to content', 'operines' ); ?></a>
 
+<div class="announce">
+	<div class="container announce-inner">
+		<p>AI &amp; automation for UAE business — Arabic &amp; English, WhatsApp-first.</p>
+		<a href="<?php echo esc_url( home_url( '/book-audit/' ) ); ?>">Book an AI Automation Audit<?php echo operines_icon( 'arrow-right', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
+	</div>
+</div>
+
 <header class="site-header" id="site-header">
 	<div class="container header-inner">
 		<?php echo operines_logo(); // phpcs:ignore WordPress.Security.EscapeOutput ?>

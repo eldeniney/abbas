@@ -39,11 +39,11 @@ $nodes = array(
 ?>
 
 <!-- 01 · HERO -->
-<section class="hero">
-	<div class="container hero-grid">
+<section class="hero hero--center">
+	<div class="container">
 		<div class="hero-copy">
 			<?php operines_eyebrow( 'AI &amp; Automation — Built for UAE Business' ); ?>
-			<h1>Build a business that runs intelligently.</h1>
+			<h1>Build a business that <br class="br-wide">runs intelligently.</h1>
 			<p class="lede">Operines connects your people, processes, data and software with AI agents and intelligent automation — turning disconnected operations into one coordinated system.</p>
 			<div class="btn-row">
 				<?php operines_button( 'Book an AI Automation Audit', home_url( '/book-audit/' ) ); ?>
@@ -56,27 +56,68 @@ $nodes = array(
 			</ul>
 		</div>
 
-		<div class="hero-canvas" aria-hidden="true">
-			<div class="hero-map">
-				<svg class="hero-map-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+		<div class="hero-frame" aria-hidden="true">
+			<div class="hero-frame-bar">
+				<span class="dot"></span><span class="dot"></span><span class="dot"></span>
+				<span class="hero-frame-title">Operines — one operation, coordinated</span>
+			</div>
+			<div class="hero-frame-body">
+				<div class="hero-map">
+					<svg class="hero-map-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+						<?php foreach ( $nodes as $key => $n ) : ?>
+							<line class="link-line" data-line="<?php echo esc_attr( $key ); ?>" x1="<?php echo esc_attr( $n[0] ); ?>" y1="<?php echo esc_attr( $n[1] ); ?>" x2="50" y2="50" vector-effect="non-scaling-stroke" />
+						<?php endforeach; ?>
+					</svg>
 					<?php foreach ( $nodes as $key => $n ) : ?>
-						<line class="link-line" data-line="<?php echo esc_attr( $key ); ?>" x1="<?php echo esc_attr( $n[0] ); ?>" y1="<?php echo esc_attr( $n[1] ); ?>" x2="50" y2="50" vector-effect="non-scaling-stroke" />
+						<span class="hero-node" data-node="<?php echo esc_attr( $key ); ?>" style="left:<?php echo esc_attr( $n[0] ); ?>%;top:<?php echo esc_attr( $n[1] ); ?>%">
+							<?php echo operines_icon( $n[3], 14 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $n[2] ); ?>
+						</span>
 					<?php endforeach; ?>
-				</svg>
-				<?php foreach ( $nodes as $key => $n ) : ?>
-					<span class="hero-node" data-node="<?php echo esc_attr( $key ); ?>" style="left:<?php echo esc_attr( $n[0] ); ?>%;top:<?php echo esc_attr( $n[1] ); ?>%">
-						<?php echo operines_icon( $n[3], 14 ); // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo esc_html( $n[2] ); ?>
-					</span>
-				<?php endforeach; ?>
-				<div class="hero-core">
-					<img class="hero-core-logo" src="<?php echo esc_url( OPERINES_URI . '/assets/img/operines-logo-light.svg' ); ?>" alt="" width="105" height="25">
-					<span class="hero-core-sub">Intelligence layer</span>
+					<div class="hero-core">
+						<img class="hero-core-logo" src="<?php echo esc_url( OPERINES_URI . '/assets/img/operines-logo-light.svg' ); ?>" alt="" width="105" height="25">
+						<span class="hero-core-sub">Intelligence layer</span>
+					</div>
+				</div>
+				<div class="hero-ticker">
+					<p class="hero-ticker-head"><span class="pulse"></span> Live operation</p>
+					<div class="hero-ticker-rows"></div>
+					<p class="hero-ticker-note">Illustrative sequence — this is how an automated operation behaves.</p>
 				</div>
 			</div>
-			<div class="hero-ticker">
-				<p class="hero-ticker-head"><span class="pulse"></span> Live operation</p>
-				<div class="hero-ticker-rows"></div>
-				<p class="hero-ticker-note">Illustrative sequence — this is how an automated operation behaves.</p>
+		</div>
+
+		<div class="systems-strip" role="presentation">
+			<p class="systems-strip-label">Built on the systems you already run</p>
+			<ul class="systems-strip-list">
+				<?php foreach ( array( 'WhatsApp Business', 'Salesforce', 'Zoho', 'Odoo', 'Power BI', 'Microsoft 365', 'n8n', 'Make', 'UiPath' ) as $sys ) : ?>
+					<li><?php echo esc_html( $sys ); ?></li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+	</div>
+</section>
+
+<!-- 01b · VALUE PROPS -->
+<section class="section section--tight" aria-label="What Operines delivers">
+	<div class="container">
+		<div class="value-grid">
+			<div class="value-item" data-reveal="up">
+				<span class="value-icon"><?php echo operines_icon( 'spark', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<h3>AI agents that work</h3>
+				<p>Digital coworkers that answer customers, qualify leads and chase follow-ups — connected to your real systems, in Arabic and English.</p>
+				<?php operines_textlink( 'Meet the agents', home_url( '/solutions/ai-agents/' ) ); ?>
+			</div>
+			<div class="value-item" data-reveal="up">
+				<span class="value-icon"><?php echo operines_icon( 'nodes', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<h3>Processes that run themselves</h3>
+				<p>Approvals, documents, reporting and handovers automated end to end across CRM, ERP and finance — no retyping, no chasing.</p>
+				<?php operines_textlink( 'See the automation', home_url( '/solutions/business-process-automation/' ) ); ?>
+			</div>
+			<div class="value-item" data-reveal="up">
+				<span class="value-icon"><?php echo operines_icon( 'shield', 22 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<h3>People stay in control</h3>
+				<p>Approval gates, audit trails and clear limits on what AI may decide alone. Automation executes; your team governs.</p>
+				<?php operines_textlink( 'How governance works', home_url( '/solutions/ai-strategy-managed/' ) ); ?>
 			</div>
 		</div>
 	</div>
@@ -293,13 +334,13 @@ $nodes = array(
 			<?php operines_eyebrow( 'What we build' ); ?>
 			<h2 id="solutions-title">Six ways in. One connected operation.</h2>
 		</div>
-		<div class="sol-rows">
+		<div class="sol-grid">
 			<?php foreach ( operines_solutions() as $slug => $s ) : ?>
-				<a class="sol-row" href="<?php echo esc_url( home_url( '/solutions/' . $slug . '/' ) ); ?>" data-reveal="up">
+				<a class="sol-tile" href="<?php echo esc_url( home_url( '/solutions/' . $slug . '/' ) ); ?>" data-reveal="up">
 					<span class="sol-no"><?php echo esc_html( $s['no'] ); ?></span>
 					<span class="sol-title"><?php echo esc_html( $s['title'] ); ?></span>
 					<span class="sol-outcome"><?php echo esc_html( $s['outcome'] ); ?></span>
-					<span class="sol-arrow"><?php echo operines_icon( 'arrow-right', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+					<span class="sol-tile-link">Explore<?php echo operines_icon( 'arrow-right', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 				</a>
 			<?php endforeach; ?>
 		</div>
