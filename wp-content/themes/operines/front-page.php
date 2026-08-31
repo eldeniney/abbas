@@ -36,12 +36,12 @@ $nodes = array(
 ?>
 
 <!-- 01 · HERO -->
-<section class="hero hero--center">
-	<div class="container">
+<section class="hero hero--split">
+	<div class="container hero-split-grid">
 		<div class="hero-copy">
 			<?php operines_eyebrow( 'AI &amp; Automation — Built for UAE Business' ); ?>
-			<h1>Build a business that <br class="br-wide"><span class="grad-text">runs intelligently.</span></h1>
-			<p class="lede">Operines connects your people, processes, data and software with AI agents and intelligent automation — turning disconnected operations into one coordinated system.</p>
+			<h1>Build a business that runs intelligently</h1>
+			<p class="lede">Operines connects your people, processes, data and software with AI agents and intelligent automation — one coordinated operation instead of disconnected tools. Built for your business. Kept under your control.</p>
 			<div class="btn-row">
 				<?php operines_button( 'Book an AI Automation Audit', home_url( '/book-audit/' ) ); ?>
 				<?php operines_button( 'See what we automate', home_url( '/use-cases/' ), 'ghost' ); ?>
@@ -52,8 +52,38 @@ $nodes = array(
 				<li><?php echo operines_icon( 'check', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>Built on your existing systems</li>
 			</ul>
 		</div>
+		<div class="hero-visual" aria-hidden="true">
+			<?php get_template_part( 'template-parts/hero-illustration' ); ?>
+		</div>
+	</div>
+	<div class="container">
+		<div class="systems-strip" role="presentation">
+			<p class="systems-strip-label">Built on the systems you already run</p>
+			<div class="systems-marquee">
+				<ul class="systems-strip-list">
+					<?php
+					$systems = array( 'WhatsApp Business', 'Salesforce', 'Zoho', 'Odoo', 'Power BI', 'Microsoft 365', 'n8n', 'Make', 'UiPath', 'Shopify', 'Google Workspace', 'REST APIs' );
+					foreach ( $systems as $sys ) :
+						?>
+						<li><?php echo esc_html( $sys ); ?></li>
+					<?php endforeach; ?>
+					<?php foreach ( $systems as $sys ) : // Duplicate run for the seamless loop. ?>
+						<li aria-hidden="true"><?php echo esc_html( $sys ); ?></li>
+					<?php endforeach; ?>
+				</ul>
+			</div>
+		</div>
+	</div>
+</section>
 
-		<div class="hero-frame-wrap">
+<!-- 01a · LIVE CONSOLE SHOWCASE -->
+<section class="section section--tight" aria-labelledby="console-title">
+	<div class="container">
+		<div class="section-head section-head--center" data-reveal="up">
+			<?php operines_eyebrow( 'See it run' ); ?>
+			<h2 id="console-title">This is your operation on Operines.</h2>
+		</div>
+		<div class="hero-frame-wrap scheme-dark">
 		<div class="hero-frame" aria-hidden="true">
 			<div class="hero-frame-bar">
 				<span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -115,24 +145,6 @@ $nodes = array(
 				</div>
 			</div>
 		</div>
-
-		</div>
-
-		<div class="systems-strip" role="presentation">
-			<p class="systems-strip-label">Built on the systems you already run</p>
-			<div class="systems-marquee">
-				<ul class="systems-strip-list">
-					<?php
-					$systems = array( 'WhatsApp Business', 'Salesforce', 'Zoho', 'Odoo', 'Power BI', 'Microsoft 365', 'n8n', 'Make', 'UiPath', 'Shopify', 'Google Workspace', 'REST APIs' );
-					foreach ( $systems as $sys ) :
-						?>
-						<li><?php echo esc_html( $sys ); ?></li>
-					<?php endforeach; ?>
-					<?php foreach ( $systems as $sys ) : // Duplicate run for the seamless loop. ?>
-						<li aria-hidden="true"><?php echo esc_html( $sys ); ?></li>
-					<?php endforeach; ?>
-				</ul>
-			</div>
 		</div>
 	</div>
 </section>
