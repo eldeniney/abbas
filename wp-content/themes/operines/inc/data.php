@@ -484,6 +484,53 @@ function operines_global_faqs(): array {
 }
 
 /**
+ * Example AI agent roles (rendered on the AI Agents solution page).
+ */
+function operines_agents(): array {
+	return apply_filters(
+		'operines_agents',
+		array(
+			array(
+				'icon' => 'person',
+				'name' => 'Sales Agent',
+				'spec' => array(
+					'Observes'    => 'WhatsApp + website leads',
+					'Understands' => 'Budget, intent, urgency',
+					'Acts'        => 'Qualifies, creates the CRM opportunity, replies',
+					'Coordinates' => 'Your sales team, with SLAs',
+					'Reports'     => 'Conversion status, live',
+				),
+				'gate' => 'Discounts &amp; offers need human approval',
+			),
+			array(
+				'icon' => 'whatsapp',
+				'name' => 'Customer Service Agent',
+				'spec' => array(
+					'Observes'    => 'WhatsApp, email, web chat',
+					'Understands' => 'The request, in Arabic or English',
+					'Acts'        => 'Answers from approved knowledge, checks orders',
+					'Coordinates' => 'Escalates hard cases with full context',
+					'Reports'     => 'Volumes, topics, satisfaction',
+				),
+				'gate' => 'Refunds &amp; exceptions go to your team',
+			),
+			array(
+				'icon' => 'chart',
+				'name' => 'Reporting Agent',
+				'spec' => array(
+					'Observes'    => 'CRM, ERP, finance data',
+					'Understands' => 'Your KPIs and thresholds',
+					'Acts'        => 'Builds the weekly brief, refreshes dashboards',
+					'Coordinates' => 'Alerts owners when numbers move',
+					'Reports'     => 'The business, to management',
+				),
+				'gate' => 'Decisions stay with people — informed ones',
+			),
+		)
+	);
+}
+
+/**
  * Primary navigation structure (rendered by header.php).
  */
 function operines_nav(): array {

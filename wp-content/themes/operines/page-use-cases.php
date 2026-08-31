@@ -16,8 +16,14 @@ operines_page_hero(
 );
 ?>
 
-<section class="section section--tight">
+<?php get_template_part( 'template-parts/explorer' ); ?>
+
+<section class="section section--tight section--line">
 	<div class="container">
+		<div class="section-head" data-reveal="up">
+			<?php operines_eyebrow( 'The library' ); ?>
+			<h2>Every automation, in one place.</h2>
+		</div>
 		<div class="uc-filters" role="tablist" aria-label="<?php esc_attr_e( 'Filter by department', 'operines' ); ?>">
 			<button class="explorer-tab" data-filter="all" aria-pressed="true">All</button>
 			<?php foreach ( array( 'sales', 'service', 'operations', 'finance', 'hr', 'management' ) as $dept ) : ?>

@@ -56,7 +56,9 @@ operines_page_hero(
 	</div>
 </section>
 
-<section class="section" aria-label="Regional grounding">
+<?php get_template_part( 'template-parts/process' ); ?>
+
+<section class="section section--line" aria-label="Regional grounding">
 	<div class="container grid-2">
 		<div data-reveal="up">
 			<?php operines_eyebrow( 'Where we work' ); ?>

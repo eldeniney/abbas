@@ -95,6 +95,12 @@ if ( ! $s ) {
 	</div>
 </section>
 
+<?php
+if ( 'ai-agents' === $slug ) {
+	get_template_part( 'template-parts/agents' );
+}
+?>
+
 <section class="section section--line" aria-label="Frequently asked questions">
 	<div class="container">
 		<?php operines_faq_list( $s['faqs'], 'Questions we hear.' ); ?>

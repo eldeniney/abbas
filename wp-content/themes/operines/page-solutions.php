@@ -44,6 +44,10 @@ operines_page_hero(
 	</div>
 </section>
 
+<?php get_template_part( 'template-parts/architecture' ); ?>
+<?php get_template_part( 'template-parts/ledger' ); ?>
+<?php get_template_part( 'template-parts/integrations' ); ?>
+
 <?php operines_cta_band(); ?>
 
 <?php get_footer(); ?>
