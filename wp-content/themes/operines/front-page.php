@@ -2,7 +2,7 @@
 /**
  * Homepage — minimal, decision-focused narrative for business owners.
  *
- * 01 Hero: illustration + live-operation feed
+ * 01 Hero: live-operation feed with floating system chips
  * 02 Three business outcomes
  * 03 The Operines Effect (before/after)
  * 04 Core solutions (navigation hub)
@@ -37,8 +37,15 @@ get_header();
 				<li><?php echo operines_icon( 'check', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>Built on your existing systems</li>
 			</ul>
 		</div>
-		<div class="hero-visual" aria-hidden="true">
-			<?php get_template_part( 'template-parts/hero-illustration' ); ?>
+		<div class="hero-visual">
+			<div class="live-card live-card--hero">
+				<p class="hero-ticker-head"><span class="pulse"></span> Live operation</p>
+				<div class="hero-ticker-rows"></div>
+				<p class="ledger-note">Illustrative sequence — this is how an automated operation behaves.</p>
+			</div>
+			<span class="float-chip float-chip--1" aria-hidden="true"><?php echo operines_icon( 'whatsapp', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>WhatsApp answered</span>
+			<span class="float-chip float-chip--2" aria-hidden="true"><?php echo operines_icon( 'person', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>CRM updated</span>
+			<span class="float-chip float-chip--3" aria-hidden="true"><?php echo operines_icon( 'doc', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>Invoice approved</span>
 		</div>
 	</div>
 	<div class="container">
@@ -60,22 +67,6 @@ get_header();
 		</div>
 	</div>
 </section>
-
-<!-- 01a · LIVE OPERATION (simple) -->
-<section class="section section--tight" aria-labelledby="live-title">
-	<div class="container">
-		<div class="section-head section-head--center" data-reveal="up">
-			<?php operines_eyebrow( 'See it run' ); ?>
-			<h2 id="live-title">This is your operation on Operines.</h2>
-		</div>
-		<div class="live-card" data-reveal="up">
-			<p class="hero-ticker-head"><span class="pulse"></span> Live operation</p>
-			<div class="hero-ticker-rows"></div>
-			<p class="ledger-note">Illustrative sequence — this is how an automated operation behaves.</p>
-		</div>
-	</div>
-</section>
-
 
 <!-- 01b · VALUE PROPS -->
 <section class="section section--tight" aria-label="What Operines delivers">
@@ -187,7 +178,15 @@ get_header();
 	</div>
 </section>
 
-<!-- 07 · FINAL CTA -->
+<!-- 07 · STRAIGHT ANSWERS (AEO) -->
+<section class="section section--line" aria-label="Common questions about AI business automation">
+	<div class="container">
+		<?php operines_faq_list( array_slice( operines_global_faqs(), 0, 4 ), 'Straight answers.' ); ?>
+		<p class="mt-2 small"><?php operines_textlink( 'More questions answered on the audit page', home_url( '/book-audit/' ) ); ?></p>
+	</div>
+</section>
+
+<!-- 08 · FINAL CTA -->
 <?php operines_cta_band(); ?>
 
 <?php get_footer(); ?>

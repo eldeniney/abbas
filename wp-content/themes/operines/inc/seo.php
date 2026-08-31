@@ -101,8 +101,9 @@ add_action(
 function operines_print_schema(): void {
 	$graph = array();
 
-	$org_id = home_url( '/#organization' );
-	$graph[] = array(
+	$org_id  = home_url( '/#organization' );
+	$contact = operines_contact();
+	$org     = array(
 		'@type'       => 'Organization',
 		'@id'         => $org_id,
 		'name'        => 'Operines',
@@ -111,7 +112,21 @@ function operines_print_schema(): void {
 		'description' => 'UAE AI and business automation company: AI agents, business process automation, CRM and ERP automation, data analytics and managed AI.',
 		'areaServed'  => array( 'AE', 'SA', 'GCC' ),
 		'slogan'      => 'Your business. Operating intelligently.',
+		'knowsAbout'  => array(
+			'AI agents', 'Business process automation', 'WhatsApp Business automation',
+			'CRM automation', 'Salesforce', 'Zoho', 'Odoo ERP implementation',
+			'Power BI dashboards', 'AI consulting', 'n8n', 'Make', 'Power Automate',
+		),
 	);
+	if ( ! empty( $contact['email'] ) ) {
+		$org['contactPoint'] = array(
+			'@type'             => 'ContactPoint',
+			'contactType'       => 'sales',
+			'email'             => $contact['email'],
+			'availableLanguage' => array( 'en', 'ar' ),
+		);
+	}
+	$graph[] = $org;
 
 	$graph[] = array(
 		'@type'    => 'WebSite',
@@ -135,19 +150,60 @@ function operines_print_schema(): void {
 			);
 			$graph[] = operines_faq_schema( $solutions[ $slug ]['faqs'] );
 		}
-		if ( in_array( $slug, array( 'book-audit', 'use-cases' ), true ) ) {
-			$graph[] = operines_faq_schema( array_slice( operines_global_faqs(), 0, 5 ) );
+		if ( 'book-audit' === $slug ) {
+			$graph[] = operines_faq_schema( array_slice( operines_global_faqs(), 5 ) );
 		}
+		if ( 'use-cases' === $slug ) {
+			$graph[] = operines_faq_schema( array_slice( operines_global_faqs(), 0, 5 ) );
+			$items   = array();
+			foreach ( operines_use_cases() as $i => $uc ) {
+				$items[] = array(
+					'@type'    => 'ListItem',
+					'position' => $i + 1,
+					'name'     => $uc[0],
+					'url'      => home_url( '/solutions/' . $uc[3] . '/' ),
+				);
+			}
+			$graph[] = array(
+				'@type'           => 'ItemList',
+				'name'            => 'Business automation use cases',
+				'itemListElement' => $items,
+			);
+		}
+		if ( 'solutions' === $slug ) {
+			$items = array();
+			$i     = 0;
+			foreach ( operines_solutions() as $sslug => $s ) {
+				$items[] = array(
+					'@type'    => 'ListItem',
+					'position' => ++$i,
+					'name'     => $s['title'],
+					'url'      => home_url( '/solutions/' . $sslug . '/' ),
+				);
+			}
+			$graph[] = array(
+				'@type'           => 'ItemList',
+				'name'            => 'Operines solutions',
+				'itemListElement' => $items,
+			);
+		}
+	}
+
+	// Homepage: answer-engine friendly FAQ entities (rendered visibly on the page too).
+	if ( is_front_page() ) {
+		$graph[] = operines_faq_schema( array_slice( operines_global_faqs(), 0, 4 ) );
 	}
 
 	if ( is_singular( 'post' ) ) {
 		$graph[] = array(
-			'@type'         => 'Article',
-			'headline'      => get_the_title(),
-			'datePublished' => get_the_date( 'c' ),
-			'dateModified'  => get_the_modified_date( 'c' ),
-			'author'        => array( '@type' => 'Organization', 'name' => 'Operines' ),
-			'publisher'     => array( '@id' => $org_id ),
+			'@type'            => 'Article',
+			'headline'         => get_the_title(),
+			'description'      => wp_strip_all_tags( get_the_excerpt() ),
+			'datePublished'    => get_the_date( 'c' ),
+			'dateModified'     => get_the_modified_date( 'c' ),
+			'author'           => array( '@type' => 'Organization', 'name' => 'Operines', '@id' => $org_id ),
+			'publisher'        => array( '@id' => $org_id ),
+			'inLanguage'       => 'en',
 			'mainEntityOfPage' => get_permalink(),
 		);
 	}

@@ -178,6 +178,50 @@ function operines_seed_site(): void {
 		),
 	);
 
+	$articles[] = array(
+		'title'    => 'How much does business automation cost in the UAE?',
+		'slug'     => 'business-automation-cost-uae',
+		'category' => 'AI Strategy',
+		'excerpt'  => 'There is no honest single number — but there is an honest way to think about it. The four factors that actually set the price, and how to keep the first project small.',
+		'content'  => '
+<p>The honest answer: it depends on scope — and anyone who quotes a price before understanding your processes is guessing. What we can give you is the framework that determines the number.</p>
+<h2>The four factors that set the price</h2>
+<ol>
+<li><strong>How many processes.</strong> Automating one flow (say, lead response and follow-up) is a small, fast project. An operation-wide intelligence layer across sales, finance and service is a phased program delivered over months.</li>
+<li><strong>How many systems must connect.</strong> A CRM with a clean API is quick. A legacy system with no API, or data spread across spreadsheets, adds integration work before automation can start.</li>
+<li><strong>How much judgment is involved.</strong> Rule-based steps (routing, notifications, document filing) are cheapest. AI-driven steps (understanding messages, qualifying leads) need design, testing and approval gates.</li>
+<li><strong>Ongoing operation.</strong> Automation is not fire-and-forget. Budget for monitoring and tuning — either in-house or as a managed service.</li>
+</ol>
+<h2>How to keep the first project small</h2>
+<p>Start with the process where delay is most expensive — usually lead response or invoice handling. A focused first automation proves value in weeks, generates the internal confidence for the next one, and teaches both sides how your operation really works.</p>
+<h2>What it costs to find out</h2>
+<p>Our <a href="/book-audit/">AI Automation Audit</a> exists precisely to replace guesswork with a ranked opportunity map: which processes to automate, in what order, with effort weighed against return — priced for your business, not an average one.</p>',
+	);
+	$articles[] = array(
+		'title'    => 'What is an AI automation audit — and what should it give you?',
+		'slug'     => 'what-is-an-ai-automation-audit',
+		'category' => 'AI Strategy',
+		'excerpt'  => 'A good audit is not a sales call with extra steps. What a real automation audit examines, what you should walk away with, and the questions to ask whoever runs yours.',
+		'content'  => '
+<p>An AI automation audit is a structured review of how work actually moves through your company, ending in a ranked plan of what to automate first. Done properly, it is useful even if you never hire the firm that ran it.</p>
+<h2>What a real audit examines</h2>
+<ul>
+<li><strong>How work moves</strong> — not the org chart, but the real path: who touches a lead, an invoice, a customer message, and where it waits.</li>
+<li><strong>Where time actually goes</strong> — the frequent, repeated tasks, not the dramatic ones. Copy-paste between systems is usually the biggest hidden cost.</li>
+<li><strong>What your systems can already do</strong> — most companies use a fraction of what their CRM and ERP support. Sometimes the first win is configuration, not new software.</li>
+<li><strong>Where judgment must stay human</strong> — pricing, exceptions, commitments. A serious audit marks these as clearly as the automation candidates.</li>
+</ul>
+<h2>What you should walk away with</h2>
+<p>Three things: a <strong>ranked opportunity map</strong> (each candidate scored on return against effort), a <strong>recommended first move</strong> small enough to prove itself in weeks, and an honest list of what <em>not</em> to automate. If an audit ends with only a proposal to buy something, it was a pitch.</p>
+<h2>Questions to ask whoever runs yours</h2>
+<ol>
+<li>Which of my current systems will you keep, and which do you think must change — and why?</li>
+<li>What is the smallest first project you would ship, and how will we measure it?</li>
+<li>Where do humans approve, and what gets logged?</li>
+</ol>
+<p>This is the structure our own <a href="/book-audit/">AI Automation Audit</a> follows for UAE businesses — seven questions in, a consultant-prepared opportunity map out.</p>',
+	);
+
 	foreach ( $articles as $a ) {
 		if ( get_page_by_path( $a['slug'], OBJECT, 'post' ) ) {
 			continue;
