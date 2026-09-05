@@ -1,6 +1,6 @@
 # توّا — Twaa · Customer App Design Guideline
 
-**Version:** 1.0 · **Based on:** BRD v1.1 · **Reference pattern:** quick-commerce apps such as noon Minutes
+**Version:** 1.1 · **Based on:** BRD v1.1 · **Launch scope:** Abu El Matamir city and its villages (Beheira) · **Reference pattern:** noon Minutes
 **Files:** `index.html` (interactive prototype) · `design-system.html` (foundations & components) · `styles.css` · `data.js` · `app.js`
 
 Open `index.html` in a browser (no build step). The left panel jumps between screens and toggles Arabic/English; the phone on the right is fully interactive (quick add, cart, promo codes, checkout, tracking).
@@ -26,13 +26,13 @@ Open `index.html` in a browser (no build step). The left panel jumps between scr
 | Display type | Baloo Bhaijaan 2 (rounded, echoes the logo): headings, prices, buttons |
 | Body type | Cairo 400–800 |
 | Motif | Cream wave ribbon at ~15–22 % opacity on hero banners, splash, deal banner |
-| Logo | Wordmark with Mandarin shadda; app icon = Aubergine rounded square, cream wordmark. Prototype renders the mark in the display font — swap in the official SVG before production. |
+| Logo | The mark alone, never with the name as text. Vector in `TWAA.logo()` / `assets/logo.svg` (drawn approximation of the wordmark — paste the official paths there). App icon: Aubergine rounded square with the cream mark (`assets/logo-mark.svg`). |
 
 ## 3. Information architecture
 
 ```
 Splash → Location & serviceability → Home
-Bottom nav: الرئيسية · الأقسام · البحث · طلباتي · حسابي   (cart bar floats above nav when cart > 0)
+Bottom nav: الرئيسية · الأقسام · السلة · طلباتي · حسابي   (noon pattern: cart in the tab bar with a badge; search lives in the header; cart bar still floats above nav when cart > 0)
 Home ─ hero banners ─ category tabs ─ category grid ─ merchandising sections ─ deal banner
 Categories → Category listing (rail + sub-chips + grid) → Product sheet
 Search → recent / trending / popular → results grid → Product sheet
@@ -46,21 +46,23 @@ Account → addresses, wallet, favourites, coupons, notifications, support, lang
 ### 4.1 Splash
 Aubergine full-bleed, wordmark, tagline **من هنا لك.. توّا**, wave motif. Auto-advances after ~2 s to Location (first run) or Home (returning).
 
-### 4.2 Location & serviceability (BRD §7–8)
-- Map with draggable pin, "استخدم موقعي الحالي", area search, City → Village selects, optional landmark.
-- **Serviceable:** green pill "بنوصّل عندك" + ETA chip + delivery fee + minimum order. CTA: أكّد الموقع.
-- **Not serviceable:** Mandarin-tinted card **"لسه موصلناش عندك، بس جايين توّا."**, phone field, CTA "بلّغني أول ما توصلوا" (demand capture). Confirm is disabled.
-- Zone data (ETA, fee, minimum) comes from the zone configuration, not hard-coded (see `TWAA.zones`).
+### 4.2 Location & serviceability — live (BRD §7–8)
+- **Live map with a fixed centre pin** (noon / Blinkit pattern): the map moves under the pin. Uses Leaflet + OpenStreetMap tiles when reachable, otherwise a built-in draggable map of the service area that shows the store and every village zone. Zoom controls, "حرّك الخريطة لتحديد مكان التوصيل بالضبط" hint on the pin.
+- **Device GPS:** "استخدم موقعي الحالي" calls the browser/phone geolocation API, recentres the map and shows a green "موقعك الحالي" badge with coordinates. If permission is denied: toast "مش قادرين نوصل لموقعك — حرّك الخريطة أو اختار القرية".
+- **Instant zone detection:** every move, GPS fix, village selection or search re-resolves the nearest configured zone (radius per village in the prototype; delivery polygons in production) and updates the serviceability card without a page reload: village name, distance from the store, ETA, fee, minimum order.
+- **Serviceable:** green pill "بنوصّل عندك" + ETA chip + fee + minimum. CTA: أكّد الموقع.
+- **Coming soon / outside:** Mandarin-tinted card **"لسه موصلناش عندك، بس جايين توّا."** with the nearest village named, phone field, CTA "بلّغني أول ما توصلوا". Confirm is disabled.
+- Scope is a single city: Abu El Matamir. Villages: وسط المدينة, شارع الجيش والمحطة, أبو الشقاف, زاوية صقر, الطيرية, الحدين, بولين (live) and الوفائية, كوم البركة (coming soon). Coordinates in `TWAA.zones` are approximate centroids for the prototype.
 
 ### 4.3 Login / OTP (BRD §10)
 Mobile number with +20 prefix, `inputmode="tel"`. OTP: 6 boxes (LTR), countdown, resend, terms acknowledgement. Guest browsing is allowed; login is requested at checkout.
 
 ### 4.4 Home (BRD §11)
 Order of blocks, top to bottom:
-1. **App bar** (Aubergine): address label + value ▾ · ETA chip (Mandarin, bolt icon) · notifications with badge. Search field **"بتدور على إيه؟"**.
+1. **App bar** (Aubergine, noon-style): small "التوصيل في" label, the ETA as the biggest element on screen (**20 دقيقة** with a Mandarin bolt), address line "البيت · وسط المدينة، أبو المطامير ▾", notifications and profile icons. Search field **"بتدور على إيه؟"**.
 2. **Hero banners** — swipeable, 150px, with promo code pill (first-order discount, free delivery threshold, local products). Dots indicator.
 3. **Category tabs** — الكل · عروض (Mandarin-tinted) · سوبر ماركت · مشروبات · سناكس · العناية · الأطفال · البيت · إلكترونيات. Tapping a tab opens the category listing; عروض opens Deal Zone.
-4. **Category grid** — 4 × 2 icon tiles ("اطلب حسب القسم").
+4. **Category grid** — dense 4-column grid of all 16 categories ("اطلب حسب القسم"), as in noon Minutes.
 5. **Merchandising carousels** (admin-configurable): عروض توّا (with countdown) → الأكثر طلباً → deal banner → أقل من 50 جنيه → منتجات محلية → اشترِ تاني → وصل جديد. مخصوص ليك is added once personalisation data exists.
 6. Sticky cart bar + bottom nav.
 
@@ -77,7 +79,7 @@ Auto-focused field, clear button. Empty state: recent searches, trending chips, 
 Bottom sheet over the current screen: image gallery with thumbnails, discount badge, favourite, brand, name, size, price/old price/percent, stock pill, attribute grid (size, origin, storage, max qty), description, ingredients/nutrition, "بيتشتروا مع بعض". Sticky footer: stepper + **أضف · price** (turns into **شوف السلة · subtotal** once in cart).
 
 ### 4.9 Quick add (BRD §17)
-`أضف` → in place `− 1 +`. At 1 the minus becomes a trash icon. Max quantity disables +. Available on home, listing, search, deals, PDP, cart and related carousels. State is patched without re-rendering the screen so scroll position is preserved.
+Outline `أضف` button (white, Aubergine border — the noon "ADD" pattern) → in place filled `− 1 +`. At 1 the minus becomes a trash icon. Max quantity disables +. Available on home, listing, search, deals, PDP, cart and related carousels. State is patched without re-rendering the screen so scroll position is preserved.
 
 ### 4.10 Cart (BRD §18–19, §32)
 Free-delivery progress: **"ضيف {n} جنيه وخد التوصيل مجاناً."** (threshold configurable, 150 EGP in demo). Line items with steppers, "ممكن تحتاج معاهم" carousel, promo code (TWAA30 = 30 % up to 60; FREE = free delivery), substitution preference (متبدلش / بدّل بمنتج مشابه / كلمني الأول), price summary (subtotal, discount, delivery, service fee, total). Minimum-basket warning disables checkout. Empty state with CTA.
@@ -86,7 +88,7 @@ Free-delivery progress: **"ضيف {n} جنيه وخد التوصيل مجانا�
 Step chips: العنوان → التوصيل → الدفع → الملخص in one scroll. Address card with change link · delivery time (توصيل توّا with ETA / حدد وقت with slots) · payment (كاش عند الاستلام, بطاقة بنكية, محفظة إلكترونية, محفظة توّا with balance) · rider notes · summary with item thumbnails and quantities. **أكّد الطلب** locks on tap (duplicate-order protection, BRD §87.11).
 
 ### 4.12 Order tracking (BRD §28–29)
-Map with rider marker and route once dispatched. Order number, **هيوصلك خلال X دقيقة**, ETA chip. Timeline **اتأكد → بيتجهز → خرج للتوصيل → وصلك** with timestamps. Rider card (name, rating, plate) with call and chat. Items list with payment method. Help card; cancel is visible only before picking (BRD §31). "قيّم الطلب" appears on delivery.
+Map with rider marker and route once dispatched. Order number, **هيوصلك خلال X دقيقة**, ETA chip. Horizontal 4-step progress **اتأكد → بيتجهز → خرج للتوصيل → وصلك** (noon pattern) with the current step described beneath it. Rider card (name, rating, plate) with call and chat. Items list with payment method. Help card; cancel is visible only before picking (BRD §31). "قيّم الطلب" appears on delivery.
 
 ### 4.13 My orders (BRD §27)
 Cards with order id (LTR), date, item count, status pill (في الطريق / تم التوصيل / ملغي), item thumbnails, total; actions: تتبع الطلب / اطلب تاني / قيّم الطلب. Reorder re-validates stock and reports unavailable items in a toast.
@@ -113,5 +115,6 @@ Every interactive element carries a `data-*` attribute that maps 1:1 to an event
 - Tokens live in `:root` of `styles.css`; port them to the mobile design tokens (Flutter/React Native theme) unchanged.
 - All merchandising sections, banners, tabs, category order and zone rules must be served by the admin CMS (BRD §51) — the prototype hard-codes them in `data.js` only for demonstration.
 - Product images: WebP, square, on the category tint; keep the tinted placeholder for loading/no-image states.
-- Replace the font-rendered wordmark with the official SVG logo and app icon.
+- Paste the official logo paths into `TWAA.logo()` and `assets/logo.svg` (same viewBox), and the app icon into `assets/logo-mark.svg`.
+- Live map: Leaflet 1.9.4 from cdnjs + OpenStreetMap tiles (swap for Google Maps / Mapbox SDK in the native apps). Zone detection is client-side nearest-radius in the prototype; production calls the serviceability API with lat/lng and gets zone, ETA, fee, minimum.
 - Out of scope in this prototype: filters sheet, scheduled-slot picker detail, wallet ledger, notifications centre, address form, support chat — all follow the same tokens and components.

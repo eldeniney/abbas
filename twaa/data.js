@@ -4,13 +4,13 @@ window.TWAA = window.TWAA || {};
 TWAA.i18n = {
   ar: {
     dir: "rtl",
-    deliverTo: "التوصيل إلى", eta: "توصيل في", min: "دقيقة", searchPh: "بتدور على إيه؟",
+    deliverTo: "التوصيل إلى", eta: "التوصيل في", min: "دقيقة", searchPh: "بتدور على إيه؟",
     all: "الكل", deals: "عروض", supermarket: "سوبر ماركت", drinks: "مشروبات", snacks: "سناكس", care: "العناية", baby: "الأطفال", home: "البيت", electronics: "إلكترونيات",
     shopBy: "اطلب حسب القسم", seeAll: "الكل",
     secDeals: "عروض توّا", secDealsSub: "خصومات لفترة محدودة", secPopular: "الأكثر طلباً", secUnder50: "أقل من 50 جنيه", secLocal: "منتجات محلية", secLocalSub: "من جيرانك.. لبيتك", secAgain: "اشترِ تاني", secNew: "وصل جديد", secForYou: "مخصوص ليك",
     add: "أضف", egp: "ج.م", off: "خصم",
     viewCart: "شوف السلة", items: "منتج", itemsPl: "منتجات",
-    navHome: "الرئيسية", navCats: "الأقسام", navSearch: "البحث", navOrders: "طلباتي", navAccount: "حسابي",
+    navHome: "الرئيسية", navCats: "الأقسام", navSearch: "البحث", navCart: "السلة", navOrders: "طلباتي", navAccount: "حسابي",
     cart: "السلة", emptyCart: "سلتك فاضية", emptyCartSub: "ابدأ التسوق وهات اللي محتاجه توّا", startShopping: "ابدأ التسوق",
     upsellFree: "ضيف {n} ج.م وخد التوصيل مجاناً", upsellDone: "التوصيل عليك مجاناً 🎉", promoPh: "كود الخصم", apply: "تطبيق", promoOk: "تم تطبيق كود {c}",
     subtotal: "المجموع", delivery: "التوصيل", service: "رسوم الخدمة", discount: "الخصم", total: "الإجمالي", free: "مجاناً",
@@ -24,7 +24,7 @@ TWAA.i18n = {
     rider: "المندوب", callRider: "اتصل", chatSupport: "الدعم", orderItems: "محتويات الطلب",
     ordersT: "طلباتي", reorder: "اطلب تاني", rateOrder: "قيّم الطلب", delivered: "تم التوصيل", onWay: "في الطريق", cancelled: "ملغي",
     accountT: "حسابي", myAddresses: "عناويني", myWallet: "محفظة توّا", myFavs: "المفضلة", myPromos: "كوبونات وعروض", notif: "الإشعارات", support: "خدمة العملاء", lang: "اللغة", privacy: "الخصوصية", terms: "الشروط والأحكام", logout: "تسجيل الخروج", orders: "طلب",
-    locT: "فين نوصّلك؟", useGps: "استخدم موقعي الحالي", searchArea: "دوّر على منطقتك أو قريتك", city: "المدينة", village: "القرية / المنطقة", confirmLoc: "أكّد الموقع", serviceable: "بنوصّل عندك", notServiceable: "لسه موصلناش عندك، بس جايين توّا.", notifyMe: "بلّغني أول ما توصلوا", minOrder: "أقل طلب", fee: "التوصيل", landmark: "علامة مميزة (اختياري)",
+    locT: "فين نوصّلك؟", useGps: "استخدم موقعي الحالي", searchArea: "دوّر على منطقتك أو قريتك", city: "المدينة", village: "القرية / المنطقة", storeLbl: "متجر توّا", youAreHere: "موقعك الحالي", dragHint: "حرّك الخريطة لتحديد مكان التوصيل بالضبط", locating: "بنحدد موقعك…", locErr: "مش قادرين نوصل لموقعك — حرّك الخريطة أو اختار القرية", distance: "على بعد {n} كم من المتجر", coming: "قريباً", outside: "خارج نطاق التوصيل حالياً", confirmLoc: "أكّد الموقع", serviceable: "بنوصّل عندك", notServiceable: "لسه موصلناش عندك، بس جايين توّا.", notifyMe: "بلّغني أول ما توصلوا", minOrder: "أقل طلب", fee: "التوصيل", landmark: "علامة مميزة (اختياري)",
     loginT: "أهلاً بيك في توّا", loginSub: "دخّل رقم موبايلك وهنبعتلك كود التأكيد", phone: "رقم الموبايل", sendOtp: "ابعت الكود", otpT: "أدخل كود التأكيد", otpSub: "بعتنا كود على {p}", resend: "إعادة الإرسال", verify: "تأكيد", termsAck: "بالمتابعة أنت موافق على الشروط والأحكام وسياسة الخصوصية",
     catsT: "الأقسام", plpSort: "ترتيب", plpFilter: "فلتر", recommended: "المقترح", popular: "الأكثر طلباً", priceLow: "الأقل سعراً", priceHigh: "الأعلى سعراً", biggestDisc: "أكبر خصم", newest: "الأحدث",
     recent: "بحثت عنها قبل كده", trending: "الأكثر بحثاً", results: "نتيجة", noResults: "مفيش نتايج لـ \"{q}\"", noResultsSub: "جرّب كلمة تانية أو اتصفح الأقسام", searching: "نتائج البحث",
@@ -33,7 +33,7 @@ TWAA.i18n = {
     ratingT: "طلبك وصل!", ratingSub: "قولنا رأيك في الطلب", rateRider: "قيّم المندوب", rateProducts: "جودة المنتجات", submit: "إرسال", skip: "لاحقاً",
     fb: ["وصل بسرعة", "التعامل ممتاز", "الطلب كامل", "الطلب اتأخر", "منتج ناقص", "منتج غلط", "جودة المنتج مش كويسة"],
     toastAdded: "تمت الإضافة للسلة", toastFav: "تمت الإضافة للمفضلة", toastOrder: "تم تأكيد طلبك", errGeneric: "حصلت مشكلة بسيطة. جرّب تاني.",
-    home_hero1k: "أول طلب", home_hero1t: "خصم 30% على أول طلب", home_hero1p: "استخدم الكود واطلب اللي محتاجه", home_hero2k: "توصيل مجاني", home_hero2t: "توصيل مجاني فوق 150 ج.م", home_hero2p: "في السادات وأبو المطامير والنوبارية", home_hero3k: "محلي", home_hero3t: "منتجات من بلدك", home_hero3p: "ألبان وخضار من المزارع المجاورة", shopNow: "اطلب دلوقتي",
+    home_hero1k: "أول طلب", home_hero1t: "خصم 30% على أول طلب", home_hero1p: "استخدم الكود واطلب اللي محتاجه", home_hero2k: "توصيل مجاني", home_hero2t: "توصيل مجاني فوق 150 ج.م", home_hero2p: "في أبو المطامير والقرى المجاورة", home_hero3k: "محلي", home_hero3t: "منتجات من بلدك", home_hero3p: "ألبان وخضار من المزارع المجاورة", shopNow: "اطلب دلوقتي",
     homeLbl: "البيت", workLbl: "الشغل", otherLbl: "أخرى",
     cancelOrder: "إلغاء الطلب", help: "مساعدة", needHelp: "محتاج مساعدة في طلبك؟",
     langAr: "العربية", langEn: "English", tagline: "من هنا لك.. توّا",
@@ -47,7 +47,7 @@ TWAA.i18n = {
     secDeals: "Twaa Deals", secDealsSub: "Limited-time discounts", secPopular: "Most ordered", secUnder50: "Under EGP 50", secLocal: "Local products", secLocalSub: "From your neighbours to your home", secAgain: "Buy again", secNew: "New arrivals", secForYou: "Picked for you",
     add: "ADD", egp: "EGP", off: "OFF",
     viewCart: "View cart", items: "item", itemsPl: "items",
-    navHome: "Home", navCats: "Categories", navSearch: "Search", navOrders: "Orders", navAccount: "Account",
+    navHome: "Home", navCats: "Categories", navSearch: "Search", navCart: "Cart", navOrders: "Orders", navAccount: "Account",
     cart: "Cart", emptyCart: "Your cart is empty", emptyCartSub: "Start shopping and get what you need, now", startShopping: "Start shopping",
     upsellFree: "Add EGP {n} more for free delivery", upsellDone: "You've unlocked free delivery 🎉", promoPh: "Promo code", apply: "Apply", promoOk: "Code {c} applied",
     subtotal: "Subtotal", delivery: "Delivery", service: "Service fee", discount: "Discount", total: "Total", free: "Free",
@@ -61,7 +61,7 @@ TWAA.i18n = {
     rider: "Rider", callRider: "Call", chatSupport: "Support", orderItems: "Order items",
     ordersT: "My orders", reorder: "Reorder", rateOrder: "Rate order", delivered: "Delivered", onWay: "On the way", cancelled: "Cancelled",
     accountT: "My account", myAddresses: "My addresses", myWallet: "Twaa Wallet", myFavs: "Favorites", myPromos: "Coupons & offers", notif: "Notifications", support: "Customer support", lang: "Language", privacy: "Privacy", terms: "Terms & conditions", logout: "Log out", orders: "orders",
-    locT: "Where should we deliver?", useGps: "Use my current location", searchArea: "Search your area or village", city: "City", village: "Village / District", confirmLoc: "Confirm location", serviceable: "We deliver here", notServiceable: "We're not here yet, but we're coming soon.", notifyMe: "Notify me when you arrive", minOrder: "Min. order", fee: "Delivery", landmark: "Landmark (optional)",
+    locT: "Where should we deliver?", useGps: "Use my current location", searchArea: "Search your area or village", city: "City", village: "Village / District", storeLbl: "Twaa store", youAreHere: "You are here", dragHint: "Drag the map to pin your exact delivery spot", locating: "Locating you…", locErr: "Couldn't get your location — drag the map or pick a village", distance: "{n} km from the store", coming: "Coming soon", outside: "Outside our delivery area for now", confirmLoc: "Confirm location", serviceable: "We deliver here", notServiceable: "We're not here yet, but we're coming soon.", notifyMe: "Notify me when you arrive", minOrder: "Min. order", fee: "Delivery", landmark: "Landmark (optional)",
     loginT: "Welcome to Twaa", loginSub: "Enter your mobile number and we'll send a verification code", phone: "Mobile number", sendOtp: "Send code", otpT: "Enter verification code", otpSub: "We sent a code to {p}", resend: "Resend", verify: "Verify", termsAck: "By continuing you agree to our Terms & Conditions and Privacy Policy",
     catsT: "Categories", plpSort: "Sort", plpFilter: "Filter", recommended: "Recommended", popular: "Most popular", priceLow: "Lowest price", priceHigh: "Highest price", biggestDisc: "Biggest discount", newest: "Newest",
     recent: "Recent searches", trending: "Trending", results: "results", noResults: "No results for \"{q}\"", noResultsSub: "Try another word or browse categories", searching: "Search results",
@@ -70,7 +70,7 @@ TWAA.i18n = {
     ratingT: "Your order arrived!", ratingSub: "Tell us how it went", rateRider: "Rate the rider", rateProducts: "Product quality", submit: "Submit", skip: "Later",
     fb: ["Arrived fast", "Great service", "Complete order", "Order was late", "Missing item", "Wrong item", "Poor product quality"],
     toastAdded: "Added to cart", toastFav: "Added to favorites", toastOrder: "Your order is confirmed", errGeneric: "Something went wrong. Please try again.",
-    home_hero1k: "FIRST ORDER", home_hero1t: "30% off your first order", home_hero1p: "Use the code and get what you need", home_hero2k: "FREE DELIVERY", home_hero2t: "Free delivery over EGP 150", home_hero2p: "In Sadat, Abu El Matamir & Nubaria", home_hero3k: "LOCAL", home_hero3t: "Products from your town", home_hero3p: "Dairy & produce from nearby farms", shopNow: "Shop now",
+    home_hero1k: "FIRST ORDER", home_hero1t: "30% off your first order", home_hero1p: "Use the code and get what you need", home_hero2k: "FREE DELIVERY", home_hero2t: "Free delivery over EGP 150", home_hero2p: "In Abu El Matamir & nearby villages", home_hero3k: "LOCAL", home_hero3t: "Products from your town", home_hero3p: "Dairy & produce from nearby farms", shopNow: "Shop now",
     homeLbl: "Home", workLbl: "Work", otherLbl: "Other",
     cancelOrder: "Cancel order", help: "Help", needHelp: "Need help with your order?",
     langAr: "العربية", langEn: "English", tagline: "From here, to you.. now",
@@ -144,8 +144,8 @@ TWAA.products = [
   P(36, "baby",    "حفاضات بامبرز مقاس 4",             "Pampers Diapers Size 4",    "52 حفاضة",   "52 pcs",  310, 345, ["deal","popular"], 20, "Pampers"),
   P(37, "baby",    "مناديل مبللة جونسون",              "Johnson's Baby Wipes",      "72 منديل",   "72 wipes", 48, null,["under50","again"], 20, "Johnson's"),
   P(38, "local",   "جبنة قريش بلدي",                    "Local Qarish Cheese",       "500 جم",     "500 g",   40,  null,["local","under50","new"], 8),
-  P(39, "local",   "عسل نحل من النوبارية",              "Nubaria Honey",             "500 جم",     "500 g",   160, null,["local","new"], 20),
-  P(40, "local",   "لبن بلدي طازة",                     "Fresh Farm Milk",           "1 لتر",      "1 L",     38,  null,["local","popular"], 20),
+  P(39, "local",   "عسل نحل من أبو المطامير",          "Abu El Matamir Honey",             "500 جم",     "500 g",   160, null,["local","new"], 20),
+  P(40, "local",   "لبن بلدي من مزارع المطامير",       "Matamir Farm Milk",           "1 لتر",      "1 L",     38,  null,["local","popular"], 20),
   P(41, "local",   "عيش بلدي",                          "Baladi Bread",              "10 أرغفة",   "10 loaves", 12, null,["local","under50","again"], 20),
   P(42, "pets",    "دراي فود قطط",                      "Cat Dry Food",              "1 كجم",      "1 kg",    95,  null,["new"], 20),
   P(43, "electro", "كابل شاحن تايب سي",                 "USB-C Charging Cable",      "1 متر",      "1 m",     60,  85,  ["deal","new"], 20),
@@ -155,22 +155,20 @@ TWAA.products = [
 /* Frequently bought together / related */
 TWAA.related = { 1: [5, 12, 11], 18: [20, 22, 19], 36: [37], 5: [3, 1], 19: [22, 20], 9: [13, 14] };
 
+/* Service area — Abu El Matamir markaz only (Beheira). Coordinates are approximate centroids for the
+   prototype; production uses surveyed delivery polygons managed in admin (BRD §6). radius in km. */
+TWAA.city = { ar: "أبو المطامير", en: "Abu El Matamir", lat: 30.9106, lng: 30.1755 };
+TWAA.store = { ar: "متجر توّا — أبو المطامير", en: "Twaa Store — Abu El Matamir", lat: 30.9122, lng: 30.1790 };
 TWAA.zones = [
-  { city: "السادات", cityEn: "Sadat", areas: [
-    { ar: "المنطقة الأولى", en: "District 1", eta: 25, fee: 10, min: 60, ok: true },
-    { ar: "المنطقة السابعة", en: "District 7", eta: 30, fee: 10, min: 60, ok: true },
-    { ar: "منطقة الفيلات", en: "Villas Area", eta: 30, fee: 12, min: 60, ok: true },
-  ]},
-  { city: "أبو المطامير", cityEn: "Abu El Matamir", areas: [
-    { ar: "وسط المدينة", en: "City Center", eta: 30, fee: 12, min: 75, ok: true },
-    { ar: "قرية النصر", en: "El Nasr Village", eta: 50, fee: 20, min: 100, ok: true },
-    { ar: "قرية بدر", en: "Badr Village", eta: 60, fee: 25, min: 100, ok: false },
-  ]},
-  { city: "النوبارية", cityEn: "Nubaria", areas: [
-    { ar: "النوبارية الجديدة", en: "New Nubaria", eta: 35, fee: 15, min: 75, ok: true },
-    { ar: "قرية 8", en: "Village 8", eta: 55, fee: 25, min: 100, ok: true },
-    { ar: "قرية الأمل", en: "El Amal Village", eta: 70, fee: 30, min: 120, ok: false },
-  ]},
+  { id: "center",   ar: "وسط المدينة",        en: "City Center",        lat: 30.9106, lng: 30.1755, radius: 2.5, eta: 20, fee: 10, min: 60,  ok: true },
+  { id: "gaish",    ar: "شارع الجيش والمحطة", en: "El Gaish St. & Station", lat: 30.9030, lng: 30.1700, radius: 1.8, eta: 25, fee: 10, min: 60,  ok: true },
+  { id: "shokaf",   ar: "أبو الشقاف",          en: "Abu El Shoqaf",      lat: 30.8790, lng: 30.2210, radius: 2.0, eta: 40, fee: 15, min: 80,  ok: true },
+  { id: "zawya",    ar: "زاوية صقر",           en: "Zawyet Saqr",        lat: 30.8720, lng: 30.1230, radius: 2.0, eta: 45, fee: 20, min: 90,  ok: true },
+  { id: "tayreya",  ar: "الطيرية",             en: "El Tayreya",         lat: 30.9430, lng: 30.2380, radius: 2.0, eta: 45, fee: 20, min: 90,  ok: true },
+  { id: "hadeen",   ar: "الحدين",              en: "El Hadeen",          lat: 30.8330, lng: 30.2010, radius: 2.2, eta: 55, fee: 25, min: 100, ok: true },
+  { id: "boulin",   ar: "بولين",               en: "Boulin",             lat: 30.9560, lng: 30.1300, radius: 2.2, eta: 55, fee: 25, min: 100, ok: true },
+  { id: "wafaeya",  ar: "الوفائية",            en: "El Wafaeya",         lat: 30.9220, lng: 30.3010, radius: 2.0, eta: 60, fee: 30, min: 120, ok: false },
+  { id: "kombaraka",ar: "كوم البركة",          en: "Kom El Baraka",      lat: 30.8020, lng: 30.1000, radius: 2.5, eta: 70, fee: 30, min: 120, ok: false },
 ];
 
 TWAA.orders = [
@@ -179,3 +177,17 @@ TWAA.orders = [
   { id: "TW-23655", status: "delivered", date: "28 أغسطس", dateEn: "28 Aug", items: [36, 37], total: 358 },
   { id: "TW-23110", status: "cancelled", date: "21 أغسطس", dateEn: "21 Aug", items: [7, 30], total: 102 },
 ];
+
+
+/* Brand logo — vector approximation of the توّا wordmark (heavy rounded ligature, Mandarin shadda).
+   Drop the official SVG paths in here (and in assets/logo.svg) to replace. */
+TWAA.logo = (ink = "currentColor", spark = "#F9732F") => `<svg viewBox="0 0 230 150" aria-label="توّا" role="img">
+  <g fill="none" stroke="${ink}" stroke-width="27" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 42 V118 C32 121 36 122 40 122"/>
+    <path d="M40 122 C70 122 82 104 82 78"/>
+    <circle cx="102" cy="72" r="20"/>
+    <path d="M118 80 C122 102 140 110 166 110 C196 110 206 88 206 60"/>
+  </g>
+  <g fill="${ink}"><circle cx="160" cy="34" r="10"/><circle cx="188" cy="34" r="10"/></g>
+  <path d="M84 30 C88 16 94 16 98 30 M98 30 C102 16 108 16 112 30" fill="none" stroke="${spark}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;

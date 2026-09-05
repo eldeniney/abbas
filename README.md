@@ -6,9 +6,10 @@ Personal projects and prototypes.
 
 ### `twaa/` — توّا Twaa quick-commerce customer app (design prototype)
 
-Interactive, Arabic-first (RTL) design prototype of the Twaa hyperlocal quick-commerce customer app, built from the BRD v1.1 and the brand direction (Aubergine `#3A1F3D` · Cream `#F9F2E7` · Mandarin `#F9732F`). Follows the quick-commerce pattern of apps like noon Minutes: address + ETA header, prominent search, hero offers, category grid, quick-add product carousels, sticky cart bar and 5-tab navigation.
+Interactive, Arabic-first (RTL) design prototype of the Twaa hyperlocal quick-commerce customer app for **Abu El Matamir and its villages**, built from the BRD v1.1 and the brand direction (Aubergine `#3A1F3D` · Cream `#F9F2E7` · Mandarin `#F9732F`). Follows the noon Minutes pattern: big ETA header, prominent search, hero offers, dense category grid, outline quick-add buttons, sticky cart bar and cart in the tab bar. The location screen uses the device GPS and a draggable map with live village/zone detection (Leaflet + OpenStreetMap when online, built-in map otherwise).
 
-- `twaa/index.html` — the prototype (16 screens, working cart, promo codes, checkout, tracking, AR/EN toggle)
+- `twaa/index.html` — the prototype (16 screens, working cart, promo codes, checkout, tracking, live location, AR/EN toggle)
+- `twaa/assets/logo.svg`, `logo-mark.svg` — vector logo (drawn approximation; drop the official paths in)
 - `twaa/design-system.html` — tokens and components
 - `twaa/DESIGN.md` — screen-by-screen design guideline mapped to the BRD
 

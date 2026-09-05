@@ -67,8 +67,8 @@
   /* ---------------- State ---------------- */
   const S = {
     lang: "ar", screen: "splash", tab: "home", cart: {}, favs: new Set([2, 26]), promo: null, sub: "similar", pay: "cod", slot: "now",
-    zone: { city: "السادات", cityEn: "Sadat", area: T.zones[0].areas[0], label: "homeLbl" },
-    cat: "dairy", subcat: 0, query: "", homeTab: "all", sort: "recommended", pdp: null, toast: null, otp: 0, phone: "010 1234 5678", loc: { city: 0, area: 0 }, stars: 0, fb: new Set(), trackStep: 2, heroIdx: 0, orderId: null,
+    zone: { area: T.zones[0], label: "homeLbl" },
+    cat: "dairy", subcat: 0, query: "", homeTab: "all", sort: "recommended", pdp: null, toast: null, otp: 0, phone: "010 1234 5678", loc: { lat: T.zones[0].lat, lng: T.zones[0].lng, zone: T.zones[0], dist: 0, live: false, status: "" }, stars: 0, fb: new Set(), trackStep: 2, heroIdx: 0, orderId: null,
   };
   const FREE_DELIVERY = 150;
   const t = (k, vars) => { let s = (T.i18n[S.lang][k] ?? T.i18n.ar[k] ?? k); if (vars) Object.keys(vars).forEach((v) => (s = s.replace(`{${v}}`, vars[v]))); return s; };
@@ -87,6 +87,16 @@
   const serviceFee = () => (subtotal() > 0 ? 3 : 0);
   const total = () => Math.max(0, subtotal() - discount() + deliveryFee() + serviceFee());
   const pct = (p) => (p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0);
+  const km = (a1, b1, a2, b2) => { const r = Math.PI / 180, R = 6371; const dLat = (a2 - a1) * r, dLng = (b2 - b1) * r; const x = Math.sin(dLat / 2) ** 2 + Math.cos(a1 * r) * Math.cos(a2 * r) * Math.sin(dLng / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); };
+  /* live serviceability: nearest configured zone within its radius (polygons in production) */
+  function resolveZone(lat, lng) {
+    let best = null;
+    T.zones.forEach((z) => { const d = km(lat, lng, z.lat, z.lng); if (d <= z.radius && (!best || d < best.d)) best = { z, d }; });
+    const nearest = T.zones.reduce((acc, z) => { const d = km(lat, lng, z.lat, z.lng); return !acc || d < acc.d ? { z, d } : acc; }, null);
+    S.loc.lat = lat; S.loc.lng = lng; S.loc.zone = best ? best.z : null; S.loc.nearest = nearest.z; S.loc.dist = km(lat, lng, T.store.lat, T.store.lng);
+  }
+  const zoneName = (z) => (S.lang === "ar" ? z.ar : z.en);
+  const placeName = (z) => esc(S.lang === "ar" ? `${z.ar}، ${T.city.ar}` : `${z.en}, ${T.city.en}`);
 
   /* ---------------- Screen registry (for the workbench sidebar) ---------------- */
   const SCREENS = [
@@ -124,8 +134,9 @@
     return `<div class="section-head"><div><h2>${title}${extra}</h2>${sub ? `<div class="sub">${sub}</div>` : ""}</div>${more ? `<button class="more" data-go="plp">${t("seeAll")} ${ic("chevS", "icon xs")}</button>` : ""}</div>`;
   }
   function bottomNav(active) {
-    const items = [["home", "home", "navHome"], ["categories", "grid", "navCats"], ["search", "search", "navSearch"], ["orders", "receipt", "navOrders"], ["account", "user", "navAccount"]];
-    return `<nav class="bottomnav" aria-label="Main">${items.map(([s, i, l]) => `<button data-go="${s}" class="${active === s ? "on" : ""}" aria-current="${active === s ? "page" : "false"}">${ic(i)}<span>${t(l)}</span></button>`).join("")}</nav>`;
+    const items = [["home", "home", "navHome"], ["categories", "grid", "navCats"], ["cart", "cart", "navCart"], ["orders", "receipt", "navOrders"], ["account", "user", "navAccount"]];
+    const n = cartCount();
+    return `<nav class="bottomnav" aria-label="Main">${items.map(([s, i, l]) => `<button data-go="${s}" class="${active === s ? "on" : ""} ${s === "cart" ? "cart-tab" : ""}" aria-current="${active === s ? "page" : "false"}">${ic(i)}${s === "cart" && n ? `<span class="badge num">${n}</span>` : ""}<span>${t(l)}</span></button>`).join("")}</nav>`;
   }
   function cartBar() {
     const n = cartCount(); if (!n) return "";
@@ -133,18 +144,20 @@
   }
   function addrHeader() {
     const a = S.zone.area;
-    return `<div class="appbar"><div class="addr-row">
-      <button class="txt" data-go="location" style="text-align:start">
-        <div class="lbl">${ic("pin", "icon xs")} ${t("deliverTo")} · ${t(S.zone.label)}</div>
-        <div class="val">${esc(S.lang === "ar" ? `${a.ar}، ${S.zone.city}` : `${a.en}, ${S.zone.cityEn}`)} ${ic("chevD", "icon xs")}</div>
+    return `<div class="appbar noon"><div class="row" style="align-items:flex-start">
+      <button class="eta-block" data-go="location" aria-label="${t("locT")}">
+        <div class="lbl">${t("eta")}</div>
+        <div class="big"><span class="num">${a.eta}</span> <span class="unit">${t("min")}</span> ${ic("bolt", "icon sm spark")}</div>
+        <div class="addr">${ic("home", "icon xs")} <b>${t(S.zone.label)}</b> · <span>${placeName(a)}</span> ${ic("chevD", "icon xs")}</div>
       </button>
-      <span class="eta-chip">${ic("bolt")}<span class="num">${a.eta} ${t("min")}</span></span>
-      <button class="icon-btn ghost-light" data-toast="notif" aria-label="${t("notif")}">${ic("bell")}<span class="badge">2</span></button>
-    </div>
+      <div class="row" style="gap:6px;margin-inline-start:auto">
+        <button class="icon-btn ghost-light" data-toast="notif" aria-label="${t("notif")}">${ic("bell")}<span class="badge">2</span></button>
+        <button class="icon-btn ghost-light" data-go="account" aria-label="${t("navAccount")}">${ic("user")}</button>
+      </div></div>
     <button class="searchbar" data-go="search" style="width:100%">${ic("search")}<span style="flex:1;text-align:start;color:var(--muted);font-size:15px">${t("searchPh")}</span></button></div>`;
   }
   function toastEl() { return S.toast ? `<div class="toast" role="status" aria-live="polite">${ic("check", "icon sm")}<span>${S.toast}</span></div>` : ""; }
-  function map(h, rider) {
+  function map(h, rider) { /* static illustration used on tracking */
     return `<div class="map" style="height:${h}px"><svg class="grid" viewBox="0 0 390 ${h}" preserveAspectRatio="none" aria-hidden="true">
       <defs><pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0v40" fill="none" stroke="#DED3C2" stroke-width="1"/></pattern></defs>
       <rect width="100%" height="100%" fill="url(#g)"/>
@@ -154,39 +167,110 @@
       ${rider ? `<path d="M60 ${h * .78} C120 ${h * .78}, 140 ${h * .5}, 195 ${h * .5}" fill="none" stroke="#3A1F3D" stroke-width="4" stroke-dasharray="8 8" stroke-linecap="round"/>` : ""}
     </svg>
     <div class="pin"><svg viewBox="0 0 44 54" aria-hidden="true"><path d="M22 2C11 2 3 10 3 21c0 13 19 31 19 31s19-18 19-31C41 10 33 2 22 2z" fill="currentColor"/><circle cx="22" cy="21" r="8" fill="#fff"/></svg></div>
-    ${rider ? `<div class="rider" style="left:44px;top:${h * .78 - 20}px">${ic("bike", "icon sm")}</div>` : ""}
-    <button class="icon-btn ghost loc-fab" aria-label="${t("useGps")}" data-toast="gps">${ic("locate")}</button></div>`;
+    ${rider ? `<div class="rider" style="left:44px;top:${h * .78 - 20}px">${ic("bike", "icon sm")}</div>` : ""}</div>`;
+  }
+
+  /* ---- Live map (location screen) ----
+     Uses Leaflet + OpenStreetMap tiles when the library and tiles are reachable; otherwise a built-in
+     draggable map of the service area. Both keep a fixed centre pin and re-resolve the zone on every move. */
+  const PIN = `<svg viewBox="0 0 44 54" aria-hidden="true"><path d="M22 2C11 2 3 10 3 21c0 13 19 31 19 31s19-18 19-31C41 10 33 2 22 2z" fill="currentColor"/><circle cx="22" cy="21" r="8" fill="#fff"/></svg>`;
+  function liveMapHtml(h) {
+    return `<div class="map live" style="height:${h}px" data-livemap>
+      <div class="lm-canvas" data-lm-canvas aria-hidden="true"></div>
+      <div class="pin live"><span class="pin-hint">${t("dragHint")}</span>${PIN}</div>
+      <div class="lm-badge ${S.loc.live ? "on" : ""}">${ic("locate", "icon xs")} ${S.loc.status || (S.loc.live ? t("youAreHere") : t("village"))}</div>
+      <button class="icon-btn ghost loc-fab" aria-label="${t("useGps")}" data-gps>${ic("locate")}</button>
+      <div class="lm-zoom"><button data-lm-zoom="1" aria-label="+">${ic("plus", "icon sm")}</button><button data-lm-zoom="-1" aria-label="−">${ic("minus", "icon sm")}</button></div>
+    </div>`;
+  }
+  const LM = { leaflet: null, zoom: 14, tileErrors: 0, tileOk: 0, mode: null, fallback: null };
+  function mountLiveMap() {
+    const host = $("[data-livemap]"); if (!host) return; const canvas = $("[data-lm-canvas]", host);
+    const canLeaflet = !!window.L && LM.mode !== "fallback";
+    if (canLeaflet) {
+      try {
+        const m = window.L.map(canvas, { center: [S.loc.lat, S.loc.lng], zoom: LM.zoom, zoomControl: false, attributionControl: false });
+        const tiles = window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(m);
+        tiles.on("tileerror", () => { LM.tileErrors++; if (LM.tileErrors >= 3 && LM.tileOk === 0) { LM.mode = "fallback"; m.remove(); LM.leaflet = null; mountLiveMap(); } });
+        tiles.on("tileload", () => { LM.tileOk++; });
+        window.L.circleMarker([T.store.lat, T.store.lng], { radius: 7, color: "#3A1F3D", fillColor: "#F9F2E7", fillOpacity: 1, weight: 3 }).addTo(m).bindTooltip(S.lang === "ar" ? T.store.ar : T.store.en);
+        T.zones.forEach((z) => window.L.circle([z.lat, z.lng], { radius: z.radius * 1000, color: z.ok ? "#2E7D4F" : "#B8860B", weight: 1, fillOpacity: .08 }).addTo(m));
+        m.on("moveend", () => { const c = m.getCenter(); LM.zoom = m.getZoom(); onMapMoved(c.lat, c.lng); });
+        m.on("movestart", () => host.classList.add("moving")); m.on("moveend", () => host.classList.remove("moving"));
+        LM.leaflet = m; LM.mode = "leaflet"; return;
+      } catch (e) { LM.mode = "fallback"; }
+    }
+    LM.mode = "fallback"; mountFallbackMap(host, canvas);
+  }
+  function mountFallbackMap(host, canvas) {
+    /* simple equirectangular projection around the city centre; 1px = metersPerPx */
+    const mpp = () => 156543 * Math.cos(T.city.lat * Math.PI / 180) / Math.pow(2, LM.zoom);
+    const W = host.clientWidth || 370, H = host.clientHeight || 260;
+    const draw = () => {
+      const m = mpp(); const px = (lat, lng) => [W / 2 + ((lng - S.loc.lng) * 111320 * Math.cos(S.loc.lat * Math.PI / 180)) / m, H / 2 - ((lat - S.loc.lat) * 110540) / m];
+      const roads = []; for (let i = -12; i <= 12; i++) { roads.push([T.city.lat + i * 0.004, "h"]); roads.push([T.city.lng + i * 0.0045, "v"]); }
+      const [sx, sy] = px(T.store.lat, T.store.lng);
+      canvas.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true">
+        <rect width="100%" height="100%" fill="#EDE6DA"/>
+        <g stroke="#F7F1E7" stroke-width="${Math.max(2, 900 / m)}">${roads.map(([v, o]) => o === "h" ? `<path d="M0 ${px(v, 0)[1]} H${W}"/>` : `<path d="M${px(0, v)[0]} 0 V${H}"/>`).join("")}</g>
+        <g stroke="#D8CCB9" stroke-width="1" fill="none">${roads.map(([v, o]) => o === "h" ? `<path d="M0 ${px(v, 0)[1]} H${W}"/>` : `<path d="M${px(0, v)[0]} 0 V${H}"/>`).join("")}</g>
+        ${T.zones.map((z) => { const [x, y] = px(z.lat, z.lng); const r = (z.radius * 1000) / m; return `<circle cx="${x}" cy="${y}" r="${r}" fill="${z.ok ? "#2E7D4F" : "#B8860B"}" fill-opacity=".09" stroke="${z.ok ? "#2E7D4F" : "#B8860B"}" stroke-opacity=".5" stroke-width="1.5"/><text x="${x}" y="${y - r - 6}" text-anchor="middle" font-size="12" font-weight="700" font-family="Cairo, sans-serif" fill="${z.ok ? "#1F5C39" : "#7A5A05"}">${esc(zoneName(z))}</text>`; }).join("")}
+        <g transform="translate(${sx} ${sy})"><circle r="11" fill="#3A1F3D"/><circle r="5" fill="#F9F2E7"/><text y="26" text-anchor="middle" font-size="11" font-weight="700" font-family="Cairo, sans-serif" fill="#3A1F3D">${esc(S.lang === "ar" ? "متجر توّا" : "Twaa store")}</text></g>
+      </svg>`;
+    };
+    draw();
+    let drag = null;
+    canvas.onpointerdown = (e) => { drag = { x: e.clientX, y: e.clientY, lat: S.loc.lat, lng: S.loc.lng }; canvas.setPointerCapture(e.pointerId); host.classList.add("moving"); };
+    canvas.onpointermove = (e) => { if (!drag) return; const m = mpp(); const dx = e.clientX - drag.x, dy = e.clientY - drag.y; S.loc.lng = drag.lng - (dx * m) / (111320 * Math.cos(drag.lat * Math.PI / 180)); S.loc.lat = drag.lat + (dy * m) / 110540; draw(); };
+    canvas.onpointerup = canvas.onpointercancel = () => { if (!drag) return; drag = null; host.classList.remove("moving"); onMapMoved(S.loc.lat, S.loc.lng); };
+    LM.fallback = { draw, setView: (lat, lng) => { S.loc.lat = lat; S.loc.lng = lng; draw(); } };
+  }
+  function onMapMoved(lat, lng) { S.loc.live = false; S.loc.status = ""; resolveZone(lat, lng); patchLocationCard(); const bd = $(".lm-badge"); if (bd) bd.replaceWith(h(`<div class="lm-badge">${ic("pin", "icon xs")} ${S.loc.zone ? esc(zoneName(S.loc.zone)) : esc(zoneName(S.loc.nearest))} · <span class="num" dir="ltr">${lat.toFixed(4)}, ${lng.toFixed(4)}</span></div>`)); }
+  function setMapView(lat, lng) { if (LM.mode === "leaflet" && LM.leaflet) LM.leaflet.setView([lat, lng], Math.max(LM.zoom, 15)); else if (LM.fallback) LM.fallback.setView(lat, lng); }
+  function locateMe() {
+    S.loc.status = t("locating"); patchLocationCard(); $(".lm-badge")?.replaceWith(h(`<div class="lm-badge">${ic("locate", "icon xs")} ${t("locating")}</div>`));
+    const fail = () => { S.loc.status = ""; toast(t("locErr")); };
+    if (!navigator.geolocation) return fail();
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const { latitude: lat, longitude: lng } = pos.coords; resolveZone(lat, lng); S.loc.live = true; S.loc.status = t("youAreHere"); setMapView(lat, lng); patchLocationCard();
+      $(".lm-badge")?.replaceWith(h(`<div class="lm-badge on">${ic("locate", "icon xs")} ${t("youAreHere")} · <span class="num" dir="ltr">${lat.toFixed(4)}, ${lng.toFixed(4)}</span></div>`));
+    }, fail, { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
+  }
+  function locationCard() {
+    const z = S.loc.zone, near = S.loc.nearest || T.zones[0];
+    if (z && z.ok) return `<div class="card loc-card" data-loc-card style="border:1.5px solid var(--success-100)"><div class="row between"><div><span class="pill success">${ic("check", "icon xs")} ${t("serviceable")}</span><div style="font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--aubergine);margin-top:8px">${placeName(z)}</div><div class="muted num">${t("distance", { n: S.loc.dist.toFixed(1) })}</div></div><span class="eta-chip">${ic("bolt")}<span class="num">${z.eta} ${t("min")}</span></span></div>
+      <div class="kv" style="margin-top:12px"><div><div class="k">${t("fee")}</div><div class="v num">${money(z.fee)}</div></div><div><div class="k">${t("minOrder")}</div><div class="v num">${money(z.min)}</div></div></div></div>`;
+    return `<div class="card loc-card" data-loc-card style="border:1.5px solid var(--mandarin-100);background:var(--mandarin-50)"><span class="pill warn">${ic("info", "icon xs")} ${z ? t("coming") : t("outside")} · ${esc(zoneName(near))}</span><div style="font-family:var(--font-display);font-weight:800;color:var(--aubergine);font-size:17px;line-height:1.5;margin-top:8px">${t("notServiceable")}</div><div class="muted" style="margin:6px 0 12px">${S.lang === "ar" ? "سيب رقمك وهنبلّغك أول ما نفتح في منطقتك." : "Leave your number and we'll tell you the moment we open in your area."}</div><div class="input" style="height:46px"><span class="prefix">+20</span><input inputmode="tel" value="${S.phone}" aria-label="${t("phone")}"></div><button class="btn dark" style="margin-top:10px;min-height:46px" data-toast="notify">${ic("bell", "icon sm")} ${t("notifyMe")}</button></div>`;
+  }
+  function patchLocationCard() {
+    const c = $("[data-loc-card]"); if (c) c.replaceWith(h(locationCard()));
+    const sel = $("[data-zone-select]"); if (sel) sel.value = S.loc.zone ? S.loc.zone.id : "";
+    const cta = $("[data-confirm-loc]"); if (cta) cta.disabled = !(S.loc.zone && S.loc.zone.ok);
   }
 
   /* ---------------- Screens ---------------- */
   const R = {};
-  R.splash = () => `<div class="screen dark"><div class="splash">${statusbar(true)}${wave()}<div class="logo on-dark"><span class="ar">توا<span class="shadda" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M3 19C7 6 11 6 15 19M15 19C19 6 23 6 27 19M27 19C31 6 35 6 39 19" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span><span class="en">TWAA</span></div><div class="tagline">${t("tagline")}</div><div class="en-tag">Local roots. Closer days.</div><button class="btn primary" style="position:absolute;bottom:56px;left:24px;right:24px" data-go="location">${t("shopNow")}</button></div></div>`;
+  R.splash = () => `<div class="screen dark"><div class="splash">${statusbar(true)}${wave()}<div class="splash-bag" aria-hidden="true"></div><div class="brand-logo lg" style="color:var(--cream)">${T.logo()}</div><div class="tagline">${t("tagline")}</div><div class="en-tag">Local roots. Closer days.</div><button class="btn primary" style="position:absolute;bottom:56px;left:24px;right:24px" data-go="location">${t("shopNow")}</button></div></div>`;
 
   R.location = () => {
-    const c = T.zones[S.loc.city], a = c.areas[S.loc.area];
     return `<div class="screen">${statusbar()}
-      <div class="topbar"><button class="icon-btn ghost" data-go="home" aria-label="back">${ic("chevS")}</button><h1>${t("locT")}</h1></div>
-      ${map(230)}
+      <div class="topbar"><button class="icon-btn ghost" data-go="home" aria-label="back">${ic("chevS")}</button><h1>${t("locT")}</h1><span class="pill brand">${esc(T.city[S.lang])}</span></div>
+      ${liveMapHtml(270)}
       <div class="scroll pad pb-cta" style="margin-top:-24px;position:relative;z-index:2">
         <div class="card">
-          <button class="btn soft" data-toast="gps" style="min-height:46px">${ic("locate")} ${t("useGps")}</button>
-          <div class="searchbar" style="box-shadow:none;border:1.5px solid var(--line-strong)">${ic("search")}<input placeholder="${t("searchArea")}" aria-label="${t("searchArea")}"></div>
-          <div class="kv" style="margin-top:12px">
-            <div><div class="k">${t("city")}</div><select class="v" data-city style="border:0;background:none;width:100%;font-weight:700">${T.zones.map((z, i) => `<option value="${i}" ${i === S.loc.city ? "selected" : ""}>${esc(S.lang === "ar" ? z.city : z.cityEn)}</option>`).join("")}</select></div>
-            <div><div class="k">${t("village")}</div><select class="v" data-area style="border:0;background:none;width:100%;font-weight:700">${c.areas.map((ar, i) => `<option value="${i}" ${i === S.loc.area ? "selected" : ""}>${esc(S.lang === "ar" ? ar.ar : ar.en)}</option>`).join("")}</select></div>
-          </div>
-          <div class="field" style="margin:12px 0 0"><div class="input" style="height:46px">${ic("pin", "icon sm")}<input placeholder="${t("landmark")}" aria-label="${t("landmark")}"></div></div>
+          <button class="btn soft" data-gps style="min-height:46px">${ic("locate")} ${t("useGps")}</button>
+          <div class="searchbar" style="box-shadow:none;border:1.5px solid var(--line-strong)">${ic("search")}<input placeholder="${t("searchArea")}" aria-label="${t("searchArea")}" list="zones-list" data-zone-search><datalist id="zones-list">${T.zones.map((z) => `<option value="${esc(zoneName(z))}">`).join("")}</datalist></div>
+          <div class="field" style="margin:12px 0 0"><label>${t("village")} · ${esc(T.city[S.lang])}</label><div class="input" style="height:46px">${ic("pin", "icon sm")}<select data-zone-select style="flex:1;border:0;background:none;font-weight:700;height:100%"><option value="">—</option>${T.zones.map((z) => `<option value="${z.id}" ${S.loc.zone && S.loc.zone.id === z.id ? "selected" : ""}>${esc(zoneName(z))}${z.ok ? "" : ` · ${t("coming")}`}</option>`).join("")}</select></div></div>
+          <div class="field" style="margin:12px 0 0"><div class="input" style="height:46px">${ic("info", "icon sm")}<input placeholder="${t("landmark")}" aria-label="${t("landmark")}"></div></div>
         </div>
-        ${a.ok ? `<div class="card" style="border:1.5px solid var(--success-100)"><div class="row between"><span class="pill success">${ic("check", "icon xs")} ${t("serviceable")}</span><span class="eta-chip">${ic("bolt")}<span class="num">${a.eta} ${t("min")}</span></span></div>
-            <div class="row" style="margin-top:12px;gap:8px"><div class="kv" style="flex:1;grid-template-columns:1fr 1fr"><div><div class="k">${t("fee")}</div><div class="v num">${money(a.fee)}</div></div><div><div class="k">${t("minOrder")}</div><div class="v num">${money(a.min)}</div></div></div></div></div>`
-          : `<div class="card" style="border:1.5px solid var(--mandarin-100);background:var(--mandarin-50)"><div style="font-family:var(--font-display);font-weight:800;color:var(--aubergine);font-size:17px;line-height:1.5">${t("notServiceable")}</div><div class="muted" style="margin:6px 0 12px">${S.lang === "ar" ? "سيب رقمك وهنبلّغك أول ما نفتح في منطقتك." : "Leave your number and we'll tell you the moment we open in your area."}</div><div class="input" style="height:46px"><span class="prefix">+20</span><input inputmode="tel" value="${S.phone}" aria-label="${t("phone")}"></div><button class="btn dark" style="margin-top:10px;min-height:46px" data-toast="notify">${ic("bell", "icon sm")} ${t("notifyMe")}</button></div>`}
+        ${locationCard()}
       </div>
-      <div class="cta-bar"><button class="btn primary" data-confirm-loc ${a.ok ? "" : "disabled"}>${t("confirmLoc")}</button></div></div>`;
+      <div class="cta-bar"><button class="btn primary" data-confirm-loc ${S.loc.zone && S.loc.zone.ok ? "" : "disabled"}>${t("confirmLoc")}</button></div></div>`;
   };
 
   R.login = () => `<div class="screen">${statusbar()}
     <div class="topbar"><button class="icon-btn ghost" data-go="cart" aria-label="back">${ic("chevS")}</button></div>
-    <div class="scroll pad"><div style="text-align:center;margin:24px 0 28px"><div class="logo" style="font-size:64px"><span class="ar">توا<span class="shadda" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M3 19C7 6 11 6 15 19M15 19C19 6 23 6 27 19M27 19C31 6 35 6 39 19" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></div></div>
+    <div class="scroll pad"><div style="text-align:center;margin:24px 0 28px"><div class="brand-logo md" style="color:var(--aubergine);margin:0 auto">${T.logo()}</div></div>
       <h2 style="font-family:var(--font-display);font-size:26px;color:var(--aubergine)">${t("loginT")}</h2><p class="muted" style="margin:6px 0 24px;line-height:1.7">${t("loginSub")}</p>
       <div class="field"><label>${t("phone")}</label><div class="input"><span class="prefix" dir="ltr">🇪🇬 +20</span><input inputmode="tel" autocomplete="tel" value="${S.phone}" aria-label="${t("phone")}" dir="ltr"></div><div class="hint">${S.lang === "ar" ? "هنبعت كود تأكيد برسالة SMS" : "We'll text you a verification code"}</div></div>
       <button class="btn primary" data-go="otp">${t("sendOtp")}</button>
@@ -209,7 +293,7 @@
         <div class="hero-track" data-hero>${heroes.map(([cls, i, code]) => `<div class="hero ${cls}">${wave()}${code ? `<span class="code">${code}</span>` : ""}<div class="kicker">${t(`home_hero${i}k`)}</div><h3>${t(`home_hero${i}t`)}</h3><p>${t(`home_hero${i}p`)}</p><button class="cta" data-go="${i === 3 ? "plp" : "deals"}" data-cat="local">${t("shopNow")}</button></div>`).join("")}</div>
         <div class="dots">${heroes.map((_, i) => `<span class="${i === S.heroIdx ? "on" : ""}"></span>`).join("")}</div>
         <div class="tabs" role="tablist">${tabs.map(([id, l]) => `<button role="tab" class="tab ${id === "deals" ? "deal" : ""} ${S.homeTab === id ? "on" : ""}" data-hometab="${id}">${id === "deals" ? ic("percent", "icon xs") + " " : ""}${t(l)}</button>`).join("")}</div>
-        <div class="section" style="margin-top:20px">${sectionHead(t("shopBy"), null, false)}<div class="cat-grid">${T.categories.slice(0, 8).map((c) => `<button class="cat" data-go="plp" data-cat="${c.id}"><span class="tile" style="background:${c.bg};color:${c.fg}">${ic(c.icon)}</span><span>${esc(catName(c))}</span></button>`).join("")}</div></div>
+        <div class="section" style="margin-top:20px">${sectionHead(t("shopBy"), null, false)}<div class="cat-grid">${T.categories.map((c) => `<button class="cat" data-go="plp" data-cat="${c.id}"><span class="tile" style="background:${c.bg};color:${c.fg}">${ic(c.icon)}</span><span>${esc(catName(c))}</span></button>`).join("")}</div></div>
         <div class="section">${sectionHead(t("secDeals"), t("secDealsSub"), true, ` <span class="countdown" aria-label="${t("endsIn")}"><span class="num">02</span>:<span class="num">14</span>:<span class="num">09</span></span>`)}${carousel(by("deal").slice(0, 8))}</div>
         <div class="section">${sectionHead(t("secPopular"))}${carousel(by("popular").slice(0, 8))}</div>
         <div class="section pad"><div class="deal-banner">${wave()}<div><h3>${t("dealHero")}</h3><p>${t("dealHeroSub")}</p></div><button class="btn sm" style="background:var(--mandarin);color:#fff" data-go="deals">${t("dealZone")}</button></div></div>
@@ -294,8 +378,8 @@
       <div class="chips" style="padding-top:0;gap:6px">${[t("addressT"), t("deliveryT"), t("paymentT"), t("summaryT")].map((s, i) => `<span class="chip ${i < 3 ? "on" : ""}" style="min-height:28px;padding:4px 10px;font-size:12px">${i + 1}. ${s}</span>`).join("")}</div>
       <div class="scroll pad pb-cta">
         <div class="card"><div class="row between"><h3 style="margin:0">${ic("pin", "icon sm")} ${t("addressT")}</h3><button class="btn ghost sm" data-go="location" style="color:var(--mandarin-600)">${t("change")}</button></div>
-          <div class="row" style="margin-top:8px"><span class="pill brand">${ic("home", "icon xs")} ${t(S.zone.label)}</span><span style="font-weight:700;font-size:14px">${esc(S.lang === "ar" ? `${a.ar}، ${S.zone.city}` : `${a.en}, ${S.zone.cityEn}`)}</span></div>
-          <div class="muted" style="margin-top:4px">${S.lang === "ar" ? "شارع المدارس، عمارة 12، الدور 3، شقة 7 · بجوار مسجد النور" : "Schools St., Bldg 12, Floor 3, Apt 7 · Next to Al Nour Mosque"}</div>
+          <div class="row" style="margin-top:8px"><span class="pill brand">${ic("home", "icon xs")} ${t(S.zone.label)}</span><span style="font-weight:700;font-size:14px">${placeName(a)}</span></div>
+          <div class="muted" style="margin-top:4px">${S.lang === "ar" ? "شارع الجيش، عمارة 12، الدور 3، شقة 7 · بجوار البنك الأهلي" : "El Gaish St., Bldg 12, Floor 3, Apt 7 · Next to NBE bank"}</div>
           <div class="row" style="margin-top:8px"><span class="muted num" dir="ltr">+20 ${S.phone}</span></div></div>
         <div class="card"><h3>${ic("clock", "icon sm")} ${t("deliveryT")}</h3>
           <button class="opt ${S.slot === "now" ? "on" : ""}" data-slot="now"><span class="radio"></span><span class="ico">${ic("bolt", "icon sm")}</span><span class="ob"><div class="t">${t("now")} · <span class="num" style="color:var(--mandarin-600)">${a.eta} ${t("min")}</span></div><div class="s">${t("nowSub")}</div></span></button>
@@ -323,7 +407,8 @@
       <div class="scroll pad pb-cta" style="margin-top:-28px;position:relative;z-index:2">
         <div class="card"><div class="row between"><div><div class="muted">${t("orderNo")} <span class="num" dir="ltr">#${S.orderId || o.id}</span></div><div style="font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--aubergine)">${t("arriving")} <span class="num" style="color:var(--mandarin-600)">${S.trackStep >= 3 ? "0" : 12 - S.trackStep * 3} ${t("min")}</span></div></div><span class="eta-chip">${ic("bolt")}<span class="num">${S.zone.area.eta} ${t("min")}</span></span></div>
           <div class="divider"></div>
-          <div class="timeline">${steps.map(([l, s, tm], i) => `<div class="step ${i < S.trackStep ? "done" : i === S.trackStep ? "now" : "pending"}"><span class="dot">${i < S.trackStep ? ic("check", "icon xs") : i === S.trackStep ? ic("bolt", "icon xs") : ""}</span><div><div class="st">${t(l)} ${tm && i <= S.trackStep ? `<span class="muted num" style="font-weight:600">· ${tm}</span>` : ""}</div><div class="ss">${t(s)}</div></div></div>`).join("")}</div>
+          <div class="hsteps" aria-label="${t("trackT")}">${steps.map(([l, s, tm], i) => `<div class="hstep ${i < S.trackStep ? "done" : i === S.trackStep ? "now" : "pending"}"><span class="dot">${i < S.trackStep ? ic("check", "icon xs") : ic(["check", "box", "bike", "home"][i], "icon xs")}</span><div class="hl">${t(l)}</div></div>`).join("")}</div>
+          <div class="hstep-msg">${ic(["check", "box", "bike", "home"][S.trackStep], "icon sm")}<div><b>${t(steps[S.trackStep][0])}</b><div class="muted">${t(steps[S.trackStep][1])}${steps[S.trackStep][2] ? ` · <span class="num">${steps[S.trackStep][2]}</span>` : ""}</div></div></div>
           <button class="btn ghost sm" data-track-next style="margin:-8px auto 0;display:flex">${S.lang === "ar" ? "(للعرض) الخطوة التالية" : "(Demo) next step"} ${ic("chevS", "icon xs")}</button></div>
         ${S.trackStep >= 2 ? `<div class="card"><div class="row"><span class="avatar">م</span><div style="flex:1"><div style="font-weight:800">${S.lang === "ar" ? "محمود عبدالله" : "Mahmoud Abdallah"}</div><div class="muted">${t("rider")} · ${ic("star", "icon xs")} <span class="num">4.9</span> · <span class="num" dir="ltr">${S.lang === "ar" ? "س ن ط 4521" : "SNT 4521"}</span></div></div><button class="icon-btn ghost" aria-label="${t("callRider")}" data-toast="call">${ic("phone")}</button><button class="icon-btn ghost" aria-label="${t("chatSupport")}" data-toast="help">${ic("chat")}</button></div></div>` : ""}
         <div class="card"><h3>${ic("box", "icon sm")} ${t("orderItems")} <span class="muted" style="font-family:var(--font-body);font-weight:600">· ${items.length}</span></h3>${items.map(({ p, q }) => `<div class="row" style="padding:6px 0">${tile(p, "thumb").replace('class="thumb"', 'class="thumb" style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center"')}<span style="flex:1;font-size:14px;font-weight:700">${esc(name(p))}</span><span class="muted num">×${q}</span><span class="num" style="font-weight:700">${money(p.price * q)}</span></div>`).join("")}<div class="divider"></div><div class="row between"><b>${t("total")}</b><b class="num">${money(S.orderId ? total() : o.total)}</b></div><div class="muted" style="margin-top:4px">${t(S.pay === "cod" ? "cod" : S.pay === "card" ? "card" : S.pay === "wallet" ? "wallet" : "twaaWallet")}</div></div>
@@ -390,6 +475,7 @@
     document.querySelectorAll("[data-wb-screen]").forEach((b) => b.classList.toggle("active", b.dataset.wbScreen === (S.pdp ? "pdp" : S.screen)));
     document.querySelectorAll("[data-wb-lang]").forEach((b) => b.classList.toggle("active", b.dataset.wbLang === S.lang));
     const q = host.querySelector("[data-q]"); if (q && S.screen === "search") { q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+    if (S.screen === "location" && !S.pdp) { LM.leaflet = null; LM.fallback = null; requestAnimationFrame(mountLiveMap); }
     const ht = host.querySelector("[data-hero]"); if (ht) ht.addEventListener("scroll", () => { const i = Math.round(ht.scrollLeft / (ht.firstElementChild.offsetWidth + 12)); const idx = Math.abs(i); if (idx !== S.heroIdx) { S.heroIdx = idx; host.querySelectorAll(".dots span").forEach((d, k) => d.classList.toggle("on", k === idx)); } }, { passive: true });
   }
   function go(screen) { S.pdp = null; S.screen = screen; if (["home", "categories", "search", "orders", "account"].includes(screen)) S.tab = screen; render(); }
@@ -431,7 +517,9 @@
     if ((el = b("[data-fb]"))) { const i = +el.dataset.fb; S.fb.has(i) ? S.fb.delete(i) : S.fb.add(i); render(); return; }
     if ((el = b("[data-otp-fill]"))) { S.otp = 0; const tick = () => { S.otp++; render(); if (S.otp < 6) setTimeout(tick, 120); }; tick(); return; }
     if ((el = b("[data-verify]"))) { go(cartCount() ? "checkout" : "home"); return; }
-    if ((el = b("[data-confirm-loc]"))) { const c = T.zones[S.loc.city]; S.zone = { city: c.city, cityEn: c.cityEn, area: c.areas[S.loc.area], label: "homeLbl" }; go("home"); return; }
+    if ((el = b("[data-confirm-loc]"))) { if (S.loc.zone && S.loc.zone.ok) { S.zone = { area: S.loc.zone, label: "homeLbl" }; go("home"); } return; }
+    if ((el = b("[data-gps]"))) { locateMe(); return; }
+    if ((el = b("[data-lm-zoom]"))) { LM.zoom = Math.min(17, Math.max(11, LM.zoom + (+el.dataset.lmZoom))); if (LM.mode === "leaflet" && LM.leaflet) LM.leaflet.setZoom(LM.zoom); else if (LM.fallback) LM.fallback.draw(); return; }
     if ((el = b("[data-lang-toggle]"))) { S.lang = S.lang === "ar" ? "en" : "ar"; render(); return; }
     if ((el = b("[data-toast]"))) { toast(TOASTS[el.dataset.toast]()); return; }
     if ((el = b("[data-go]"))) { if (el.dataset.cat) { S.cat = el.dataset.cat; S.subcat = 0; } if (el.dataset.go === "checkout" && !S.loggedIn) { S.loggedIn = true; return go("login"); } go(el.dataset.go); return; }
@@ -440,8 +528,8 @@
     if (e.target.matches("[data-q]")) { S.query = e.target.value; const sc = host.querySelector(".scroll"); const html = R.search(); const tmp = h(html); host.querySelector(".screen").querySelector(".scroll").innerHTML = tmp.querySelector(".scroll").innerHTML; const cb = host.querySelector(".cartbar"); return; }
   });
   host.addEventListener("change", (e) => {
-    if (e.target.matches("[data-city]")) { S.loc.city = +e.target.value; S.loc.area = 0; render(); }
-    if (e.target.matches("[data-area]")) { S.loc.area = +e.target.value; render(); }
+    if (e.target.matches("[data-zone-select]")) { const z = T.zones.find((x) => x.id === e.target.value); if (z) { resolveZone(z.lat, z.lng); setMapView(z.lat, z.lng); patchLocationCard(); } }
+    if (e.target.matches("[data-zone-search]")) { const v = e.target.value.trim().toLowerCase(); const z = T.zones.find((x) => x.ar === v || x.en.toLowerCase() === v || x.ar.includes(v) || x.en.toLowerCase().includes(v)); if (z) { resolveZone(z.lat, z.lng); setMapView(z.lat, z.lng); patchLocationCard(); } }
   });
 
   /* ---------------- Workbench (sidebar) ---------------- */
@@ -453,6 +541,7 @@
     $("#wb-seed")?.addEventListener("click", () => { S.cart = { 1: 2, 5: 1, 24: 1, 9: 1 }; S.loggedIn = true; go("cart"); });
   }
 
+  resolveZone(S.loc.lat, S.loc.lng);
   render();
   /* auto-advance splash */
   setTimeout(() => { if (S.screen === "splash") go("location"); }, 2200);
