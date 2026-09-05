@@ -493,6 +493,7 @@
     const prevScroll = host.querySelector(".scroll"); if (prevScroll) scrollMemo[S.screen] = prevScroll.scrollTop;
     const base = S.screen === "pdp" ? (S.tab || "home") : S.screen;
     host.innerHTML = (R[base] || R.home)() + (S.pdp ? pdpSheet() : "");
+    if (host.firstElementChild) host.firstElementChild.dataset.screen = base;
     document.documentElement.lang = S.lang; document.documentElement.dir = T.i18n[S.lang].dir;
     const sc = host.querySelector(".scroll"); if (sc && scrollMemo[S.screen] != null && !S.pdp) sc.scrollTop = scrollMemo[S.screen];
     document.querySelectorAll("[data-wb-screen]").forEach((b) => b.classList.toggle("active", b.dataset.wbScreen === (S.pdp ? "pdp" : S.screen)));
@@ -563,6 +564,17 @@
     side.addEventListener("click", (e) => { const b = e.target.closest("[data-wb-screen]"); if (!b) return; const id = b.dataset.wbScreen; if (id === "pdp") { S.screen = S.tab || "home"; S.pdp = 1; render(); } else go(id); });
     document.querySelectorAll("[data-wb-lang]").forEach((b) => b.addEventListener("click", () => { S.lang = b.dataset.wbLang; render(); }));
     $("#wb-seed")?.addEventListener("click", () => { S.cart = { 1: 2, 5: 1, 24: 1, 9: 1 }; S.loggedIn = true; go("cart"); });
+    /* preview frame modes: fill window (responsive web), tablet, phone */
+    const phone = $("#phone"), wb = $("#workbench");
+    const setFrame = (m) => { phone.className = `phone frame-${m}`; wb.classList.toggle("fill", m === "fill"); document.querySelectorAll("[data-wb-frame]").forEach((b) => b.classList.toggle("active", b.dataset.wbFrame === m)); try { localStorage.setItem("twaa.frame", m); } catch (e) {} if (S.screen === "location") render(); };
+    document.querySelectorAll("[data-wb-frame]").forEach((b) => b.addEventListener("click", () => setFrame(b.dataset.wbFrame)));
+    let saved = "fill"; try { saved = localStorage.getItem("twaa.frame") || "fill"; } catch (e) {}
+    setFrame(saved);
+    /* small viewports: sidebar as a drawer */
+    const sideEl = $(".wb-side"); let scrim = null;
+    const openSide = (on) => { sideEl.classList.toggle("open", on); if (on && !scrim) { scrim = h('<div class="wb-scrim"></div>'); scrim.addEventListener("click", () => openSide(false)); document.body.appendChild(scrim); } if (!on && scrim) { scrim.remove(); scrim = null; } };
+    $("#wb-fab")?.addEventListener("click", () => openSide(true)); $("#wb-close")?.addEventListener("click", () => openSide(false));
+    side.addEventListener("click", () => { if (window.innerWidth <= 860) openSide(false); });
   }
 
   resolveZone(S.loc.lat, S.loc.lng);

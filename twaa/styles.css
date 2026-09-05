@@ -632,3 +632,156 @@ img, svg { display: block; }
 .logo-img img { width: 100%; height: auto; display: block; object-fit: contain; }
 .logo-img.mark img { clip-path: inset(0 0 22% 0); margin-bottom: -22%; } /* mark only: crop the TWAA line */
 .logo-img svg { width: 100%; height: auto; }
+
+/* ==========================================================================
+   v1.3 — Responsive: real-device fill mode, tablet, desktop web layout
+   The app root (.phone) is a size container; every rule below responds to the
+   container width, so the framed preview and the full-window app behave alike.
+   ========================================================================== */
+.phone { container-type: inline-size; container-name: app; }
+
+/* ---- Preview / device modes on the app root ---- */
+.phone.frame-tablet { width: min(768px, 100%); height: max(700px, calc(100dvh - 64px)); border-radius: 36px; }
+.phone.frame-fill { width: 100%; height: 100dvh; min-height: 100dvh; border: 0; border-radius: 0; box-shadow: none; }
+.phone:not(.frame-phone)::before, .phone:not(.frame-phone) .statusbar, .phone:not(.frame-phone) .home-indicator { display: none; }
+.phone.frame-fill .appbar, .phone.frame-fill .topbar { padding-top: calc(var(--s-2) + env(safe-area-inset-top, 0px)); }
+.phone.frame-fill .splash .brand-logo { margin-top: env(safe-area-inset-top, 0px); }
+.phone.frame-fill .bottomnav { height: calc(62px + max(22px, env(safe-area-inset-bottom, 0px))); padding-bottom: max(22px, env(safe-area-inset-bottom, 0px)); }
+.phone.frame-fill .cta-bar { padding-bottom: max(28px, calc(12px + env(safe-area-inset-bottom, 0px))); }
+.workbench.fill .wb-main { padding: 0; align-items: stretch; }
+.workbench.fill .wb-main .phone { flex: 1; }
+
+/* ---- Workbench on small viewports: sidebar becomes a drawer ---- */
+.wb-fab { display: none; position: fixed; left: 14px; bottom: 14px; z-index: 200; width: 48px; height: 48px; border-radius: 24px; background: var(--aubergine); color: var(--cream); box-shadow: var(--sh-3); place-items: center; border: 2px solid rgba(255,255,255,.35); }
+.wb-close { display: none; margin-inline-start: auto; color: var(--cream); width: 40px; height: 40px; border-radius: 20px; background: rgba(255,255,255,.12); place-items: center; }
+@media (max-width: 860px) {
+  .workbench { display: block; }
+  .wb-side { position: fixed; left: 0; top: 0; bottom: 0; width: min(340px, 88vw); z-index: 300; transform: translateX(-100%); transition: transform var(--dur-3) var(--ease-out); box-shadow: none; }
+  .wb-side.open { transform: none; box-shadow: var(--sh-3); }
+  .wb-scrim { position: fixed; inset: 0; background: rgba(36,22,38,.5); z-index: 290; }
+  .wb-fab, .wb-close { display: grid; }
+  .wb-fab { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); width: 40px; height: 40px; opacity: .85; }
+  .wb-main { padding: 0; }
+  .phone, .phone.frame-phone, .phone.frame-tablet { width: 100%; height: 100dvh; min-height: 100dvh; border: 0; border-radius: 0; box-shadow: none; }
+  .phone::before, .phone .statusbar, .phone .home-indicator { display: none; }
+  .phone .appbar, .phone .topbar { padding-top: calc(var(--s-2) + env(safe-area-inset-top, 0px)); }
+  .phone .bottomnav { height: calc(62px + max(22px, env(safe-area-inset-bottom, 0px))); padding-bottom: max(22px, env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---- Shared centring: content column inside every scroll area ---- */
+.scroll { --g: 0px; --maxw: 1180px; }
+.scroll.pad { --g: var(--s-4); }
+
+/* =============== Tablet and up (container ≥ 600px) =============== */
+@container app (min-width: 600px) {
+  .scroll, .scroll.pad { padding-inline: max(var(--g), calc((100% - var(--maxw)) / 2)); }
+  .appbar, .topbar { padding-inline: max(var(--s-6), calc((100% - var(--maxw, 1180px)) / 2)); }
+  .appbar { border-radius: 0; }
+  .appbar.noon .searchbar { max-width: 720px; }
+  .hero-track { padding-inline: 0; gap: var(--s-4); }
+  .hero { width: calc(50% - 8px); height: 170px; }
+  .hero h3 { font-size: var(--fs-24); }
+  .tabs, .chips { padding-inline: 0; }
+  .section-head, .cat-grid, .p-grid, .h-scroll, .trend { padding-inline: 0; }
+  .scroll:not(.pad) > .section > .section-head, .scroll:not(.pad) > .section > .cat-grid, .scroll:not(.pad) > .section > .h-scroll, .scroll:not(.pad) > .section.pad, .scroll:not(.pad) > .hero-track, .scroll:not(.pad) > .tabs, .scroll:not(.pad) > .chips, .scroll:not(.pad) > .p-grid, .scroll:not(.pad) > .muted, .scroll:not(.pad) > .search-list, .scroll:not(.pad) > .section > .trend, .scroll:not(.pad) > .section > .search-list, .scroll:not(.pad) > .empty, .scroll:not(.pad) > .pad { padding-inline: var(--s-6); }
+  .scroll:not(.pad) > .section.pad { padding-inline: var(--s-6); }
+  .cat-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: var(--s-4) var(--s-3); }
+  .cat .tile { width: 76px; height: 76px; }
+  .p-grid { grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: var(--s-4); }
+  .product { width: 176px; }
+  .product .img, .p-grid .product .img { height: 132px; }
+  .meal { width: 250px; }
+  .cartbar { inset-inline: max(var(--s-4), calc((100% - 640px) / 2)); }
+  .cta-bar { padding-inline: max(var(--s-4), calc((100% - 720px) / 2)); }
+  .sheet { inset-inline: max(0px, calc((100% - 720px) / 2)); }
+  .toast { inset-inline: max(var(--s-4), calc((100% - 520px) / 2)); }
+  .bottomnav { padding-inline: max(var(--s-2), calc((100% - 720px) / 2)); }
+  .map { min-height: 340px; }
+  .kv { grid-template-columns: repeat(4, 1fr); }
+  .plp-rail { width: 200px; }
+  .plp-rail button { flex-direction: row; text-align: start; font-size: var(--fs-13); padding: 10px 14px; gap: 10px; }
+  .plp-rail .tile { width: 40px; height: 40px; }
+  .plp-body .p-grid { padding: 0 var(--s-4) var(--s-4); gap: var(--s-3); }
+  .plp-body .product .img { height: 124px; }
+  [data-screen="login"] .scroll, [data-screen="otp"] .scroll, [data-screen="rating"] .scroll { --maxw: 480px; }
+  [data-screen="account"] .scroll { --maxw: 760px; }
+  [data-screen="orders"] .scroll { --maxw: 820px; }
+  [data-screen="cart"] .scroll, [data-screen="checkout"] .scroll { --maxw: 720px; }
+}
+
+/* =============== Desktop (container ≥ 900px): side rail + multi-column =============== */
+@container app (min-width: 900px) {
+  .screen:has(> .bottomnav) { padding-inline-start: 96px; }
+  .phone .screen > .bottomnav { inset-inline-start: 0; inset-inline-end: auto; top: 0; bottom: 0; height: auto; width: 96px; padding: var(--s-6) var(--s-2) var(--s-6); display: flex; flex-direction: column; gap: var(--s-2); justify-content: flex-start; background: var(--aubergine); border: 0; }
+  .bottomnav button { color: rgba(249,242,231,.68); min-height: 64px; width: 100%; font-size: var(--fs-12); }
+  .bottomnav button.on { color: var(--cream); background: rgba(255,255,255,.1); }
+  .bottomnav button.on::after { width: 24px; }
+  .bottomnav .cart-tab .badge { inset-inline-end: 16px; top: 8px; }
+  .screen:has(> .bottomnav) .cartbar { inset-inline-start: auto; inset-inline-end: var(--s-6); bottom: var(--s-6); width: 440px; }
+  .pb-nav { padding-bottom: 120px; }
+
+  /* home app bar → one horizontal bar */
+  .appbar.noon { display: grid; grid-template-columns: auto minmax(320px, 1fr) auto; align-items: center; gap: var(--s-6); padding-block: var(--s-3); }
+  .appbar.noon > .row { display: contents; }
+  .appbar.noon .eta-block { order: 0; }
+  .appbar.noon .eta-block .big { font-size: var(--fs-24); }
+  .appbar.noon .searchbar { order: 1; margin: 0; width: 100%; max-width: none; }
+  .appbar.noon > .row > .row { order: 2; }
+  .hero { width: calc(33.333% - 11px); height: 190px; }
+  .hero h3 { font-size: var(--fs-28); }
+  .section-head h2 { font-size: var(--fs-24); }
+
+  /* map screens: map | details */
+  [data-screen="location"], [data-screen="tracking"] { display: grid; grid-template-columns: 1fr 460px; grid-template-rows: auto 1fr; }
+  [data-screen="location"] > .topbar, [data-screen="tracking"] > .topbar { grid-column: 1 / -1; }
+  [data-screen="location"] > .map, [data-screen="tracking"] > .map { grid-column: 1; grid-row: 2; height: auto !important; min-height: 0; }
+  [data-screen="location"] > .scroll, [data-screen="tracking"] > .scroll { grid-column: 2; grid-row: 2; margin-top: 0 !important; --maxw: 460px; --g: var(--s-5); padding-top: var(--s-4); background: var(--bg); box-shadow: -1px 0 0 var(--line); }
+  .phone [data-screen="location"] > .cta-bar, .phone [data-screen="tracking"] > .cta-bar { left: auto; right: auto; inset-inline-end: 0; width: 460px; padding: var(--s-3) var(--s-5) var(--s-5); }
+
+  /* cart & checkout: content | sticky summary */
+  [data-screen="cart"] .scroll, [data-screen="checkout"] .scroll { --maxw: 1040px; display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 0 var(--s-6); align-content: start; padding-top: var(--s-4); }
+  [data-screen="cart"] .scroll > * , [data-screen="checkout"] .scroll > * { grid-column: 1; }
+  [data-screen="cart"] .scroll > .card + .card, [data-screen="checkout"] .scroll > .card + .card { margin-top: 0; }
+  [data-screen="cart"] .scroll > * { margin-bottom: var(--s-3); }
+  [data-screen="cart"] .scroll > :nth-child(n+4) { grid-column: 2; }
+  [data-screen="cart"] .scroll > :nth-child(4) { grid-row: 1; }
+  [data-screen="cart"] .scroll > .card:nth-child(4) { margin-top: 132px; }
+  [data-screen="cart"] .scroll > :nth-child(5) { grid-row: 2; }
+  [data-screen="cart"] .scroll > :nth-child(6) { grid-row: 3; }
+  [data-screen="checkout"] .scroll > * { margin-bottom: var(--s-3); }
+  [data-screen="checkout"] .scroll > :last-child { grid-column: 2; grid-row: 1 / span 4; position: sticky; top: 132px; align-self: start; margin-top: 132px; }
+  .phone [data-screen="cart"] .cta-bar, .phone [data-screen="checkout"] .cta-bar { left: auto; right: auto; inset-inline-end: max(var(--s-4), calc((100% - 1040px) / 2)); width: 380px; top: 76px; bottom: auto; border-radius: var(--r-lg); border: 1px solid var(--line); box-shadow: var(--sh-2); padding: var(--s-3) var(--s-4); }
+  [data-screen="cart"] .pb-cta, [data-screen="checkout"] .pb-cta { padding-bottom: 40px; }
+
+  /* product sheet → centred modal, image | details */
+  .sheet { inset: 5% max(var(--s-6), calc((100% - 960px) / 2)); max-height: none; border-radius: var(--r-2xl); animation: fade var(--dur-2); }
+  .sheet .scroll { display: grid; grid-template-columns: 1fr 1.15fr; gap: 0 var(--s-6); align-content: start; padding: var(--s-6) var(--s-8) 120px; --maxw: none; }
+  .sheet .scroll > .pdp-img { grid-column: 1; height: 360px; margin: 0; }
+  .sheet .scroll > .pdp-thumbs { grid-column: 1; }
+  .sheet .scroll > .pad { grid-column: 2; grid-row: 1 / span 2; margin-top: 0 !important; padding: 0; }
+  .sheet .scroll > .section { grid-column: 1 / -1; }
+  .sheet .cta-bar { padding-inline: var(--s-8); border-radius: 0 0 var(--r-2xl) var(--r-2xl); }
+  .sheet .grab { display: none; }
+
+  /* listing: wider rail */
+  .plp-rail { width: 240px; }
+  .plp-body .p-grid { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+
+  /* food: two-column meal list */
+  .meal-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-3); }
+  .meal-list .meal.wide + .meal.wide { margin-top: 0; }
+  .food-hero h3 { font-size: var(--fs-28); }
+
+  /* orders: two columns */
+  [data-screen="orders"] .scroll { --maxw: 1040px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); align-content: start; padding-top: var(--s-2); }
+  [data-screen="orders"] .scroll > .card + .card { margin-top: 0; }
+
+  /* account: stats bar wide */
+  [data-screen="account"] .scroll { --maxw: 840px; }
+}
+
+@container app (min-width: 1240px) {
+  .p-grid { grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); }
+  .cat-grid { grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); }
+  .hero { width: calc(33.333% - 11px); height: 210px; }
+}

@@ -110,6 +110,18 @@ Ready-to-eat meals from the Twaa kitchen and partner local kitchens, delivered w
 - **Data:** food items carry `prep` (minutes), `sub` (sub-category) and `descAr/descEn`; the product sheet shows the description. Category tint is a warm terracotta so food reads differently from grocery.
 - Demo menu: فول وطعمية, كشري, شاورما, نص فرخة مشوية, بيتزا, برجر, فطار بلدي لشخصين, رز بلبن, أم علي, شاي بالنعناع, قهوة تركي, بطاطس.
 
+## 4b. Responsive behaviour
+One codebase, one set of components; layout responds to the **container width** (CSS container queries on the app root), so the framed preview and the full-window app behave identically.
+
+| Width | Layout |
+|---|---|
+| < 600px (phone) | The app fills the viewport, no fake frame. Safe-area insets are respected by the app bar, tab bar and CTA bar. Single-column grids, bottom tab bar, floating cart bar, product sheet from the bottom. |
+| 600–899px (tablet) | Content column centred (max 1180px); category grid and product grids auto-fill (4–6 columns); hero banners 2-up; cart bar, sheets, toasts and CTA bars centre at a comfortable width; listing rail shows labels beside icons. |
+| ≥ 900px (desktop web) | Left **side rail** replaces the tab bar (Aubergine, icons + labels, cart badge). Home app bar becomes one horizontal bar: ETA + address, search in the middle, icons at the end. Hero 3-up. Cart and checkout become two columns with a sticky summary and a floating CTA card. Location and tracking split map | details. Product sheet becomes a centred modal (image | details). Food list and orders in two columns. |
+| ≥ 1240px | Larger product and category tiles. |
+
+Preview modes in the workbench: **Fill window** (default, resize the browser to test), **Tablet** (768px frame), **Phone** (390×844 frame with status bar). On small viewports the workbench panel collapses into a drawer behind a floating button. The page carries PWA meta (theme colour, standalone, viewport-fit=cover) so it can be added to the home screen.
+
 ## 5. Component library
 See `design-system.html`: colour tokens, type scale, spacing/radius/elevation, buttons, quick add, chips & pills, ETA chip, product card anatomy, category tile palette, sticky cart bar, bottom nav, timeline, option rows, inputs/OTP, toast, empty states.
 

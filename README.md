@@ -19,7 +19,9 @@ Open `twaa/index.html` in a browser, or serve the folder:
 python3 -m http.server 8000   # then visit http://localhost:8000/twaa/
 ```
 
-No build step, no dependencies (Google Fonts loaded at runtime; falls back to system fonts offline).
+Fully responsive: fills a phone screen (PWA-ready), adapts grids on tablets, and becomes a desktop web layout with a side rail and multi-column cart, checkout, tracking and product pages. Preview modes: Fill window / Tablet / Phone.
+
+No build step, no dependencies (Google Fonts and Leaflet loaded at runtime; falls back gracefully offline).
 
 ### `index.html` — Expense Calculator
 
