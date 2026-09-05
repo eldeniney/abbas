@@ -745,7 +745,7 @@ img, svg { display: block; }
   [data-screen="cart"] .scroll > * { margin-bottom: var(--s-3); }
   [data-screen="cart"] .scroll > :nth-child(n+4) { grid-column: 2; }
   [data-screen="cart"] .scroll > :nth-child(4) { grid-row: 1; }
-  [data-screen="cart"] .scroll > .card:nth-child(4) { margin-top: 132px; }
+  [data-screen="cart"] .scroll > .card:nth-child(4) { margin-top: 132px !important; } /* beats the inline mobile margin */
   [data-screen="cart"] .scroll > :nth-child(5) { grid-row: 2; }
   [data-screen="cart"] .scroll > :nth-child(6) { grid-row: 3; }
   [data-screen="checkout"] .scroll > * { margin-bottom: var(--s-3); }
