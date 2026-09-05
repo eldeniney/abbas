@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>توّا Twaa — Customer App Prototype</title>
+<meta name="description" content="Twaa (توّا) hyperlocal quick-commerce customer app — interactive Arabic-first design prototype.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="workbench">
+  <aside class="wb-side" dir="ltr">
+    <div class="wb-brand">
+      <span class="logo-mark" aria-hidden="true">توا<span class="shadda" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M3 19C7 6 11 6 15 19M15 19C19 6 23 6 27 19M27 19C31 6 35 6 39 19" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+      <div><div class="tag">The Route</div><div class="wb-title">Twaa · توّا — Customer App</div></div>
+    </div>
+    <p class="wb-note">Interactive design prototype of the customer app (BRD v1.1). Arabic-first, RTL, quick-commerce pattern: address + ETA header, search, hero offers, category grid, quick-add carousels, sticky cart bar, 5-tab navigation.</p>
+    <div class="wb-group"><h4>Language</h4><div class="wb-seg"><button data-wb-lang="ar" class="active">العربية</button><button data-wb-lang="en">English</button></div></div>
+    <div class="wb-group"><h4>Screens</h4><div class="wb-list" id="wb-screens"></div></div>
+    <div class="wb-group"><h4>Demo</h4><div class="wb-list"><button id="wb-seed"><span>Seed cart with 4 items</span><span class="k">→ Cart</span></button></div><p class="wb-note" style="margin-top:8px">Promo codes: <b>TWAA30</b> (30% off, max 60) · <b>FREE</b> (free delivery). Free delivery threshold: 150 EGP.</p></div>
+    <div class="wb-group"><h4>Brand</h4><div class="wb-swatches"><span style="background:#3A1F3D" title="Aubergine #3A1F3D"></span><span style="background:#F9F2E7" title="Cream #F9F2E7"></span><span style="background:#F9732F" title="Mandarin #F9732F"></span></div></div>
+    <div class="wb-group wb-links"><h4>Docs</h4><a href="design-system.html">Design system →</a><a href="DESIGN.md">Design guideline (DESIGN.md) →</a></div>
+  </aside>
+  <main class="wb-main">
+    <div class="phone" id="phone">
+      <div class="screen-host" id="screen-host" aria-live="polite"></div>
+      <div class="home-indicator" aria-hidden="true"></div>
+    </div>
+  </main>
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

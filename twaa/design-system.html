@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twaa Design System</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@600;700;800&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  body { background: var(--cream); }
+  .ds { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
+  .ds h1 { font-family: var(--font-display); font-size: 40px; color: var(--aubergine); }
+  .ds h2 { font-family: var(--font-display); font-size: 26px; color: var(--aubergine); margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
+  .ds h3 { font-family: var(--font-display); font-size: 17px; color: var(--ink-2); margin: 20px 0 10px; }
+  .ds p { line-height: 1.7; color: var(--ink-2); max-width: 760px; }
+  .ds .lead { font-size: 18px; }
+  .sw { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .sw div { border-radius: 14px; padding: 14px; min-height: 110px; display: flex; flex-direction: column; justify-content: flex-end; box-shadow: var(--sh-1); font-size: 12px; font-weight: 700; }
+  .sw code { font-size: 11px; opacity: .8; font-weight: 500; }
+  .demo { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; background: var(--surface); border-radius: 16px; padding: 20px; box-shadow: var(--sh-1); }
+  .demo.rtl { direction: rtl; }
+  .type-row { display: grid; grid-template-columns: 200px 1fr; gap: 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+  .type-row .m { font-size: 12px; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--surface); border-radius: 12px; overflow: hidden; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--aubergine-50); color: var(--aubergine); font-weight: 800; }
+  .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .do-dont div { background: var(--surface); border-radius: 12px; padding: 14px 16px; border-top: 4px solid var(--success); }
+  .do-dont div.dont { border-top-color: var(--danger); }
+  .do-dont b { display: block; margin-bottom: 6px; }
+  .do-dont ul { padding-left: 18px; line-height: 1.7; font-size: 14px; color: var(--ink-2); }
+  .logo-block { display: flex; gap: 24px; flex-wrap: wrap; }
+  .logo-block > div { border-radius: 16px; padding: 28px 40px; display: grid; place-items: center; min-width: 200px; box-shadow: var(--sh-1); }
+  a { color: var(--mandarin-600); }
+</style>
+</head>
+<body>
+<div class="ds">
+  <a href="index.html">← Back to prototype</a>
+  <h1 style="margin-top:12px">Twaa Design System <span style="font-size:.6em;color:var(--mandarin)">v1.0</span></h1>
+  <p class="lead">Foundations and components for the توّا customer app. Every value below is a CSS custom property in <code>styles.css</code>, so screens never hard-code colours or sizes.</p>
+
+  <h2>1. Brand</h2>
+  <p>Tagline: <b>من هنا لك.. توّا</b> · "Local roots. Closer days." The wordmark is heavy, rounded Arabic lettering in Aubergine with a Mandarin shadda (the "spark"). The rounded cream wave ribbon is the secondary motif used on bags, uniforms and app banners.</p>
+  <div class="logo-block">
+    <div style="background:var(--cream)"><div class="logo" style="font-size:72px"><span class="ar">توا<span class="shadda" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M3 19C7 6 11 6 15 19M15 19C19 6 23 6 27 19M27 19C31 6 35 6 39 19" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span><span class="en">TWAA</span></div></div>
+    <div style="background:var(--aubergine)"><div class="logo on-dark" style="font-size:72px"><span class="ar">توا<span class="shadda" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M3 19C7 6 11 6 15 19M15 19C19 6 23 6 27 19M27 19C31 6 35 6 39 19" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span><span class="en">TWAA</span></div></div>
+    <div style="background:#fff"><span class="logo-mark" style="width:88px;height:88px;border-radius:24px;font-size:44px">توا<span class="shadda" style="width:24px;height:16px;top:8px;right:26px" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M3 19C7 6 11 6 15 19M15 19C19 6 23 6 27 19M27 19C31 6 35 6 39 19" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></div>
+    <div style="background:var(--ink)"><div class="logo" style="font-size:72px;color:#fff"><span class="ar">توا<span class="shadda" style="color:#fff" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M3 19C7 6 11 6 15 19M15 19C19 6 23 6 27 19M27 19C31 6 35 6 39 19" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span></div></div>
+  </div>
+  <p style="margin-top:12px;font-size:13px"><b>Note:</b> the wordmark here is rendered with the display font as a stand-in. Replace with the official vector logo (SVG) from the brand package before production; keep clear space equal to the height of the shadda around it.</p>
+
+  <h2>2. Colour</h2>
+  <div class="sw">
+    <div style="background:#3A1F3D;color:#F9F2E7">Aubergine · Primary<code>#3A1F3D · --aubergine</code></div>
+    <div style="background:#2C162F;color:#F9F2E7">Aubergine 700<code>#2C162F · pressed / headers</code></div>
+    <div style="background:#4E2C52;color:#F9F2E7">Aubergine 500<code>#4E2C52 · gradients</code></div>
+    <div style="background:#EFE5F0;color:#3A1F3D">Aubergine 100<code>#EFE5F0 · soft buttons, chips</code></div>
+    <div style="background:#F9F2E7;color:#3A1F3D">Cream · Background<code>#F9F2E7 · --cream / --bg</code></div>
+    <div style="background:#FFFFFF;color:#3A1F3D;border:1px solid #EADFD3">Surface<code>#FFFFFF · cards</code></div>
+    <div style="background:#F9732F;color:#fff">Mandarin · Accent<code>#F9732F · CTA, badges, ETA</code></div>
+    <div style="background:#E05F1C;color:#fff">Mandarin 600<code>#E05F1C · hover, text on light</code></div>
+    <div style="background:#FEE7DA;color:#E05F1C">Mandarin 100<code>#FEE7DA · deal chips</code></div>
+    <div style="background:#241626;color:#fff">Ink<code>#241626 · body text</code></div>
+    <div style="background:#7E6F80;color:#fff">Muted<code>#7E6F80 · secondary text</code></div>
+    <div style="background:#EADFD3;color:#241626">Line<code>#EADFD3 · dividers</code></div>
+    <div style="background:#2E7D4F;color:#fff">Success<code>#2E7D4F</code></div>
+    <div style="background:#B8860B;color:#fff">Warning<code>#B8860B</code></div>
+    <div style="background:#C63A3A;color:#fff">Danger<code>#C63A3A</code></div>
+  </div>
+  <h3>Usage rules</h3>
+  <div class="do-dont">
+    <div><b>Do</b><ul><li>Aubergine for structure: app bar, primary text emphasis, prices, active nav.</li><li>Mandarin for one thing per screen: the primary action, plus small signals (ETA chip, discount badge, active indicator).</li><li>Cream as the page background; white cards float on it.</li><li>Pair Cream text on Aubergine (contrast 12.6:1) and white on Mandarin only for text ≥ 14px bold.</li></ul></div>
+    <div class="dont"><b>Don't</b><ul><li>Don't use Mandarin as a background for large areas or body text.</li><li>Don't put grey text on the cream background below 13px.</li><li>Don't introduce new hues for categories beyond the tinted tile palette in <code>data.js</code>.</li><li>Don't convey stock/status with colour alone — always pair with a label.</li></ul></div>
+  </div>
+
+  <h2>3. Typography</h2>
+  <p>Display: <b>Baloo Bhaijaan 2</b> (rounded, echoes the logo) for headings, prices, buttons and the wordmark. Body: <b>Cairo</b> for everything else. Both cover Arabic and Latin so language switching never changes the voice. Numbers always use tabular figures (<code>.num</code>).</p>
+  <div class="demo rtl" style="display:block">
+    <div class="type-row"><span class="m">Display / 34 · 800</span><span style="font-family:var(--font-display);font-size:34px;font-weight:800;color:var(--aubergine)">محتاج حاجة؟ هاتها توّا.</span></div>
+    <div class="type-row"><span class="m">H1 / 24 · 800</span><span style="font-family:var(--font-display);font-size:24px;font-weight:800">خصم 30% على أول طلب</span></div>
+    <div class="type-row"><span class="m">H2 / 20 · 700</span><span style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--aubergine)">عروض توّا</span></div>
+    <div class="type-row"><span class="m">Title / 16 · 700</span><span style="font-weight:700;font-size:16px">لبن جهينة كامل الدسم</span></div>
+    <div class="type-row"><span class="m">Body / 15 · 500</span><span style="font-size:15px">بنوصّل عندك خلال 30 دقيقة في السادات وأبو المطامير والنوبارية.</span></div>
+    <div class="type-row"><span class="m">Caption / 12 · 600</span><span style="font-size:12px;color:var(--muted);font-weight:600">1 لتر · الحد الأقصى 10</span></div>
+    <div class="type-row"><span class="m">Price / 16 · 800</span><span class="price num">44<small>ج.م</small></span> <span class="price-old num">52 ج.م</span></div>
+  </div>
+  <h3>Voice</h3>
+  <p>Egyptian colloquial Arabic, warm and short. Say <b>"هاتها توّا"</b> not "قم بطلب المنتج". Errors are human: <b>"حصلت مشكلة بسيطة. جرّب تاني."</b> Never show raw codes to customers.</p>
+
+  <h2>4. Spacing, radius, elevation</h2>
+  <table><tr><th>Token</th><th>Value</th><th>Use</th></tr>
+    <tr><td>--s-1 … --s-10</td><td>4 · 8 · 12 · 16 · 20 · 24 · 32 · 40</td><td>4pt grid. Screen gutter 16, section gap 24, card padding 16.</td></tr>
+    <tr><td>--r-sm / md / lg / xl / 2xl</td><td>8 · 12 · 16 · 20 · 28</td><td>Chips & badges 8, inputs 12, cards & product tiles 16, banners 20, app bar & sheets 28. Pills 999.</td></tr>
+    <tr><td>--sh-1 / 2 / 3</td><td>subtle · card hover · floating</td><td>Cards use sh-1; app bar and hero use sh-2; cart bar and sheets use sh-3. Never mix random shadows.</td></tr>
+    <tr><td>--tap</td><td>44px</td><td>Minimum touch target for every control, including stepper buttons and rail items.</td></tr>
+    <tr><td>--dur-1 / 2 / 3</td><td>150 · 220 · 320 ms</td><td>Press feedback / state change / screen & sheet entrance. All respect <code>prefers-reduced-motion</code>.</td></tr>
+  </table>
+
+  <h2>5. Components</h2>
+  <h3>Buttons</h3>
+  <div class="demo rtl">
+    <button class="btn primary" style="width:auto">أكّد الطلب</button>
+    <button class="btn dark" style="width:auto">شوف السلة</button>
+    <button class="btn outline" style="width:auto">تغيير</button>
+    <button class="btn soft" style="width:auto">استخدم موقعي</button>
+    <button class="btn ghost" style="width:auto">لاحقاً</button>
+    <button class="btn primary" style="width:auto" disabled>غير متاح</button>
+    <button class="btn primary sm">اطلب دلوقتي</button>
+  </div>
+  <p style="font-size:13px;margin-top:8px">One primary (Mandarin) button per screen, full-width inside the bottom CTA bar with the total shown on the trailing side.</p>
+
+  <h3>Quick add (ADD → − qty +)</h3>
+  <div class="demo rtl">
+    <button class="qa add"><svg class="icon xs" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg><span>أضف</span></button>
+    <div class="qa stepper"><button aria-label="−"><svg class="icon xs" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button><span class="n num">2</span><button aria-label="+"><svg class="icon xs" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button></div>
+    <div class="qa stepper lg"><button aria-label="−"><svg class="icon xs" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button><span class="n num">1</span><button aria-label="+"><svg class="icon xs" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button></div>
+    <span class="pill danger">غير متوفر</span>
+  </div>
+  <p style="font-size:13px;margin-top:8px">Tapping ADD converts in place into a stepper — the customer never leaves the list. At quantity 1 the minus icon becomes a trash icon. Maximum per-order quantity disables the plus.</p>
+
+  <h3>Chips, pills, ETA</h3>
+  <div class="demo rtl">
+    <span class="tab on">الكل</span><span class="tab deal">عروض</span><span class="tab">سوبر ماركت</span>
+    <span class="chip on">المقترح</span><span class="chip">الأقل سعراً</span>
+    <span class="eta-chip"><svg class="icon" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg><span class="num">30 دقيقة</span></span>
+    <span class="pill success">بنوصّل عندك</span><span class="pill warn">باقي 3 فقط</span><span class="pill accent">خصم 15%</span><span class="pill brand">البيت</span>
+  </div>
+
+  <h3>Product card anatomy</h3>
+  <div class="demo rtl">
+    <article class="product"><div class="img" style="background:#E8F0FA;color:#2F5FA8"><svg class="icon" viewBox="0 0 24 24" style="width:56px;height:56px"><path d="M8 2h8"/><path d="M9 2v2.8L6 9v11a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9l-3-4.2V2"/><path d="M6 12h12"/></svg><span class="discount num">15% خصم</span></div><span class="fav"><svg class="icon" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></span><div class="name">لبن جهينة كامل الدسم</div><div class="unit">1 لتر</div><div class="price-row"><div><span class="price num">44<small>ج.م</small></span><div class="price-old num">52 ج.م</div></div><button class="qa add"><svg class="icon xs" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg><span>أضف</span></button></div></article>
+    <div style="max-width:420px;font-size:14px;line-height:1.8;color:var(--ink-2)"><b>Fixed order, top to bottom:</b> image tile (category-tinted, 1:1-ish) with discount badge top-start and favourite top-end → name (2 lines max) → unit/size → optional low-stock pill → price row: current price bold in Aubergine, old price struck-through beneath, quick-add trailing. Out-of-stock items dim the whole card with a label and hide ADD.</div>
+  </div>
+
+  <h3>Category tile palette</h3>
+  <p>Each category has a soft tint and a matching glyph colour; use the same pair everywhere the category appears (home grid, listing rail, product tiles, cart thumbnails).</p>
+  <div class="sw" id="cat-sw"></div>
+
+  <h3>Sticky cart bar & bottom navigation</h3>
+  <div class="demo rtl" style="position:relative;height:200px;overflow:hidden;background:var(--cream)">
+    <button class="cartbar" style="bottom:92px"><span class="count num">4</span><span class="info"><div class="t">شوف السلة</div><div class="s num">4 منتجات · 133 ج.م</div></span><span class="go">إتمام الطلب</span></button>
+    <nav class="bottomnav" style="position:absolute"><button class="on"><svg class="icon" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg><span>الرئيسية</span></button><button><svg class="icon" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1.5"/><rect width="7" height="7" x="14" y="3" rx="1.5"/><rect width="7" height="7" x="14" y="14" rx="1.5"/><rect width="7" height="7" x="3" y="14" rx="1.5"/></svg><span>الأقسام</span></button><button><svg class="icon" viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3"/><circle cx="11" cy="11" r="7"/></svg><span>البحث</span></button><button><svg class="icon" viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8"/><path d="M8 11h8"/></svg><span>طلباتي</span></button><button><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>حسابي</span></button></nav>
+  </div>
+  <p style="font-size:13px;margin-top:8px">The cart bar appears as soon as the first item is added and floats above the nav on every browsing screen (home, categories, listing, search, deals). It shows count, subtotal and a single action.</p>
+
+  <h3>Order timeline</h3>
+  <div class="demo rtl"><div class="timeline" style="min-width:300px">
+    <div class="step done"><span class="dot"><svg class="icon xs" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><div class="st">اتأكد</div><div class="ss">المتجر استلم طلبك</div></div></div>
+    <div class="step done"><span class="dot"><svg class="icon xs" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><div><div class="st">بيتجهز</div><div class="ss">بيتم تجهيز وتغليف طلبك</div></div></div>
+    <div class="step now"><span class="dot"><svg class="icon xs" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></span><div><div class="st">خرج للتوصيل</div><div class="ss">المندوب في الطريق إليك</div></div></div>
+    <div class="step pending"><span class="dot"></span><div><div class="st">وصلك</div><div class="ss">بالهنا والشفا</div></div></div>
+  </div></div>
+  <p style="font-size:13px;margin-top:8px">Customer-facing states collapse the 11 internal order states (BRD §28) into four: <b>اتأكد → بيتجهز → خرج للتوصيل → وصلك</b>. Exceptions (cancelled, delivery failed, refund) replace the timeline with a status card and a support action.</p>
+
+  <h2>6. Layout & navigation</h2>
+  <table><tr><th>Region</th><th>Spec</th></tr>
+    <tr><td>App bar (home)</td><td>Aubergine, rounded bottom 28px. Row 1: address (label + value with chevron) · ETA chip · notifications. Row 2: search field. Address tap → location screen.</td></tr>
+    <tr><td>Bottom nav</td><td>5 tabs: الرئيسية · الأقسام · البحث · طلباتي · حسابي. Active tab in Aubergine with a Mandarin underline. Never nest sub-navigation here.</td></tr>
+    <tr><td>Category listing</td><td>Start-side vertical rail (84px) of category tiles + sub-category chips + 2-column product grid. Sort chips above. Rail item = 44px+ target.</td></tr>
+    <tr><td>Product detail</td><td>Bottom sheet over the current screen (keeps browsing context). Sticky footer: stepper + primary action. Swipe-down or × to dismiss.</td></tr>
+    <tr><td>Checkout</td><td>Single scroll: address → delivery time → payment → notes → summary. Sticky "أكّد الطلب" with total. Button locks after first tap to prevent duplicate orders.</td></tr>
+    <tr><td>RTL</td><td>All layout uses logical properties (inset-inline, margin-inline). Numbers, phone numbers and order IDs are forced LTR. Switching to English flips <code>dir</code> only — no separate layouts.</td></tr>
+  </table>
+
+  <h2>7. Accessibility & performance</h2>
+  <ul style="line-height:1.9;color:var(--ink-2);padding-left:20px">
+    <li>Text contrast ≥ 4.5:1 on cream and white; Cream-on-Aubergine 12.6:1; white-on-Mandarin reserved for bold ≥ 14px.</li>
+    <li>Every icon-only control has an <code>aria-label</code>; toasts use <code>aria-live="polite"</code>; the PDP sheet is <code>role="dialog"</code>.</li>
+    <li>Touch targets ≥ 44px including stepper halves; 8px minimum gaps between targets.</li>
+    <li>Reserved image space (fixed tile heights) prevents layout shift on slow networks. Product images should ship as WebP ≤ 40KB with a tinted placeholder.</li>
+    <li>Body text 15–16px; nothing below 11px; Cairo at 500+ for legibility on low-end Android.</li>
+    <li>Motion ≤ 320ms, transform/opacity only, disabled under <code>prefers-reduced-motion</code>.</li>
+  </ul>
+</div>
+<script src="data.js"></script>
+<script>
+  document.getElementById("cat-sw").innerHTML = TWAA.categories.map(c => `<div style="background:${c.bg};color:${c.fg}">${c.ar} · ${c.en}<code>${c.bg} / ${c.fg}</code></div>`).join("");
+</script>
+</body>
+</html>
