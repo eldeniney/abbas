@@ -26,12 +26,13 @@ Open `index.html` in a browser (no build step). The left panel jumps between scr
 | Display type | Baloo Bhaijaan 2 (rounded, echoes the logo): headings, prices, buttons |
 | Body type | Cairo 400–800 |
 | Motif | Cream wave ribbon at ~15–22 % opacity on hero banners, splash, deal banner |
-| Logo | The mark alone, never with the name as text. Vector in `TWAA.logo()` / `assets/logo.svg` (drawn approximation of the wordmark — paste the official paths there). App icon: Aubergine rounded square with the cream mark (`assets/logo-mark.svg`). |
+| Logo | Official artwork traced to vector in `TWAA.logo(ink, spark, withName)` and `assets/logo.svg` (full, with TWAA lettering), `assets/logo-cream.svg` (on dark), `assets/logo-mark.svg` (app icon, mark only). Logo ink `#2E1338`, coral shadda strokes `#E85A3F`. Splash uses the full logo; login, sidebar and icons use the mark alone. Never set the name in UI text next to the logo. |
 
 ## 3. Information architecture
 
 ```
 Splash → Location & serviceability → Home
+Home tabs: الكل · عروض · أكل · سوبر ماركت …  →  Deal Zone / Food / Category listing
 Bottom nav: الرئيسية · الأقسام · السلة · طلباتي · حسابي   (noon pattern: cart in the tab bar with a badge; search lives in the header; cart bar still floats above nav when cart > 0)
 Home ─ hero banners ─ category tabs ─ category grid ─ merchandising sections ─ deal banner
 Categories → Category listing (rail + sub-chips + grid) → Product sheet
@@ -101,6 +102,13 @@ Aubergine header with name, phone, quick stats (orders, wallet, favourites). Men
 
 ### 4.16 Deal Zone (BRD §25)
 Mandarin countdown banner, category chips, grid sorted by biggest discount.
+
+### 4.17 Food — أكل جاهز
+Ready-to-eat meals from the Twaa kitchen and partner local kitchens, delivered with the grocery order (not a restaurant marketplace — BRD §86 keeps that out of scope).
+- **Home:** a warm "أكل" tab next to عروض, and a section **"أكل جاهز.. سخن"** with an "مفتوح دلوقتي" pill and horizontal **meal cards**: image tile with a prep-time badge (e.g. 10 دقيقة) and discount, name, one-line description, price, quick add.
+- **Food screen:** hero banner **"جعان؟ هاتها توّا."** with prep range and kitchen name, sub-category chips (سندوتشات · وجبات · فطار · حلويات · مشروبات ساخنة), and a vertical list of wide meal cards.
+- **Data:** food items carry `prep` (minutes), `sub` (sub-category) and `descAr/descEn`; the product sheet shows the description. Category tint is a warm terracotta so food reads differently from grocery.
+- Demo menu: فول وطعمية, كشري, شاورما, نص فرخة مشوية, بيتزا, برجر, فطار بلدي لشخصين, رز بلبن, أم علي, شاي بالنعناع, قهوة تركي, بطاطس.
 
 ## 5. Component library
 See `design-system.html`: colour tokens, type scale, spacing/radius/elevation, buttons, quick add, chips & pills, ETA chip, product card anatomy, category tile palette, sticky cart bar, bottom nav, timeline, option rows, inputs/OTP, toast, empty states.

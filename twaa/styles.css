@@ -604,3 +604,25 @@ img, svg { display: block; }
 .hstep-msg { display: flex; gap: 10px; align-items: center; background: var(--aubergine-50); border-radius: var(--r-md); padding: 10px 12px; }
 .hstep-msg .icon { color: var(--mandarin); flex: none; }
 .hstep-msg b { font-size: var(--fs-14); }
+
+/* ---------- Food (ready meals) ---------- */
+.tab.food { color: #B4441E; border-color: #FCE9D9; background: #FFF6EF; }
+.tab.food.on { background: #B4441E; color: #fff; border-color: #B4441E; }
+.food-hero { background: linear-gradient(135deg, #8E2F14, #B4441E); color: #fff; }
+.food-hero .wave { opacity: .12; }
+.meal { width: 220px; background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--line); box-shadow: var(--sh-1); overflow: hidden; display: flex; flex-direction: column; text-align: start; }
+.meal.in-cart { border-color: var(--aubergine-100); }
+.meal .mimg { height: 120px; display: grid; place-items: center; position: relative; width: 100%; }
+.meal .mimg > svg.icon { width: 52px; height: 52px; }
+.meal .mimg .discount { position: absolute; top: 8px; inset-inline-start: 8px; background: var(--mandarin); color: #fff; font-family: var(--font-display); font-weight: 800; font-size: var(--fs-11); padding: 2px 7px; border-radius: 6px; }
+.meal .prep { position: absolute; bottom: 8px; inset-inline-start: 8px; display: inline-flex; align-items: center; gap: 3px; background: rgba(255,255,255,.92); color: var(--ink); font-size: var(--fs-11); font-weight: 800; padding: 3px 8px; border-radius: var(--r-pill); }
+.meal .mbody { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.meal .mname { font-weight: 800; font-size: var(--fs-14); line-height: 1.3; }
+.meal .mdesc { font-size: var(--fs-12); color: var(--muted); line-height: 1.5; height: 3em; overflow: hidden; }
+.meal .price-row { margin-top: 6px; }
+.meal.wide { width: 100%; flex-direction: row; align-items: stretch; }
+.meal.wide + .meal.wide { margin-top: var(--s-3); }
+.meal.wide .mimg { width: 124px; height: auto; min-height: 124px; flex: none; }
+.meal.wide .mdesc { height: auto; max-height: 3em; }
+.meal-list { padding-top: var(--s-2); }
+.food-sec .section-head h2 .icon { color: #B4441E; }

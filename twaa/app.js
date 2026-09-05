@@ -60,6 +60,8 @@
     paw: '<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5c0 4-2 5-5 5s-5-1-5-5a5 5 0 0 1 5-5z"/>',
     plug: '<path d="M12 22v-5"/><path d="M9 8V2M15 8V2"/><path d="M18 8v5a6 6 0 0 1-12 0V8z"/>',
     egg: '<path d="M12 22c-5 0-7-4-7-9 0-5 3-11 7-11s7 6 7 11c0 5-2 9-7 9z"/>',
+    food: '<path d="M3 17h18"/><path d="M5 17a7 7 0 0 1 14 0"/><path d="M12 10V8"/><path d="M7 21h10"/>',
+    flame: '<path d="M12 22c4 0 7-3 7-7 0-3-2-5-3-7-1 3-2 4-4 4 0-3-1-6-3-8-1 4-4 6-4 11 0 4 3 7 7 7z"/>',
   };
   const ic = (name, cls = "icon") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[name] || ""}</svg>`;
   const wave = (cls = "wave") => `<svg class="${cls}" viewBox="0 0 240 80" aria-hidden="true"><path d="M0 40c30-30 60-30 90 0s60 30 90 0 45-25 60 0" fill="none" stroke="#F9F2E7" stroke-width="16" stroke-linecap="round"/><path d="M0 40c30 30 60 30 90 0s60-30 90 0 45 25 60 0" fill="none" stroke="#F9F2E7" stroke-width="16" stroke-linecap="round" opacity=".6"/></svg>`;
@@ -101,7 +103,7 @@
   /* ---------------- Screen registry (for the workbench sidebar) ---------------- */
   const SCREENS = [
     ["splash", "Splash", "شاشة البداية"], ["location", "Location & serviceability", "الموقع"], ["login", "Login (mobile)", "تسجيل الدخول"], ["otp", "OTP", "كود التأكيد"],
-    ["home", "Home", "الرئيسية"], ["categories", "Categories", "الأقسام"], ["plp", "Category listing", "قائمة المنتجات"], ["search", "Search", "البحث"], ["deals", "Deal zone", "منطقة العروض"],
+    ["home", "Home", "الرئيسية"], ["categories", "Categories", "الأقسام"], ["plp", "Category listing", "قائمة المنتجات"], ["search", "Search", "البحث"], ["deals", "Deal zone", "منطقة العروض"], ["food", "Food", "أكل جاهز"],
     ["pdp", "Product detail (sheet)", "تفاصيل المنتج"], ["cart", "Cart", "السلة"], ["checkout", "Checkout", "إتمام الطلب"], ["tracking", "Order tracking", "تتبع الطلب"], ["orders", "My orders", "طلباتي"], ["rating", "Rate order", "التقييم"], ["account", "Account", "حسابي"],
   ];
 
@@ -130,6 +132,13 @@
     </article>`;
   }
   function carousel(list) { return `<div class="h-scroll">${list.map(productCard).join("")}</div>`; }
+  function mealCard(p, wide = false) {
+    const c = cat(p.cat); const d = pct(p);
+    return `<article class="meal ${wide ? "wide" : ""} ${S.cart[p.id] ? "in-cart" : ""}" data-pid="${p.id}">
+      <button class="mimg" data-open="${p.id}" style="background:${c.bg};color:${c.fg}" aria-label="${esc(name(p))}">${ic("food")}${d ? `<span class="discount num">${d}% ${t("off")}</span>` : ""}<span class="prep">${ic("clock", "icon xs")} <span class="num">${p.prep}</span> ${t("min")}</span></button>
+      <div class="mbody"><div class="mname">${esc(name(p))}</div><div class="mdesc">${esc(S.lang === "ar" ? p.descAr : p.descEn)}</div>
+        <div class="price-row"><div>${fmt(p.price)}${p.oldPrice ? `<span class="price-old num" style="margin-inline-start:6px">${p.oldPrice} ${t("egp")}</span>` : ""}</div>${quickAdd(p)}</div></div></article>`;
+  }
   function sectionHead(title, sub, more = true, extra = "") {
     return `<div class="section-head"><div><h2>${title}${extra}</h2>${sub ? `<div class="sub">${sub}</div>` : ""}</div>${more ? `<button class="more" data-go="plp">${t("seeAll")} ${ic("chevS", "icon xs")}</button>` : ""}</div>`;
   }
@@ -250,7 +259,7 @@
 
   /* ---------------- Screens ---------------- */
   const R = {};
-  R.splash = () => `<div class="screen dark"><div class="splash">${statusbar(true)}${wave()}<div class="splash-bag" aria-hidden="true"></div><div class="brand-logo lg" style="color:var(--cream)">${T.logo()}</div><div class="tagline">${t("tagline")}</div><div class="en-tag">Local roots. Closer days.</div><button class="btn primary" style="position:absolute;bottom:56px;left:24px;right:24px" data-go="location">${t("shopNow")}</button></div></div>`;
+  R.splash = () => `<div class="screen dark"><div class="splash">${statusbar(true)}${wave()}<div class="splash-bag" aria-hidden="true"></div><div class="brand-logo lg" style="color:var(--cream)">${T.logo("currentColor", T.logoSpark, true)}</div><div class="tagline">${t("tagline")}</div><div class="en-tag">Local roots. Closer days.</div><button class="btn primary" style="position:absolute;bottom:56px;left:24px;right:24px" data-go="location">${t("shopNow")}</button></div></div>`;
 
   R.location = () => {
     return `<div class="screen">${statusbar()}
@@ -270,7 +279,7 @@
 
   R.login = () => `<div class="screen">${statusbar()}
     <div class="topbar"><button class="icon-btn ghost" data-go="cart" aria-label="back">${ic("chevS")}</button></div>
-    <div class="scroll pad"><div style="text-align:center;margin:24px 0 28px"><div class="brand-logo md" style="color:var(--aubergine);margin:0 auto">${T.logo()}</div></div>
+    <div class="scroll pad"><div style="text-align:center;margin:24px 0 28px"><div class="brand-logo md" style="color:var(--aubergine);margin:0 auto">${T.logo("currentColor", T.logoSpark, false)}</div></div>
       <h2 style="font-family:var(--font-display);font-size:26px;color:var(--aubergine)">${t("loginT")}</h2><p class="muted" style="margin:6px 0 24px;line-height:1.7">${t("loginSub")}</p>
       <div class="field"><label>${t("phone")}</label><div class="input"><span class="prefix" dir="ltr">🇪🇬 +20</span><input inputmode="tel" autocomplete="tel" value="${S.phone}" aria-label="${t("phone")}" dir="ltr"></div><div class="hint">${S.lang === "ar" ? "هنبعت كود تأكيد برسالة SMS" : "We'll text you a verification code"}</div></div>
       <button class="btn primary" data-go="otp">${t("sendOtp")}</button>
@@ -285,17 +294,19 @@
       <div style="text-align:center;margin-top:16px"><button class="btn ghost sm" data-otp-fill>${S.lang === "ar" ? "(للعرض) املأ الكود" : "(Demo) fill code"}</button></div></div></div>`;
 
   R.home = () => {
-    const tabs = [["all", "all"], ["deals", "deals"], ["grocery", "supermarket"], ["drinks", "drinks"], ["snacks", "snacks"], ["care", "care"], ["baby", "baby"], ["cleaning", "home"], ["electro", "electronics"]];
+    const tabs = [["all", "all"], ["deals", "deals"], ["food", "food"], ["grocery", "supermarket"], ["drinks", "drinks"], ["snacks", "snacks"], ["care", "care"], ["baby", "baby"], ["cleaning", "home"], ["electro", "electronics"]];
     const by = (tag) => T.products.filter((p) => p.tags.includes(tag));
     const heroes = [["a", 1, "TWAA30"], ["b", 2, null], ["c", 3, null]];
     return `<div class="screen">${statusbar(true)}${addrHeader()}
       <div class="scroll pb-nav">
         <div class="hero-track" data-hero>${heroes.map(([cls, i, code]) => `<div class="hero ${cls}">${wave()}${code ? `<span class="code">${code}</span>` : ""}<div class="kicker">${t(`home_hero${i}k`)}</div><h3>${t(`home_hero${i}t`)}</h3><p>${t(`home_hero${i}p`)}</p><button class="cta" data-go="${i === 3 ? "plp" : "deals"}" data-cat="local">${t("shopNow")}</button></div>`).join("")}</div>
         <div class="dots">${heroes.map((_, i) => `<span class="${i === S.heroIdx ? "on" : ""}"></span>`).join("")}</div>
-        <div class="tabs" role="tablist">${tabs.map(([id, l]) => `<button role="tab" class="tab ${id === "deals" ? "deal" : ""} ${S.homeTab === id ? "on" : ""}" data-hometab="${id}">${id === "deals" ? ic("percent", "icon xs") + " " : ""}${t(l)}</button>`).join("")}</div>
+        <div class="tabs" role="tablist">${tabs.map(([id, l]) => `<button role="tab" class="tab ${id === "deals" ? "deal" : ""} ${id === "food" ? "food" : ""} ${S.homeTab === id ? "on" : ""}" data-hometab="${id}">${id === "deals" ? ic("percent", "icon xs") + " " : id === "food" ? ic("flame", "icon xs") + " " : ""}${t(l)}</button>`).join("")}</div>
         <div class="section" style="margin-top:20px">${sectionHead(t("shopBy"), null, false)}<div class="cat-grid">${T.categories.map((c) => `<button class="cat" data-go="plp" data-cat="${c.id}"><span class="tile" style="background:${c.bg};color:${c.fg}">${ic(c.icon)}</span><span>${esc(catName(c))}</span></button>`).join("")}</div></div>
         <div class="section">${sectionHead(t("secDeals"), t("secDealsSub"), true, ` <span class="countdown" aria-label="${t("endsIn")}"><span class="num">02</span>:<span class="num">14</span>:<span class="num">09</span></span>`)}${carousel(by("deal").slice(0, 8))}</div>
-        <div class="section">${sectionHead(t("secPopular"))}${carousel(by("popular").slice(0, 8))}</div>
+        <div class="section">${sectionHead(t("secPopular"))}${carousel(by("popular").filter((p) => p.cat !== "food").slice(0, 8))}</div>
+        <div class="section food-sec"><div class="section-head"><div><h2>${ic("flame", "icon sm")} ${t("secFood")}</h2><div class="sub">${t("secFoodSub")} · <span class="pill success" style="padding:1px 8px">${t("openNow")}</span></div></div><button class="more" data-go="food">${t("seeAll")} ${ic("chevS", "icon xs")}</button></div>
+          <div class="h-scroll">${by("food").slice(0, 8).map((p) => mealCard(p)).join("")}</div></div>
         <div class="section pad"><div class="deal-banner">${wave()}<div><h3>${t("dealHero")}</h3><p>${t("dealHeroSub")}</p></div><button class="btn sm" style="background:var(--mandarin);color:#fff" data-go="deals">${t("dealZone")}</button></div></div>
         <div class="section">${sectionHead(t("secUnder50"))}${carousel(by("under50").slice(0, 8))}</div>
         <div class="section">${sectionHead(t("secLocal"), t("secLocalSub"))}${carousel(by("local"))}</div>
@@ -309,7 +320,7 @@
     <div class="scroll pb-nav"><div class="cat-grid" style="grid-template-columns:repeat(3,1fr);gap:16px 12px;padding-top:8px">${T.categories.map((c) => `<button class="cat" data-go="plp" data-cat="${c.id}"><span class="tile" style="width:100%;aspect-ratio:1;height:auto;background:${c.bg};color:${c.fg}">${ic(c.icon)}</span><span>${esc(catName(c))}</span></button>`).join("")}</div></div>${cartBar()}${bottomNav("categories")}${toastEl()}</div>`;
 
   R.plp = () => {
-    const c = cat(S.cat); const subs = T.subcats[S.cat] || ["الكل"];
+    const c = cat(S.cat); const subs = (S.lang === "en" && T.subcatsEn[S.cat]) || T.subcats[S.cat] || ["الكل"];
     let list = T.products.filter((p) => p.cat === S.cat);
     if (S.sort === "priceLow") list = [...list].sort((a, b) => a.price - b.price); if (S.sort === "priceHigh") list = [...list].sort((a, b) => b.price - a.price); if (S.sort === "biggestDisc") list = [...list].sort((a, b) => pct(b) - pct(a));
     const sorts = ["recommended", "popular", "priceLow", "priceHigh", "biggestDisc", "newest"];
@@ -318,7 +329,7 @@
       <div class="chips" style="padding-top:0">${sorts.map((s) => `<button class="chip ${S.sort === s ? "on" : ""}" data-sort="${s}">${s === "recommended" ? ic("sort") : ""}${t(s)}</button>`).join("")}</div>
       <div class="plp-layout">
         <div class="plp-rail" role="tablist">${T.categories.map((k) => `<button role="tab" class="${k.id === S.cat ? "on" : ""}" data-cat-switch="${k.id}"><span class="tile" style="background:${k.bg};color:${k.fg}">${ic(k.icon)}</span>${esc(catName(k))}</button>`).join("")}</div>
-        <div class="plp-body"><div class="chips">${subs.map((s, i) => `<button class="chip ${S.subcat === i ? "on" : ""}" data-subcat="${i}">${esc(S.lang === "ar" ? s : i === 0 ? "All" : s)}</button>`).join("")}</div>
+        <div class="plp-body"><div class="chips">${subs.map((s, i) => `<button class="chip ${S.subcat === i ? "on" : ""}" data-subcat="${i}">${esc(S.lang === "ar" || T.subcatsEn[S.cat] ? s : i === 0 ? "All" : s)}</button>`).join("")}</div>
           <div class="scroll pb-nav"><div class="muted num" style="padding:0 12px 8px">${list.length} ${t("results")}</div><div class="p-grid">${list.map(productCard).join("")}</div></div></div>
       </div>${cartBar()}${bottomNav("categories")}${toastEl()}</div>`;
   };
@@ -346,6 +357,18 @@
       <div class="scroll pb-nav"><div class="pad"><div class="deal-banner" style="background:linear-gradient(135deg,var(--mandarin-600),var(--mandarin));color:#fff">${wave()}<div><div style="font-size:12px;font-weight:800;opacity:.9">${t("endsIn")}</div><h3 style="margin:2px 0 4px"><span class="countdown"><span class="num" style="background:rgba(255,255,255,.2)">02</span>:<span class="num" style="background:rgba(255,255,255,.2)">14</span>:<span class="num" style="background:rgba(255,255,255,.2)">09</span></span></h3><p>${t("dealHero")} · ${t("dealHeroSub")}</p></div>${ic("percent", "icon")} </div></div>
         <div class="chips">${[["all", t("all")], ["grocery", t("supermarket")], ["drinks", t("drinks")], ["care", t("care")], ["baby", t("baby")]].map(([id, l], i) => `<button class="chip ${i === 0 ? "on" : ""}">${l}</button>`).join("")}</div>
         <div class="p-grid">${deals.map(productCard).join("")}</div></div>${cartBar()}${bottomNav("home")}${toastEl()}</div>`;
+  };
+
+  R.food = () => {
+    const subs = S.lang === "ar" ? T.subcats.food : T.subcatsEn.food; const si = S.foodSub || 0;
+    const list = T.products.filter((p) => p.cat === "food" && (si === 0 || p.sub === si));
+    return `<div class="screen">${statusbar()}
+      <div class="topbar"><button class="icon-btn ghost" data-go="home" aria-label="back">${ic("chevS")}</button><h1>${t("foodT")}</h1><button class="icon-btn ghost" data-go="search" aria-label="${t("navSearch")}">${ic("search")}</button></div>
+      <div class="scroll pb-nav">
+        <div class="pad"><div class="deal-banner food-hero">${wave()}<div><div class="row" style="gap:6px;margin-bottom:4px"><span class="pill" style="background:rgba(255,255,255,.18);color:#fff">${ic("clock", "icon xs")} 10–25 ${t("min")}</span><span class="pill" style="background:rgba(255,255,255,.18);color:#fff">${t("kitchen")}</span></div><h3>${t("foodHero")}</h3><p>${t("foodHeroSub")}</p></div>${ic("food", "icon")}</div></div>
+        <div class="chips">${subs.map((s, i) => `<button class="chip ${si === i ? "on" : ""}" data-foodsub="${i}">${esc(s)}</button>`).join("")}</div>
+        <div class="pad meal-list">${list.map((p) => mealCard(p, true)).join("")}</div>
+      </div>${cartBar()}${bottomNav("home")}${toastEl()}</div>`;
   };
 
   R.cart = () => {
@@ -456,7 +479,7 @@
         <div class="pad" style="margin-top:16px"><div class="muted">${esc(p.brand || catName(c))}</div><h2 class="pdp-title">${esc(name(p))}</h2><div class="muted" style="margin-top:2px">${esc(unit(p))}</div>
           <div class="row" style="margin-top:12px;gap:10px"><span class="price num" style="font-size:28px">${p.price}<small>${t("egp")}</small></span>${p.oldPrice ? `<span class="price-old num" style="font-size:14px">${p.oldPrice} ${t("egp")}</span><span class="pill accent num">${t("off")} ${d}%</span>` : ""}<span style="margin-inline-start:auto" class="pill ${p.stock === 0 ? "danger" : p.stock <= 5 ? "warn" : "success"}">${p.stock === 0 ? t("outStock") : p.stock <= 5 ? t("lowStock", { n: p.stock }) : t("inStock")}</span></div>
           <div class="kv" style="margin-top:16px"><div><div class="k">${t("size")}</div><div class="v">${esc(unit(p))}</div></div><div><div class="k">${t("origin")}</div><div class="v">${S.lang === "ar" ? "مصر" : "Egypt"}</div></div><div><div class="k">${t("storage")}</div><div class="v">${p.cat === "dairy" || p.cat === "frozen" ? (S.lang === "ar" ? "يحفظ مبرداً" : "Keep refrigerated") : S.lang === "ar" ? "مكان جاف وبارد" : "Cool dry place"}</div></div><div><div class="k">${t("maxQty", { n: 10 })}</div><div class="v">${S.lang === "ar" ? "لكل طلب" : "per order"}</div></div></div>
-          <div class="card" style="margin-top:12px"><h3>${t("desc")}</h3><p class="muted" style="line-height:1.8">${S.lang === "ar" ? "منتج أصلي بضمان الجودة والصلاحية. يتم اختياره وتغليفه بعناية من متجر توّا القريب منك ويوصلك في أسرع وقت." : "Genuine product with quality and expiry guaranteed. Carefully picked and packed at your nearest Twaa store and delivered fast."}</p></div>
+          <div class="card" style="margin-top:12px"><h3>${t("desc")}</h3><p class="muted" style="line-height:1.8">${p.descAr ? esc(S.lang === "ar" ? p.descAr : p.descEn) : S.lang === "ar" ? "منتج أصلي بضمان الجودة والصلاحية. يتم اختياره وتغليفه بعناية من متجر توّا القريب منك ويوصلك في أسرع وقت." : "Genuine product with quality and expiry guaranteed. Carefully picked and packed at your nearest Twaa store and delivered fast."}</p></div>
           <div class="card"><h3>${t("ingredients")} · ${t("nutrition")}</h3><p class="muted" style="line-height:1.8">${S.lang === "ar" ? "راجع العبوة للمكونات الكاملة والقيمة الغذائية لكل 100 جم." : "See pack for full ingredients and nutrition per 100 g."}</p></div>
         </div>
         <div class="section">${sectionHead(t("alsoBought"), null, false)}${carousel(rel)}</div></div>
@@ -482,7 +505,7 @@
   let toastTimer;
   function toast(msg) { S.toast = msg; render(); clearTimeout(toastTimer); toastTimer = setTimeout(() => { S.toast = null; render(); }, 1800); }
   function patchProduct(id) { /* re-render only affected product cards + bars (keeps scroll position) */
-    host.querySelectorAll(`[data-pid="${id}"]`).forEach((el) => { const n = h(productCard(prod(id))); el.replaceWith(n); });
+    host.querySelectorAll(`[data-pid="${id}"]`).forEach((el) => { const p = prod(id); const n = h(el.classList.contains("meal") ? mealCard(p, el.classList.contains("wide")) : productCard(p)); el.replaceWith(n); });
     const bar = host.querySelector(".cartbar"); const nb = cartBar();
     if (bar && nb) bar.outerHTML = nb; else if (bar && !nb) bar.remove(); else if (!bar && nb) { const nav = host.querySelector(".bottomnav"); if (nav) nav.insertAdjacentHTML("beforebegin", nb); }
     if (S.pdp || S.screen === "cart" || S.screen === "checkout") render();
@@ -498,9 +521,10 @@
     if ((el = b("[data-fav]"))) { const id = +el.dataset.fav; S.favs.has(id) ? S.favs.delete(id) : S.favs.add(id); if (S.favs.has(id)) toast(t("toastFav")); else render(); return; }
     if ((el = b("[data-open]"))) { S.pdp = +el.dataset.open; render(); return; }
     if ((el = b("[data-close-pdp]"))) { S.pdp = null; render(); return; }
-    if ((el = b("[data-hometab]"))) { S.homeTab = el.dataset.hometab; if (S.homeTab === "deals") return go("deals"); if (S.homeTab !== "all") { S.cat = S.homeTab; S.subcat = 0; return go("plp"); } render(); return; }
+    if ((el = b("[data-hometab]"))) { S.homeTab = el.dataset.hometab; if (S.homeTab === "deals") return go("deals"); if (S.homeTab === "food") return go("food"); if (S.homeTab !== "all") { S.cat = S.homeTab; S.subcat = 0; return go("plp"); } render(); return; }
     if ((el = b("[data-cat-switch]"))) { S.cat = el.dataset.catSwitch; S.subcat = 0; render(); return; }
     if ((el = b("[data-subcat]"))) { S.subcat = +el.dataset.subcat; render(); return; }
+    if ((el = b("[data-foodsub]"))) { S.foodSub = +el.dataset.foodsub; render(); return; }
     if ((el = b("[data-sort]"))) { S.sort = el.dataset.sort; render(); return; }
     if ((el = b("[data-q-set]"))) { S.query = el.dataset.qSet; render(); return; }
     if ((el = b("[data-clear-q]"))) { S.query = ""; render(); return; }

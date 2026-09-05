@@ -45,10 +45,10 @@
   <div class="logo-block">
     <div style="background:var(--cream)"><div class="brand-logo lg" style="color:var(--aubergine)" data-logo></div></div>
     <div style="background:var(--aubergine)"><div class="brand-logo lg" style="color:var(--cream)" data-logo></div></div>
-    <div style="background:#fff"><span class="logo-tile" style="width:96px;height:96px;border-radius:26px;padding:14px" data-logo-tile></span></div>
+    <div style="background:#fff"><span class="logo-tile" style="width:110px;height:96px;border-radius:26px;padding:14px" data-logo-tile></span></div>
     <div style="background:var(--ink)"><div class="brand-logo lg" style="color:#fff" data-logo-mono></div></div>
   </div>
-  <p style="margin-top:12px;font-size:13px"><b>Usage:</b> the logo is always used as the mark alone — never accompanied by the name in text. Vector paths live in <code>TWAA.logo()</code> and <code>assets/logo.svg</code> (a drawn approximation); paste the official paths from the brand package there. Minimum size 40px wide; clear space equal to the shadda height; mono version for single-colour print.</p>
+  <p style="margin-top:12px;font-size:13px"><b>Usage:</b> the logo is always used as the mark alone — never accompanied by the name in text. Vector traced from the official artwork lives in <code>TWAA.logo()</code> and <code>assets/logo.svg</code> (full, with TWAA), <code>logo-cream.svg</code> (on dark) and <code>logo-mark.svg</code> (app icon, mark only). Logo ink is <code>#2E1338</code> with coral <code>#E85A3F</code> shadda strokes; in the UI the mark takes the Aubergine or Cream of the surface it sits on. Minimum size 40px wide; clear space equal to the shadda height; mono version for single-colour print.</p>
 
   <h2>2. Colour</h2>
   <div class="sw">
@@ -175,7 +175,7 @@
 </div>
 <script src="data.js"></script>
 <script>
-  document.querySelectorAll("[data-logo]").forEach(e => e.innerHTML = TWAA.logo()); document.querySelectorAll("[data-logo-mono]").forEach(e => e.innerHTML = TWAA.logo("currentColor", "currentColor")); document.querySelectorAll("[data-logo-tile]").forEach(e => e.innerHTML = TWAA.logo("#F9F2E7"));
+  document.querySelectorAll("[data-logo]").forEach(e => e.innerHTML = TWAA.logo()); document.querySelectorAll("[data-logo-mono]").forEach(e => e.innerHTML = TWAA.logo("currentColor", "currentColor")); document.querySelectorAll("[data-logo-tile]").forEach(e => e.innerHTML = TWAA.logo("#F9F2E7", TWAA.logoSpark, false));
   document.getElementById("cat-sw").innerHTML = TWAA.categories.map(c => `<div style="background:${c.bg};color:${c.fg}">${c.ar} · ${c.en}<code>${c.bg} / ${c.fg}</code></div>`).join("");
 </script>
 </body>

@@ -10,7 +10,7 @@ TWAA.i18n = {
     secDeals: "عروض توّا", secDealsSub: "خصومات لفترة محدودة", secPopular: "الأكثر طلباً", secUnder50: "أقل من 50 جنيه", secLocal: "منتجات محلية", secLocalSub: "من جيرانك.. لبيتك", secAgain: "اشترِ تاني", secNew: "وصل جديد", secForYou: "مخصوص ليك",
     add: "أضف", egp: "ج.م", off: "خصم",
     viewCart: "شوف السلة", items: "منتج", itemsPl: "منتجات",
-    navHome: "الرئيسية", navCats: "الأقسام", navSearch: "البحث", navCart: "السلة", navOrders: "طلباتي", navAccount: "حسابي",
+    navHome: "الرئيسية", navCats: "الأقسام", navSearch: "البحث", navCart: "السلة", food: "أكل", secFood: "أكل جاهز.. سخن", secFoodSub: "من مطبخ توّا ومطابخ بلدك", foodT: "أكل جاهز", prep: "تجهيز", foodHero: "جعان؟ هاتها توّا.", foodHeroSub: "سندوتشات ووجبات سخنة توصلك مع طلبك", kitchen: "مطبخ توّا", openNow: "مفتوح دلوقتي", navOrders: "طلباتي", navAccount: "حسابي",
     cart: "السلة", emptyCart: "سلتك فاضية", emptyCartSub: "ابدأ التسوق وهات اللي محتاجه توّا", startShopping: "ابدأ التسوق",
     upsellFree: "ضيف {n} ج.م وخد التوصيل مجاناً", upsellDone: "التوصيل عليك مجاناً 🎉", promoPh: "كود الخصم", apply: "تطبيق", promoOk: "تم تطبيق كود {c}",
     subtotal: "المجموع", delivery: "التوصيل", service: "رسوم الخدمة", discount: "الخصم", total: "الإجمالي", free: "مجاناً",
@@ -47,7 +47,7 @@ TWAA.i18n = {
     secDeals: "Twaa Deals", secDealsSub: "Limited-time discounts", secPopular: "Most ordered", secUnder50: "Under EGP 50", secLocal: "Local products", secLocalSub: "From your neighbours to your home", secAgain: "Buy again", secNew: "New arrivals", secForYou: "Picked for you",
     add: "ADD", egp: "EGP", off: "OFF",
     viewCart: "View cart", items: "item", itemsPl: "items",
-    navHome: "Home", navCats: "Categories", navSearch: "Search", navCart: "Cart", navOrders: "Orders", navAccount: "Account",
+    navHome: "Home", navCats: "Categories", navSearch: "Search", navCart: "Cart", food: "Food", secFood: "Hot food, ready now", secFoodSub: "From Twaa kitchen and local kitchens", foodT: "Food", prep: "prep", foodHero: "Hungry? Get it now.", foodHeroSub: "Hot sandwiches and meals delivered with your order", kitchen: "Twaa Kitchen", openNow: "Open now", navOrders: "Orders", navAccount: "Account",
     cart: "Cart", emptyCart: "Your cart is empty", emptyCartSub: "Start shopping and get what you need, now", startShopping: "Start shopping",
     upsellFree: "Add EGP {n} more for free delivery", upsellDone: "You've unlocked free delivery 🎉", promoPh: "Promo code", apply: "Apply", promoOk: "Code {c} applied",
     subtotal: "Subtotal", delivery: "Delivery", service: "Service fee", discount: "Discount", total: "Total", free: "Free",
@@ -92,15 +92,17 @@ TWAA.categories = [
   { id: "cleaning", ar: "منظفات",           en: "Cleaning",        bg: "#E6F4F1", fg: "#1E7C6B", icon: "spray" },
   { id: "care",     ar: "عناية شخصية",      en: "Personal care",   bg: "#F6E8F3", fg: "#8A3F84", icon: "soap" },
   { id: "baby",     ar: "الأطفال",          en: "Baby",            bg: "#FDECEC", fg: "#C24E6B", icon: "baby" },
+  { id: "food",     ar: "أكل جاهز",          en: "Food",            bg: "#FCE9D9", fg: "#B4441E", icon: "food" },
   { id: "local",    ar: "منتجات محلية",     en: "Local products",  bg: "#F1E6D6", fg: "#3A1F3D", icon: "home" },
   { id: "pets",     ar: "الحيوانات",        en: "Pets",            bg: "#EDE9E1", fg: "#6B5A45", icon: "paw" },
   { id: "electro",  ar: "إكسسوارات",       en: "Electronics",     bg: "#E9E9F2", fg: "#3E3E7A", icon: "plug" },
   { id: "seasonal", ar: "موسمي",            en: "Seasonal",        bg: "#FEE7DA", fg: "#B85A1E", icon: "star" },
 ];
+TWAA.subcatsEn = { food: ["All","Sandwiches","Meals","Breakfast","Desserts","Hot drinks"] };
 TWAA.subcats = {
   fruits: ["الكل","فواكه","خضار","ورقيات","أعشاب"], dairy: ["الكل","لبن","جبن","زبادي","بيض","زبدة"], drinks: ["الكل","غازية","عصائر","شاي وقهوة","طاقة"],
   snacks: ["الكل","شيبسي","بسكويت","مقرمشات","مكسرات"], grocery: ["الكل","أرز ومكرونة","زيوت","معلبات","توابل","سكر ودقيق"], cleaning: ["الكل","أطباق","أرضيات","غسيل","مطهرات"],
-  care: ["الكل","شامبو","صابون","عناية بالفم","حلاقة"], baby: ["الكل","حفاضات","مناديل","طعام أطفال","استحمام"], local: ["الكل","ألبان بلدي","خضار مزارع","مخبوزات بلدي","عسل"],
+  care: ["الكل","شامبو","صابون","عناية بالفم","حلاقة"], food: ["الكل","سندوتشات","وجبات","فطار","حلويات","مشروبات ساخنة"], baby: ["الكل","حفاضات","مناديل","طعام أطفال","استحمام"], local: ["الكل","ألبان بلدي","خضار مزارع","مخبوزات بلدي","عسل"],
 };
 
 /* unit helper: "1 L", "500 g"... shown as ar/en */
@@ -150,10 +152,23 @@ TWAA.products = [
   P(42, "pets",    "دراي فود قطط",                      "Cat Dry Food",              "1 كجم",      "1 kg",    95,  null,["new"], 20),
   P(43, "electro", "كابل شاحن تايب سي",                 "USB-C Charging Cable",      "1 متر",      "1 m",     60,  85,  ["deal","new"], 20),
   P(44, "seasonal","تمر مجدول",                         "Medjool Dates",             "500 جم",     "500 g",   120, 150, ["deal","new"], 20),
+  /* Food — ready-to-eat from the Twaa kitchen & partner local kitchens. prep = minutes, sub = food sub-category index */
+  { ...P(50, "food", "سندوتش فول وطعمية",          "Fool & Taameya Sandwich",    "سندوتش",     "1 sandwich", 15,  null,["food","popular","under50"], 20), sub: 1, prep: 10, descAr: "عيش بلدي طازة، فول مدمس وطعمية مقرمشة وسلطة", descEn: "Fresh baladi bread, fool, crispy taameya and salad" },
+  { ...P(51, "food", "كشري وسط",                     "Koshary (Medium)",            "وجبة",       "1 meal",     45,  null,["food","popular","under50"], 20), sub: 2, prep: 15, descAr: "أرز ومكرونة وعدس، دقة وشطة وبصل مقرمش", descEn: "Rice, pasta, lentils, dakka, chilli and crispy onions" },
+  { ...P(52, "food", "شاورما فراخ سوري",             "Chicken Shawarma Wrap",       "سندوتش",     "1 wrap",     65,  75,  ["food","deal","popular"], 20), sub: 1, prep: 12, descAr: "شاورما فراخ بالثومية والمخلل في عيش سوري", descEn: "Chicken shawarma with garlic sauce and pickles in Syrian bread" },
+  { ...P(53, "food", "نص فرخة مشوية + أرز",           "Half Grilled Chicken + Rice", "وجبة",       "1 meal",     140, 160, ["food","deal"], 12), sub: 2, prep: 25, descAr: "نص فرخة على الفحم مع أرز وسلطة وطحينة", descEn: "Charcoal-grilled half chicken with rice, salad and tahini" },
+  { ...P(54, "food", "بيتزا مارجريتا وسط",            "Margherita Pizza (Medium)",   "8 قطع",      "8 slices",   120, null,["food","new"], 20), sub: 2, prep: 20, descAr: "صوص طماطم وموتزاريلا وريحان", descEn: "Tomato sauce, mozzarella and basil" },
+  { ...P(55, "food", "برجر لحمة بالجبنة",             "Beef Cheeseburger",           "سندوتش",     "1 burger",   85,  null,["food","popular"], 20), sub: 1, prep: 15, descAr: "لحمة بلدي 150 جم، جبنة شيدر، بطاطس", descEn: "150 g local beef, cheddar, with fries" },
+  { ...P(56, "food", "فطار بلدي لشخصين",              "Baladi Breakfast for 2",      "طبق مشترك",  "sharing",    95,  110, ["food","deal","new"], 10), sub: 3, prep: 15, descAr: "فول، طعمية، بيض، جبنة قريش، طحينة وعيش بلدي", descEn: "Fool, taameya, eggs, qarish cheese, tahini and baladi bread" },
+  { ...P(57, "food", "رز بلبن بالمكسرات",             "Rice Pudding with Nuts",      "كوب",        "1 cup",      30,  null,["food","under50"], 20), sub: 4, prep: 5, descAr: "رز بلبن بارد بالقرفة والمكسرات", descEn: "Chilled rice pudding with cinnamon and nuts" },
+  { ...P(58, "food", "أم علي",                         "Om Ali",                      "طبق",        "1 bowl",     40,  null,["food","under50","popular"], 20), sub: 4, prep: 8, descAr: "أم علي سخنة بالزبيب وجوز الهند", descEn: "Warm Om Ali with raisins and coconut" },
+  { ...P(59, "food", "شاي بالنعناع",                   "Mint Tea",                    "كوب",        "1 cup",      12,  null,["food","under50"], 20), sub: 5, prep: 5, descAr: "شاي كشري بالنعناع الطازة", descEn: "Egyptian tea with fresh mint" },
+  { ...P(60, "food", "قهوة تركي مظبوط",                "Turkish Coffee",              "كوب",        "1 cup",      20,  null,["food","under50"], 20), sub: 5, prep: 6, descAr: "قهوة تركي على الرمل", descEn: "Sand-brewed Turkish coffee" },
+  { ...P(61, "food", "بطاطس مقلية كبيرة",              "Large Fries",                 "عبوة",       "1 pack",     35,  null,["food","under50"], 20), sub: 1, prep: 10, descAr: "بطاطس مقرمشة بالتتبيلة", descEn: "Crispy seasoned fries" },
 ];
 
 /* Frequently bought together / related */
-TWAA.related = { 1: [5, 12, 11], 18: [20, 22, 19], 36: [37], 5: [3, 1], 19: [22, 20], 9: [13, 14] };
+TWAA.related = { 52: [61, 9, 58], 51: [59, 57], 55: [61, 9], 1: [5, 12, 11], 18: [20, 22, 19], 36: [37], 5: [3, 1], 19: [22, 20], 9: [13, 14] };
 
 /* Service area — Abu El Matamir markaz only (Beheira). Coordinates are approximate centroids for the
    prototype; production uses surveyed delivery polygons managed in admin (BRD §6). radius in km. */
@@ -179,15 +194,17 @@ TWAA.orders = [
 ];
 
 
-/* Brand logo — vector approximation of the توّا wordmark (heavy rounded ligature, Mandarin shadda).
-   Drop the official SVG paths in here (and in assets/logo.svg) to replace. */
-TWAA.logo = (ink = "currentColor", spark = "#F9732F") => `<svg viewBox="0 0 230 150" aria-label="توّا" role="img">
-  <g fill="none" stroke="${ink}" stroke-width="27" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M32 42 V118 C32 121 36 122 40 122"/>
-    <path d="M40 122 C70 122 82 104 82 78"/>
-    <circle cx="102" cy="72" r="20"/>
-    <path d="M118 80 C122 102 140 110 166 110 C196 110 206 88 206 60"/>
+/* Brand logo — vector of the official artwork (traced from the supplied 1536×1024 image).
+   ink = letterforms + TWAA, spark = the two coral shadda strokes. `withName` toggles the TWAA lettering. */
+TWAA.logoInk = "#2E1338"; TWAA.logoSpark = "#E85A3F";
+TWAA.logo = (ink = "currentColor", spark = TWAA.logoSpark, withName = true) => `<svg viewBox="${withName ? "180 120 1200 800" : "180 120 1200 660"}" aria-label="توّا" role="img">
+  <g fill="none" stroke="${ink}" stroke-width="172" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M322 332 V596 C322 690 372 738 470 738 L600 738"/>
+    <path d="M648 690 L568 806"/>
+    <circle cx="720" cy="568" r="138"/>
+    <path d="M846 598 C880 690 960 660 1110 660 L1248 660 V512"/>
   </g>
-  <g fill="${ink}"><circle cx="160" cy="34" r="10"/><circle cx="188" cy="34" r="10"/></g>
-  <path d="M84 30 C88 16 94 16 98 30 M98 30 C102 16 108 16 112 30" fill="none" stroke="${spark}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="${ink}"><circle cx="1074" cy="334" r="74"/><circle cx="1232" cy="334" r="74"/></g>
+  <g fill="none" stroke="${spark}" stroke-width="104" stroke-linecap="round"><path d="M545 322 L634 218"/><path d="M742 300 L846 168"/></g>
+  ${withName ? `<text x="1058" y="886" text-anchor="middle" font-family="'Baloo Bhaijaan 2','Arial Rounded MT Bold','Nunito',sans-serif" font-weight="800" font-size="112" letter-spacing="34" fill="${ink}">TWAA</text>` : ""}
 </svg>`;
