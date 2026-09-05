@@ -69,13 +69,24 @@
     sparkle: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 17l.7 2.3L22 20l-2.3.7L19 23l-.7-2.3L16 20l2.3-.7z"/>',
     stethoscope: '<path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6 6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/>',
     rx: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h3a2 2 0 1 1 0 4H9v-4"/><path d="m12 17 3 3"/>',
+    share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>',
+    door: '<path d="M6 21V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v17"/><path d="M3 21h18"/><path d="M14 12h.01"/>',
+    hand: '<path d="M18 11V6a2 2 0 0 0-4 0v1"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.9-2.4L3.3 16.6a2 2 0 0 1 2.8-2.8L8 15.5"/>',
+    undo: '<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/>',
+    gift: '<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+    crown: '<path d="m2 8 4 10h12l4-10-5 4-5-7-5 7z"/>',
+    coins: '<circle cx="8" cy="8" r="6"/><path d="M18.1 10a6 6 0 1 1-8 8"/><path d="M7 6h1v4"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>',
+    image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
+    mic: '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><path d="M12 19v3"/>',
+    lock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
   };
   const ic = (name, cls = "icon") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[name] || ""}</svg>`;
   const wave = (cls = "wave") => `<svg class="${cls}" viewBox="0 0 240 80" aria-hidden="true"><path d="M0 40c30-30 60-30 90 0s60 30 90 0 45-25 60 0" fill="none" stroke="#F9F2E7" stroke-width="16" stroke-linecap="round"/><path d="M0 40c30 30 60 30 90 0s60-30 90 0 45 25 60 0" fill="none" stroke="#F9F2E7" stroke-width="16" stroke-linecap="round" opacity=".6"/></svg>`;
 
   /* ---------------- State ---------------- */
   const S = {
-    seg: {}, psub: 0, lang: "ar", screen: "splash", tab: "home", cart: {}, favs: new Set([2, 26]), promo: null, sub: "similar", pay: "cod", slot: "now",
+    seg: {}, psub: 0, onb: 0, ret: { step: 0, items: new Set(), reason: null, method: "wallet", done: false }, useWallet: false, change: "200", card: 0, handover: "hand", cancel: null, viewOrder: null, deliveryCode: "4821", lang: "ar", screen: "splash", tab: "home", cart: {}, favs: new Set([2, 26]), promo: null, sub: "similar", pay: "cod", slot: "now",
     zone: { area: T.zones[0], label: "homeLbl" },
     cat: "dairy", subcat: 0, query: "", homeTab: "all", sort: "recommended", pdp: null, toast: null, otp: 0, phone: "010 1234 5678", loc: { lat: T.zones[0].lat, lng: T.zones[0].lng, zone: T.zones[0], dist: 0, live: false, status: "" }, stars: 0, fb: new Set(), trackStep: 2, heroIdx: 0, orderId: null,
   };
@@ -95,6 +106,10 @@
   const deliveryFee = () => (subtotal() >= FREE_DELIVERY || S.promo === "FREE" ? 0 : S.zone.area.fee);
   const serviceFee = () => (subtotal() > 0 ? 3 : 0);
   const total = () => Math.max(0, subtotal() - discount() + deliveryFee() + serviceFee());
+  const walletUsed = () => (S.useWallet ? Math.min(T.wallet.balance, total()) : 0);
+  const dueNow = () => total() - walletUsed();
+  const ptsFor = (amt) => Math.floor(amt / 10);
+  const activeOrder = () => (S.orderId ? { id: S.orderId, total: total(), items: cartItems() } : T.orders[0].status === "out" ? { id: T.orders[0].id, total: T.orders[0].total, items: T.orders[0].items.map((id) => ({ p: prod(id), q: 1 })) } : null);
   const pct = (p) => (p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0);
   const km = (a1, b1, a2, b2) => { const r = Math.PI / 180, R = 6371; const dLat = (a2 - a1) * r, dLng = (b2 - b1) * r; const x = Math.sin(dLat / 2) ** 2 + Math.cos(a1 * r) * Math.cos(a2 * r) * Math.sin(dLng / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); };
   /* live serviceability: nearest configured zone within its radius (polygons in production) */
@@ -109,9 +124,9 @@
 
   /* ---------------- Screen registry (for the workbench sidebar) ---------------- */
   const SCREENS = [
-    ["splash", "Splash", "شاشة البداية"], ["location", "Location & serviceability", "الموقع"], ["login", "Login (mobile)", "تسجيل الدخول"], ["otp", "OTP", "كود التأكيد"],
+    ["splash", "Splash", "شاشة البداية"], ["onboarding", "Onboarding", "التعريف بالتطبيق"], ["location", "Location & serviceability", "الموقع"], ["login", "Login (mobile)", "تسجيل الدخول"], ["otp", "OTP", "كود التأكيد"],
     ["home", "Home", "الرئيسية"], ["categories", "Categories", "الأقسام"], ["plp", "Category listing", "قائمة المنتجات"], ["search", "Search", "البحث"], ["deals", "Deal zone", "منطقة العروض"], ["food", "Food vertical", "أكل"], ["pharmacy", "Pharmacy vertical", "صيدلية"],
-    ["pdp", "Product detail (sheet)", "تفاصيل المنتج"], ["cart", "Cart", "السلة"], ["checkout", "Checkout", "إتمام الطلب"], ["tracking", "Order tracking", "تتبع الطلب"], ["orders", "My orders", "طلباتي"], ["rating", "Rate order", "التقييم"], ["account", "Account", "حسابي"],
+    ["pdp", "Product detail (sheet)", "تفاصيل المنتج"], ["cart", "Cart", "السلة"], ["checkout", "Checkout & payment", "إتمام الطلب والدفع"], ["confirmed", "Order confirmed", "تم التأكيد"], ["tracking", "Live tracking", "تتبع مباشر"], ["orders", "My orders", "طلباتي"], ["orderDetail", "Order details", "تفاصيل الطلب"], ["returns", "Return & refund", "إرجاع واسترداد"], ["rating", "Rate order", "التقييم"], ["wallet", "Wallet", "محفظة توّا"], ["loyalty", "Twaa Points & Twaa+", "نقط توّا"], ["notifications", "Notifications", "الإشعارات"], ["support", "Help & support", "المساعدة"], ["account", "Account", "حسابي"],
   ];
 
   /* ---------------- Rendering helpers ---------------- */
@@ -172,8 +187,8 @@
   }
   function vhead(active, opts = {}) {
     return `<div class="vhead v-${active}">${vstrip(active)}
-      <div class="vhead-row">${addrLine(!!opts.big)}<div class="row" style="gap:4px"><button class="icon-btn ghost" data-toast="notif" aria-label="${t("notif")}">${ic("bell")}<span class="badge" style="border-color:#fff">2</span></button></div></div>
-      <div class="row" style="gap:8px;align-items:stretch"><button class="searchbar" data-go="search" style="flex:1;margin:0">${ic("search")}<span style="flex:1;text-align:start;color:var(--muted);font-size:15px">${opts.search || t("searchPh2")}</span>${ic("camera", "icon sm")}</button>${opts.side ? `<button class="side-tile" data-go="${opts.side[1]}">${ic(opts.side[2], "icon sm")}<span>${opts.side[0]}</span></button>` : ""}</div></div>`;
+      <div class="vhead-row">${addrLine(!!opts.big)}<div class="row" style="gap:6px">${ptsChip()}<button class="icon-btn ghost" data-go="notifications" aria-label="${t("notif")}">${ic("bell")}<span class="badge" style="border-color:#fff">2</span></button></div></div>
+      <div class="row" style="gap:8px;align-items:stretch"><button class="searchbar" data-go="search" style="flex:1;margin:0">${ic("search")}<span style="flex:1;text-align:start;color:var(--muted);font-size:15px">${opts.search || t("searchPh2")}</span>${ic("mic", "icon sm")}${ic("camera", "icon sm")}</button>${opts.side ? `<button class="side-tile" data-go="${opts.side[1]}">${ic(opts.side[2], "icon sm")}<span>${opts.side[0]}</span></button>` : ""}</div></div>`;
   }
   function promoTiles(tiles) {
     return `<div class="h-scroll promo-tiles">${tiles.map((x) => `<button class="promo-tile" style="background:${x.bg};color:${x.fg || "#fff"}" data-go="${x.go}" ${x.cat ? `data-cat="${x.cat}"` : ""}>${x.code ? `<span class="code">${x.code}</span>` : ""}<div class="pt-title">${x.t}</div><div class="pt-sub">${x.s}</div>${ic(x.icon, "icon pt-icon")}</button>`).join("")}</div>`;
@@ -193,6 +208,18 @@
     return `<article class="fcard" data-pid="${p.id}"><button class="fimg" data-open="${p.id}" style="background:linear-gradient(180deg,${c.bg},#F3D9C4);color:${c.fg}" aria-label="${esc(name(p))}">${ic(c.icon)}<div class="fov">${d ? `<b>${d}% ${t("off")}</b>` : `<b>${t("free")} ${t("delivery")}</b>`}<span class="num">${p.prep} ${t("min")}</span></div></button><button class="fav ${S.favs.has(p.id) ? "on" : ""}" data-fav="${p.id}" aria-label="${t("myFavs")}">${ic("heart")}</button>
       <div class="fbody"><div class="mname">${esc(name(p))}</div><div class="row between"><span class="price num" style="font-size:15px">${p.price}<small>${t("egp")}</small></span>${quickAdd(p)}</div></div></article>`;
   }
+  function trustRow(compact = false) {
+    const items = [["bolt", t("why1")], ["undo", t("why2")], ["lock", t("why3")], ["coins", t("why4")]];
+    return `<div class="trust ${compact ? "compact" : ""}">${items.map(([i, l]) => `<span>${ic(i, "icon xs")}${l}</span>`).join("")}</div>`;
+  }
+  function activeOrderCard() {
+    const o = activeOrder(); if (!o) return "";
+    const step = S.trackStep; const labels = ["stConfirmed", "stPreparing", "stOut", "stDelivered"]; const mins = step >= 3 ? 0 : 12 - step * 3;
+    return `<button class="active-order" data-go="tracking"><span class="ao-ico ${step >= 3 ? "done" : ""}">${ic(step >= 2 ? "bike" : "box", "icon sm")}</span>
+      <span class="ao-body"><span class="ao-t">${t("activeOrder")} · <b>${t(labels[Math.min(step, 3)])}</b></span><span class="ao-s num">${step >= 3 ? t("stDeliveredS") : `${t("arrivesIn")} ${mins} ${t("min")} · #${o.id}`}</span><span class="ao-bar"><i style="width:${Math.min(100, (step + 1) * 25)}%"></i></span></span>
+      <span class="ao-cta">${t("viewLive")} ${ic("chevS", "icon xs")}</span></button>`;
+  }
+  const ptsChip = () => `<button class="pts-chip" data-go="loyalty" aria-label="${t("loyaltyT")}">${ic("coins", "icon xs")}<span class="num">${T.loyalty.points}</span> ${t("ptsChip")}</button>`;
   function toastEl() { return S.toast ? `<div class="toast" role="status" aria-live="polite">${ic("check", "icon sm")}<span>${S.toast}</span></div>` : ""; }
   function map(h, rider) { /* static illustration used on tracking */
     return `<div class="map" style="height:${h}px"><svg class="grid" viewBox="0 0 390 ${h}" preserveAspectRatio="none" aria-hidden="true">
@@ -287,7 +314,7 @@
 
   /* ---------------- Screens ---------------- */
   const R = {};
-  R.splash = () => `<div class="screen dark"><div class="splash">${statusbar(true)}${wave()}<div class="splash-bag" aria-hidden="true"></div><div class="brand-logo lg" style="color:var(--cream)">${T.logoImg(true, true)}</div><div class="tagline">${t("tagline")}</div><div class="en-tag">Local roots. Closer days.</div><button class="btn primary" style="position:absolute;bottom:56px;left:24px;right:24px" data-go="location">${t("shopNow")}</button></div></div>`;
+  R.splash = () => `<div class="screen dark"><div class="splash">${statusbar(true)}${wave()}<div class="splash-bag" aria-hidden="true"></div><div class="brand-logo lg" style="color:var(--cream)">${T.logoImg(true, true)}</div><div class="tagline">${t("tagline")}</div><div class="en-tag">Local roots. Closer days.</div><button class="btn primary" style="position:absolute;bottom:56px;left:24px;right:24px" data-go="onboarding">${t("shopNow")}</button></div></div>`;
 
   R.location = () => {
     return `<div class="screen">${statusbar()}
@@ -329,11 +356,14 @@
       { t: t("secFood"), s: t("secFoodSub"), bg: "linear-gradient(160deg,#8E2F14,#B4441E)", go: "food", icon: "food" },
       { t: t("pharmaT"), s: t("otcNote"), bg: "linear-gradient(160deg,#0B5F6B,#0F7C8C)", go: "pharmacy", icon: "pill" },
       { t: t("home_hero3t"), s: t("home_hero3p"), bg: "linear-gradient(160deg,#1F6B4A,#2E7D4F)", go: "plp", cat: "local", icon: "leaf" },
+      { t: t("plusT"), s: t("plusS"), bg: "linear-gradient(160deg,#241626,#3A1F3D)", go: "loyalty", icon: "crown", code: t("plusSoon") },
     ];
     const segList = (S.seg.home ?? 0) === 0 ? by("again") : T.products.filter((p) => S.favs.has(p.id));
     return `<div class="screen">${statusbar()}${vhead("home", { big: true, side: [S.lang === "ar" ? "اطلب بقائمتك" : "Shop by list", "orders", "list"] })}
       <div class="scroll pb-nav">
+        <div class="pad" style="margin-top:8px">${activeOrderCard()}</div>
         ${promoTiles(tiles)}
+        <div class="pad">${trustRow()}</div>
         <div class="section" style="margin-top:12px"><div class="pad">${segmented("home", [[t("secAgain"), "refresh"], [t("myFavs"), "heart"]])}</div>${segList.length ? carousel(segList.slice(0, 10)) : `<div class="empty" style="padding:24px"><p>${t("emptyCartSub")}</p></div>`}</div>
         <div class="section">${sectionHead(t("shopBy"), null, true)}<div class="cat-scroll">${T.categories.map((c) => `<button class="cat round" data-go="${c.id === "food" ? "food" : c.id === "pharmacy" ? "pharmacy" : "plp"}" data-cat="${c.id}"><span class="tile" style="background:${c.bg};color:${c.fg}">${ic(c.icon)}</span><span>${esc(catName(c))}</span></button>`).join("")}</div></div>
         <div class="section">${sectionHead(t("recommended2"), null, false)}${carousel(by("popular").filter((p) => !["food", "pharmacy"].includes(p.cat)).slice(0, 8))}</div>
@@ -482,7 +512,15 @@
           <button class="opt ${S.slot === "now" ? "on" : ""}" data-slot="now"><span class="radio"></span><span class="ico">${ic("bolt", "icon sm")}</span><span class="ob"><div class="t">${t("now")} · <span class="num" style="color:var(--mandarin-600)">${a.eta} ${t("min")}</span></div><div class="s">${t("nowSub")}</div></span></button>
           <button class="opt ${S.slot === "sched" ? "on" : ""}" data-slot="sched"><span class="radio"></span><span class="ico">${ic("clock", "icon sm")}</span><span class="ob"><div class="t">${t("sched")}</div><div class="s">${t("schedSub")}</div></span></button>
           ${S.slot === "sched" ? `<div class="chips" style="padding:10px 0 0">${["6–7 م", "7–8 م", "8–9 م", "9–10 م"].map((s, i) => `<button class="chip ${i === 1 ? "on" : ""}">${s}</button>`).join("")}</div>` : ""}</div>
-        <div class="card"><h3>${ic("wallet", "icon sm")} ${t("paymentT")}</h3>${pays.map(([v, i, l, s]) => `<button class="opt ${S.pay === v ? "on" : ""}" data-pay="${v}"><span class="radio"></span><span class="ico">${ic(i, "icon sm")}</span><span class="ob"><div class="t">${t(l)}</div><div class="s num">${t(s, { n: 45 })}</div></span></button>`).join("")}</div>
+        <div class="card"><h3>${ic("wallet", "icon sm")} ${t("paymentT")} <span class="pill success" style="margin-inline-start:auto;font-family:var(--font-body)">${ic("lock", "icon xs")} ${t("secureBadge")}</span></h3>
+          <button class="opt wallet-opt ${S.useWallet ? "on" : ""}" data-usewallet><span class="ico" style="background:var(--mandarin-100);color:var(--mandarin-600)">${ic("wallet", "icon sm")}</span><span class="ob"><div class="t">${t("useWallet")} · <span class="num">${money(T.wallet.balance)}</span></div><div class="s">${S.useWallet ? t("useWalletS", { n: walletUsed() }) : t("walletPromo")}</div></span><span class="switch ${S.useWallet ? "on" : ""}"><i></i></span></button>
+          ${dueNow() > 0 ? `<div class="muted" style="margin:10px 0 6px;font-weight:700">${S.useWallet ? `${t("remaining")} <span class="num">${money(dueNow())}</span> · ` : ""}${S.lang === "ar" ? "ادفع بـ" : "Pay with"}</div>
+          ${[["cod", "cash", "cod", "codSub"], ["card", "card", "card", "cardSub"], ["wallet", "mobile", "wallet", "walletSub"]].map(([v, i, l, s]) => `<button class="opt ${S.pay === v ? "on" : ""}" data-pay="${v}"><span class="radio"></span><span class="ico">${ic(i, "icon sm")}</span><span class="ob"><div class="t">${t(l)}</div><div class="s">${t(s)}</div></span></button>
+            ${S.pay === v && v === "cod" ? `<div class="sub-opt"><div class="muted" style="font-weight:700;margin-bottom:6px">${t("changeFor")}</div><div class="chips" style="padding:0">${["exact", "100", "200", "500"].map((c) => `<button class="chip ${S.change === c ? "on" : ""}" data-change="${c}">${c === "exact" ? t("changeNo") : `<span class="num">${c}</span> ${t("egp")}`}</button>`).join("")}</div></div>` : ""}
+            ${S.pay === v && v === "card" ? `<div class="sub-opt"><div class="muted" style="font-weight:700;margin-bottom:6px">${t("savedCards")}</div>${T.cards.map((c, k) => `<button class="opt sm ${S.card === k ? "on" : ""}" data-card="${k}"><span class="radio"></span><span class="ob"><div class="t">${c.brand} <span class="num" dir="ltr">•••• ${c.last4}</span></div><div class="s num" dir="ltr">${c.exp}</div></span>${ic("card", "icon sm")}</button>`).join("")}<button class="btn ghost sm" style="margin-top:6px">${ic("plus", "icon sm")} ${t("addCard")}</button></div>` : ""}
+            ${S.pay === v && v === "wallet" ? `<div class="sub-opt"><div class="input" style="height:44px"><span class="prefix">+20</span><input inputmode="tel" value="${S.phone}" aria-label="${t("walletPhone")}"></div><div class="hint" style="margin-top:6px">${S.lang === "ar" ? "هيجيلك طلب تأكيد على موبايلك" : "You'll get a confirmation prompt on your phone"}</div></div>` : ""}`).join("")}` : `<div class="pill success" style="margin-top:10px">${ic("check", "icon xs")} ${S.lang === "ar" ? "المحفظة بتغطي الطلب كله" : "Wallet covers the whole order"}</div>`}
+          <div class="row" style="gap:6px;margin-top:12px;color:var(--muted);font-size:12px">${ic("lock", "icon xs")} ${t("secure")}</div></div>
+        <div class="card earn-card"><span class="ico">${ic("coins", "icon sm")}</span><div><b>${t("earnOnOrder", { n: ptsFor(total()) })}</b><div class="muted">${t("earnRule")}</div></div><button class="btn ghost sm" data-go="loyalty">${ic("chevS", "icon xs")}</button></div>
         <div class="card"><h3>${t("notes")}</h3><div class="input" style="height:46px"><input placeholder="${t("notesPh")}" aria-label="${t("notes")}"></div></div>
         <div class="card"><h3>${t("summaryT")} <span class="muted num" style="font-family:var(--font-body);font-weight:600">· ${cartCount()} ${t("itemsPl")}</span></h3>
           <div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:10px">${cartItems().slice(0, 6).map(({ p, q }) => `<span style="position:relative">${tile(p, "thumb").replace('class="thumb"', 'class="thumb" style="width:44px;height:44px;border-radius:10px;display:grid;place-items:center;"')}<span class="badge" style="position:absolute;top:-4px;inset-inline-end:-4px;min-width:18px;height:18px;border-radius:9px;background:var(--aubergine);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center">${q}</span></span>`).join("")}</div>
@@ -492,7 +530,7 @@
           <div class="row between muted" style="margin-top:6px"><span>${t("service")}</span><span class="num">${money(serviceFee())}</span></div>
           <div class="divider"></div><div class="row between"><b>${t("total")}</b><span class="price num">${total()} <small>${t("egp")}</small></span></div></div>
       </div>
-      <div class="cta-bar"><div class="row"><span class="muted">${t("total")}</span><b class="num" style="margin-inline-start:auto">${money(total())}</b></div><button class="btn primary" data-place>${ic("check", "icon sm")} ${t("placeOrder")}</button></div>${toastEl()}</div>`;
+      <div class="cta-bar"><div class="row"><span class="muted">${S.useWallet ? t("remaining") : t("total")}${S.pay === "cod" && dueNow() > 0 ? ` · ${t("payAtDoor")}` : ""}</span><b class="num" style="margin-inline-start:auto">${money(dueNow())}</b></div><button class="btn primary" data-place>${ic("check", "icon sm")} ${t("placeOrder")}</button></div>${toastEl()}</div>`;
   };
 
   R.tracking = () => {
@@ -507,9 +545,13 @@
           <div class="hsteps" aria-label="${t("trackT")}">${steps.map(([l, s, tm], i) => `<div class="hstep ${i < S.trackStep ? "done" : i === S.trackStep ? "now" : "pending"}"><span class="dot">${i < S.trackStep ? ic("check", "icon xs") : ic(["check", "box", "bike", "home"][i], "icon xs")}</span><div class="hl">${t(l)}</div></div>`).join("")}</div>
           <div class="hstep-msg">${ic(["check", "box", "bike", "home"][S.trackStep], "icon sm")}<div><b>${t(steps[S.trackStep][0])}</b><div class="muted">${t(steps[S.trackStep][1])}${steps[S.trackStep][2] ? ` · <span class="num">${steps[S.trackStep][2]}</span>` : ""}</div></div></div>
           <button class="btn ghost sm" data-track-next style="margin:-8px auto 0;display:flex">${S.lang === "ar" ? "(للعرض) الخطوة التالية" : "(Demo) next step"} ${ic("chevS", "icon xs")}</button></div>
-        ${S.trackStep >= 2 ? `<div class="card"><div class="row"><span class="avatar">م</span><div style="flex:1"><div style="font-weight:800">${S.lang === "ar" ? "محمود عبدالله" : "Mahmoud Abdallah"}</div><div class="muted">${t("rider")} · ${ic("star", "icon xs")} <span class="num">4.9</span> · <span class="num" dir="ltr">${S.lang === "ar" ? "س ن ط 4521" : "SNT 4521"}</span></div></div><button class="icon-btn ghost" aria-label="${t("callRider")}" data-toast="call">${ic("phone")}</button><button class="icon-btn ghost" aria-label="${t("chatSupport")}" data-toast="help">${ic("chat")}</button></div></div>` : ""}
+        <div class="card code-card"><div><div class="muted">${t("deliveryCode")}</div><div class="code-digits num" dir="ltr">${S.deliveryCode.split("").map((c) => `<span>${c}</span>`).join("")}</div><div class="muted">${t("deliveryCodeS")}</div></div><div class="col" style="display:flex;flex-direction:column;gap:8px"><button class="btn soft sm" data-toast="share">${ic("share", "icon sm")} ${t("shareTrack")}</button><span class="pill ${S.pay === "cod" && dueNow() > 0 ? "warn" : "success"}">${S.pay === "cod" && dueNow() > 0 ? `${ic("cash", "icon xs")} ${t("codDue")} · <span class="num">${money(dueNow())}</span>` : `${ic("check", "icon xs")} ${t("paidOk")}`}</span></div></div>
+        ${S.trackStep < 3 ? `<div class="card"><h3>${ic("door", "icon sm")} ${S.lang === "ar" ? "طريقة الاستلام" : "Handover"}</h3><div class="row" style="gap:8px">${[["hand", "hand", "handToMe", "handToMeS"], ["door", "door", "contactless", "contactlessS"]].map(([v, i, l, s]) => `<button class="opt ${S.handover === v ? "on" : ""}" data-handover="${v}" style="flex:1;margin:0"><span class="ico">${ic(i, "icon sm")}</span><span class="ob"><div class="t">${t(l)}</div><div class="s">${t(s)}</div></span></button>`).join("")}</div>${S.pay === "cod" && dueNow() > 0 ? `<div class="pill warn" style="margin-top:10px">${ic("info", "icon xs")} ${t("prepareChange")} · ${S.change === "exact" ? t("changeNo") : `<span class="num">${S.change} ${t("egp")}</span>`}</div>` : ""}</div>` : `<div class="card"><h3>${ic("image", "icon sm")} ${t("proof")}</h3><div class="proof"><span class="proof-img">${ic("box")}</span><div><b>${t("stDeliveredS")}</b><div class="muted">${t("proofS")} · <span class="num">4:52</span></div></div></div></div>`}
+        ${S.trackStep >= 2 ? `<div class="card"><div class="row"><span class="avatar">م</span><div style="flex:1"><div style="font-weight:800">${S.lang === "ar" ? "محمود عبدالله" : "Mahmoud Abdallah"}</div><div class="muted">${t("rider")} · ${ic("star", "icon xs")} <span class="num">4.9</span> · <span class="num" dir="ltr">${S.lang === "ar" ? "س ن ط 4521" : "SNT 4521"}</span></div><div class="pill accent" style="margin-top:4px">${ic("nav", "icon xs")} ${t("riderAway", { n: S.trackStep >= 3 ? "0" : "1.2" })}</div></div><button class="icon-btn ghost" aria-label="${t("callRider")}" data-toast="call">${ic("phone")}</button><button class="icon-btn ghost" aria-label="${t("chatSupport")}" data-toast="help">${ic("chat")}</button></div></div>` : ""}
         <div class="card"><h3>${ic("box", "icon sm")} ${t("orderItems")} <span class="muted" style="font-family:var(--font-body);font-weight:600">· ${items.length}</span></h3>${items.map(({ p, q }) => `<div class="row" style="padding:6px 0">${tile(p, "thumb").replace('class="thumb"', 'class="thumb" style="width:40px;height:40px;border-radius:10px;display:grid;place-items:center"')}<span style="flex:1;font-size:14px;font-weight:700">${esc(name(p))}</span><span class="muted num">×${q}</span><span class="num" style="font-weight:700">${money(p.price * q)}</span></div>`).join("")}<div class="divider"></div><div class="row between"><b>${t("total")}</b><b class="num">${money(S.orderId ? total() : o.total)}</b></div><div class="muted" style="margin-top:4px">${t(S.pay === "cod" ? "cod" : S.pay === "card" ? "card" : S.pay === "wallet" ? "wallet" : "twaaWallet")}</div></div>
-        <div class="card"><div class="row between"><span style="font-weight:700">${t("needHelp")}</span><button class="btn soft sm" data-toast="help">${ic("chat", "icon sm")} ${t("support")}</button></div>${S.trackStep < 1 ? `<div class="divider"></div><button class="btn ghost sm" style="color:var(--danger)">${t("cancelOrder")}</button>` : ""}</div>
+        <div class="card"><h3>${ic("bell", "icon sm")} ${t("updatesT")}</h3>${[[3, "4:52", "stDeliveredS"], [2, "4:38", "stOutS"], [1, "4:26", "stPreparingS"], [0, "4:21", "stConfirmedS"]].filter(([i]) => i <= S.trackStep).map(([i, tm, k]) => `<div class="upd"><span class="num">${tm}</span><span>${t(k)}</span></div>`).join("")}</div>
+        <div class="card"><div class="row between"><span style="font-weight:700">${t("needHelp")}</span><button class="btn soft sm" data-go="support">${ic("chat", "icon sm")} ${t("support")}</button></div>
+          ${S.trackStep < 1 ? `<div class="divider"></div>${S.cancel === null ? `<div class="row between"><span class="pill success">${ic("check", "icon xs")} ${t("cancelFree")}</span><button class="btn ghost sm" style="color:var(--danger)" data-cancel-start>${t("cancelOrder")}</button></div>` : S.cancel === "done" ? `<div class="pill danger">${ic("x", "icon xs")} ${t("cancelled2")}</div><div class="muted" style="margin-top:6px">${t("cancelledS")}</div>` : `<div class="muted" style="font-weight:700;margin-bottom:8px">${t("cancelReasonT")}</div><div class="chips" style="padding:0;flex-wrap:wrap">${t("cancelReasons").map((r, i) => `<button class="chip ${S.cancel === i ? "on" : ""}" data-cancel-reason="${i}">${esc(r)}</button>`).join("")}</div><button class="btn outline sm" style="margin-top:10px;color:var(--danger);border-color:var(--danger)" data-cancel-confirm ${typeof S.cancel === "number" ? "" : "disabled"}>${t("cancelConfirm")}</button>`}` : ""}</div>
       </div>
       ${S.trackStep >= 3 ? `<div class="cta-bar"><button class="btn primary" data-go="rating">${ic("star", "icon sm")} ${t("rateOrder")}</button></div>` : ""}${toastEl()}</div>`;
   };
@@ -518,7 +560,8 @@
     <div class="topbar"><h1>${t("ordersT")}</h1></div>
     <div class="scroll pad pb-nav">${T.orders.map((o) => `<div class="card order-card"><div class="oh"><div><div style="font-weight:800" class="num" dir="ltr">#${o.id}</div><div class="muted">${esc(S.lang === "ar" ? o.date : o.dateEn)} · <span class="num">${o.items.length} ${t("itemsPl")}</span></div></div><span class="pill ${o.status === "out" ? "accent" : o.status === "delivered" ? "success" : "danger"}">${o.status === "out" ? ic("bike", "icon xs") + " " + t("onWay") : o.status === "delivered" ? ic("check", "icon xs") + " " + t("delivered") : ic("x", "icon xs") + " " + t("cancelled")}</span></div>
       <div class="thumbs">${o.items.slice(0, 4).map((id) => `<span style="background:${cat(prod(id).cat).bg};color:${cat(prod(id).cat).fg}">${ic(cat(prod(id).cat).icon)}</span>`).join("")}${o.items.length > 4 ? `<span class="more">+${o.items.length - 4}</span>` : ""}</div>
-      <div class="row between"><b class="num">${money(o.total)}</b><div class="row" style="gap:8px">${o.status === "out" ? `<button class="btn dark sm" data-go="tracking">${ic("nav", "icon sm")} ${t("trackT")}</button>` : `<button class="btn soft sm" data-reorder="${o.id}">${ic("refresh", "icon sm")} ${t("reorder")}</button>${o.status === "delivered" ? `<button class="btn ghost sm" data-go="rating">${t("rateOrder")}</button>` : ""}`}</div></div></div>`).join("")}</div>${cartBar()}${bottomNav("orders")}${toastEl()}</div>`;
+      ${o.status === "out" ? `<div class="ao-bar" style="margin-bottom:10px"><i style="width:${(S.trackStep + 1) * 25}%"></i></div>` : ""}
+      <div class="row between"><b class="num">${money(o.total)}</b><div class="row" style="gap:8px">${o.status === "out" ? `<button class="btn dark sm" data-go="tracking">${ic("nav", "icon sm")} ${t("trackT")}</button>` : `<button class="btn soft sm" data-reorder="${o.id}">${ic("refresh", "icon sm")} ${t("reorder")}</button>`}<button class="btn ghost sm" data-order="${o.id}">${t("orderDetailT")} ${ic("chevS", "icon xs")}</button></div></div></div>`).join("")}</div>${cartBar()}${bottomNav("orders")}${toastEl()}</div>`;
 
   R.rating = () => `<div class="screen">${statusbar()}
     <div class="topbar"><button class="icon-btn ghost" data-go="orders" aria-label="close">${ic("x")}</button></div>
@@ -530,16 +573,115 @@
     <div class="cta-bar"><button class="btn primary" data-toast="thanks" ${S.stars ? "" : "disabled"}>${t("submit")}</button><button class="btn ghost" data-go="home" style="min-height:40px">${t("skip")}</button></div>${toastEl()}</div>`;
 
   R.account = () => {
-    const rows = [["pin", "myAddresses", "location", `3`], ["wallet", "myWallet", null, `<span class="num">45 ${t("egp")}</span>`], ["heart", "myFavs", null, `${S.favs.size}`], ["tag", "myPromos", "deals", "2"], ["bell", "notif", null, ""], ["chat", "support", null, ""], ["globe", "lang", "lang", S.lang === "ar" ? "العربية" : "English"], ["shield", "privacy", null, ""], ["doc", "terms", null, ""]];
+    const rows = [["receipt", "ordersT", "orders", `12`], ["pin", "myAddresses", "location", `3`], ["wallet", "myWallet", "wallet", `<span class="num">${T.wallet.balance} ${t("egp")}</span>`], ["coins", "loyaltyT", "loyalty", `<span class="num">${T.loyalty.points}</span>`], ["undo", "retT", "orders", ""], ["heart", "myFavs", null, `${S.favs.size}`], ["tag", "myPromos", "deals", "2"], ["bell", "notif", "notifications", "2"], ["chat", "support", "support", ""], ["globe", "lang", "lang", S.lang === "ar" ? "العربية" : "English"], ["shield", "privacy", null, ""], ["doc", "terms", null, ""]];
     return `<div class="screen">${statusbar(true)}
       <div class="appbar"><div class="row"><span class="avatar" style="background:var(--cream);color:var(--aubergine)">أ</span><div style="flex:1"><div style="font-family:var(--font-display);font-weight:800;font-size:20px">${S.lang === "ar" ? "أحمد محمد" : "Ahmed Mohamed"}</div><div style="opacity:.8;font-size:13px" class="num" dir="ltr">+20 ${S.phone}</div></div><button class="icon-btn ghost-light" aria-label="edit">${ic("user")}</button></div>
-        <div class="row" style="margin-top:16px;gap:8px">${[[12, t("orders")], ["45", t("myWallet")], [S.favs.size, t("myFavs")]].map(([n, l]) => `<div style="flex:1;background:rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center"><div class="num" style="font-family:var(--font-display);font-weight:800;font-size:20px">${n}</div><div style="font-size:11px;opacity:.8">${l}</div></div>`).join("")}</div></div>
+        <div class="row" style="margin-top:16px;gap:8px">${[[12, t("orders")], [T.wallet.balance, t("myWallet")], [T.loyalty.points, t("ptsPl")]].map(([n, l], k) => `<div data-go="${["orders", "wallet", "loyalty"][k]}" role="button" tabindex="0" style="flex:1;background:rgba(255,255,255,.1);border-radius:12px;padding:10px;text-align:center;cursor:pointer"><div class="num" style="font-family:var(--font-display);font-weight:800;font-size:20px">${n}</div><div style="font-size:11px;opacity:.8">${l}</div></div>`).join("")}</div></div>
       <div class="scroll pad pb-nav" style="padding-top:16px">
         <div>${rows.map(([i, l, go, v]) => `<button class="menu-item" ${go === "lang" ? "data-lang-toggle" : go ? `data-go="${go}"` : ""}><span class="mi">${ic(i, "icon sm")}</span><span class="ml">${t(l)}</span><span class="muted">${v}</span>${ic("chevS", "icon sm chev")}</button>`).join("")}</div>
         <div style="margin-top:16px"><button class="menu-item danger" style="border-radius:16px" data-go="login"><span class="mi">${ic("logout", "icon sm")}</span><span class="ml">${t("logout")}</span></button></div>
         <div class="muted" style="text-align:center;margin-top:20px;font-size:12px">Twaa v1.0 · ${S.lang === "ar" ? "من هنا لك.. توّا" : "From here, to you.. now"}</div>
       </div>${cartBar()}${bottomNav("account")}${toastEl()}</div>`;
   };
+
+  /* ---- Onboarding (first run) ---- */
+  R.onboarding = () => {
+    const slides = [["pin", "onb1T", "onb1S", "#EFE5F0", "#3A1F3D"], ["cart", "onb2T", "onb2S", "#FCE9D9", "#B4441E"], ["bike", "onb3T", "onb3S", "#E3F3E6", "#2E7D4F"]]; const i = S.onb;
+    return `<div class="screen">${statusbar()}<div class="topbar"><span style="flex:1"></span><button class="btn ghost sm" data-go="location">${t("onbSkip")}</button></div>
+      <div class="scroll pad" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px">
+        <div class="onb-ill" style="background:${slides[i][3]};color:${slides[i][4]}">${ic(slides[i][0])}</div>
+        <h2 style="font-family:var(--font-display);font-size:28px;color:var(--aubergine)">${t(slides[i][1])}</h2><p class="muted" style="font-size:15px;line-height:1.8;max-width:320px">${t(slides[i][2])}</p>
+        <div class="dots">${slides.map((_, k) => `<span class="${k === i ? "on" : ""}"></span>`).join("")}</div>${trustRow(true)}</div>
+      <div class="cta-bar"><button class="btn primary" data-onb-next>${i === 2 ? t("onbStart") : t("onbNext")} ${ic("chevS", "icon sm")}</button></div></div>`;
+  };
+
+  /* ---- Order confirmed ---- */
+  R.confirmed = () => {
+    const a = S.zone.area; const pts = ptsFor(total() || 134); const id = S.orderId || T.orders[0].id;
+    return `<div class="screen">${statusbar()}<div class="scroll pad" style="text-align:center;padding-top:24px">
+      <div class="confirm-ill">${ic("check")}</div>
+      <h2 style="font-family:var(--font-display);font-size:28px;color:var(--aubergine);margin-top:12px">${t("confirmedT")}</h2><p class="muted" style="line-height:1.7;margin:6px auto 18px;max-width:320px">${t("confirmedS")}</p>
+      <div class="card" style="text-align:start"><div class="row between"><div><div class="muted">${t("orderNo")} <span class="num" dir="ltr">#${id}</span></div><div style="font-family:var(--font-display);font-weight:800;font-size:22px;color:var(--aubergine)">${t("arrivesIn")} <span class="num" style="color:var(--mandarin-600)">${a.eta} ${t("min")}</span></div></div><span class="eta-chip">${ic("bolt")}<span class="num">${a.eta} ${t("min")}</span></span></div>
+        <div class="hsteps" style="margin-top:14px"><div class="hstep done"><span class="dot">${ic("check", "icon xs")}</span><div class="hl">${t("stConfirmed")}</div></div><div class="hstep now"><span class="dot">${ic("box", "icon xs")}</span><div class="hl">${t("stPreparing")}</div></div><div class="hstep pending"><span class="dot">${ic("bike", "icon xs")}</span><div class="hl">${t("stOut")}</div></div><div class="hstep pending"><span class="dot">${ic("home", "icon xs")}</span><div class="hl">${t("stDelivered")}</div></div></div></div>
+      <div class="card code-card" style="text-align:start"><div><div class="muted">${t("deliveryCode")}</div><div class="code-digits num" dir="ltr">${S.deliveryCode.split("").map((c) => `<span>${c}</span>`).join("")}</div><div class="muted">${t("deliveryCodeS")}</div></div><span class="pill ${S.pay === "cod" && dueNow() > 0 ? "warn" : "success"}">${S.pay === "cod" && dueNow() > 0 ? `${ic("cash", "icon xs")} ${t("codDue")} <span class="num">${money(dueNow())}</span>` : `${ic("check", "icon xs")} ${t("paidOk")}`}</span></div>
+      <div class="card earn-card" style="text-align:start"><span class="ico">${ic("coins", "icon sm")}</span><div><b>${t("youEarn")} <span class="num">${pts}</span> ${t("ptsPl")}</b><div class="muted">${t("earnRule")}</div></div></div>
+      <div style="height:140px"></div></div>
+      <div class="cta-bar"><button class="btn primary" data-go="tracking">${ic("nav", "icon sm")} ${t("trackBtn")}</button><button class="btn ghost" data-go="home" style="min-height:40px">${t("keepShopping")}</button></div></div>`;
+  };
+
+  /* ---- Order details (Amazon-style: everything about one order) ---- */
+  R.orderDetail = () => {
+    const o = T.orders.find((x) => x.id === S.viewOrder) || T.orders[1]; const items = o.items.map((id) => ({ p: prod(id), q: 1 }));
+    const st = o.status; const pill = st === "out" ? `<span class="pill accent">${ic("bike", "icon xs")} ${t("onWay")}</span>` : st === "delivered" ? `<span class="pill success">${ic("check", "icon xs")} ${t("delivered")}</span>` : `<span class="pill danger">${ic("x", "icon xs")} ${t("cancelled")}</span>`;
+    return `<div class="screen">${statusbar()}<div class="topbar"><button class="icon-btn ghost" data-go="orders" aria-label="back">${ic("chevS")}</button><h1>${t("orderDetailT")}</h1><button class="icon-btn ghost" data-toast="share" aria-label="${t("invoice")}">${ic("doc")}</button></div>
+      <div class="scroll pad pb-cta">
+        <div class="card"><div class="row between"><div><div style="font-weight:800" class="num" dir="ltr">#${o.id}</div><div class="muted">${esc(S.lang === "ar" ? o.date : o.dateEn)} · <span class="num">${items.length} ${t("itemsPl")}</span></div></div>${pill}</div>
+          ${st === "out" ? `<button class="btn dark" style="margin-top:12px;min-height:46px" data-go="tracking">${ic("nav", "icon sm")} ${t("trackT")}</button>` : ""}</div>
+        ${st === "delivered" ? `<div class="card return-card"><div class="row"><span class="ico" style="background:var(--success-100);color:var(--success)">${ic("undo", "icon sm")}</span><div style="flex:1"><b>${t("problem")}</b><div class="muted">${t("returnPolicyS")}</div></div></div><button class="btn outline" style="margin-top:12px;min-height:46px" data-ret-start="${o.id}">${t("returnBtn")}</button></div>` : ""}
+        <div class="card"><h3>${ic("box", "icon sm")} ${t("orderItems")}</h3>${items.map(({ p, q }) => `<div class="row" style="padding:8px 0">${tile(p, "thumb").replace('class="thumb"', 'class="thumb" style="width:44px;height:44px;border-radius:10px;display:grid;place-items:center"')}<span style="flex:1;font-size:14px;font-weight:700">${esc(name(p))}<div class="muted" style="font-weight:600">${esc(unit(p))}</div></span><span class="muted num">×${q}</span><span class="num" style="font-weight:700">${money(p.price * q)}</span></div>`).join("")}<div class="divider"></div><div class="row between muted"><span>${t("subtotal")}</span><span class="num">${money(o.total - 13)}</span></div><div class="row between muted" style="margin-top:4px"><span>${t("delivery")} + ${t("service")}</span><span class="num">${money(13)}</span></div><div class="row between" style="margin-top:6px"><b>${t("total")}</b><b class="num">${money(o.total)}</b></div></div>
+        <div class="card"><h3>${ic("wallet", "icon sm")} ${t("paidStatus")}</h3><div class="row between"><span>${t("cod")}</span><span class="pill success">${ic("check", "icon xs")} ${t("paidOk")}</span></div><div class="row between" style="margin-top:8px"><span class="muted">${t("youEarned")}</span><span class="pill brand">${ic("coins", "icon xs")} <span class="num">${ptsFor(o.total)}</span> ${t("ptsPl")}</span></div></div>
+        <div class="card"><h3>${ic("pin", "icon sm")} ${t("addressT")}</h3><div style="font-weight:700">${t("homeLbl")} · ${placeName(S.zone.area)}</div><div class="muted">${S.lang === "ar" ? "شارع الجيش، عمارة 12، الدور 3، شقة 7" : "El Gaish St., Bldg 12, Floor 3, Apt 7"}</div></div>
+        <div class="card"><div class="row" style="gap:8px"><button class="btn soft sm" style="flex:1" data-reorder="${o.id}">${ic("refresh", "icon sm")} ${t("reorderAll")}</button><button class="btn soft sm" style="flex:1" data-go="support">${ic("chat", "icon sm")} ${t("helpOrder")}</button></div></div>
+      </div></div>`;
+  };
+
+  /* ---- Return & refund wizard ---- */
+  R.returns = () => {
+    const o = T.orders.find((x) => x.id === S.viewOrder) || T.orders[1]; const items = o.items.map(prod); const r = S.ret;
+    const amount = [...r.items].reduce((s, id) => s + prod(id).price, 0);
+    const steps = ["retStep1", "retStep2", "retStep3", "retStep4"];
+    const body = r.done ? `<div class="empty" style="padding-top:12px"><div class="ill" style="background:var(--success-100);color:var(--success)">${ic("check")}</div><h3>${t("retDoneT")}</h3><p style="max-width:300px">${t("retDoneS")}</p></div>
+        <div class="card"><div class="row between"><span class="muted">${t("retAmount")}</span><b class="num" style="font-size:20px;color:var(--aubergine)">${money(amount)}</b></div><div class="divider"></div><div class="hsteps" style="margin:0">${t("retTimeline").map((l, i) => `<div class="hstep ${i === 0 ? "done" : i === 1 ? "now" : "pending"}"><span class="dot">${i === 0 ? ic("check", "icon xs") : ""}</span><div class="hl">${esc(l)}</div></div>`).join("")}</div></div>
+        <div class="card"><div class="row between"><span>${t("walletT")}</span><span class="pill brand">${ic("wallet", "icon xs")} <span class="num">${T.wallet.balance}</span> ${t("egp")}</span></div><button class="btn soft sm" style="margin-top:10px" data-go="wallet">${t("walletHistory")} ${ic("chevS", "icon xs")}</button></div>`
+      : r.step === 0 ? `<div class="muted" style="margin:4px 0 10px">${t("retSelectS")}</div>${items.map((p) => `<button class="opt ${r.items.has(p.id) ? "on" : ""}" data-ret-item="${p.id}"><span class="check ${r.items.has(p.id) ? "on" : ""}">${ic("check", "icon xs")}</span>${tile(p, "thumb").replace('class="thumb"', 'class="thumb" style="width:44px;height:44px;border-radius:10px;display:grid;place-items:center"')}<span class="ob"><div class="t">${esc(name(p))}</div><div class="s">${esc(unit(p))} · <span class="num">${money(p.price)}</span></div></span></button>`).join("")}`
+      : r.step === 1 ? `<div class="muted" style="margin:4px 0 10px">${t("retReasonS")}</div><div class="chips" style="padding:0;flex-wrap:wrap">${t("retReasons").map((x, i) => `<button class="chip ${r.reason === i ? "on" : ""}" data-ret-reason="${i}">${esc(x)}</button>`).join("")}</div>
+          <button class="opt" style="margin-top:14px" data-toast="photo"><span class="ico">${ic("camera", "icon sm")}</span><span class="ob"><div class="t">${t("retPhoto")}</div><div class="s">${t("retPhotoS")}</div></span>${ic("plus", "icon sm")}</button>
+          <div class="field" style="margin-top:12px"><div class="input" style="height:80px;align-items:flex-start;padding-top:10px"><input placeholder="${S.lang === "ar" ? "تفاصيل إضافية (اختياري)" : "More details (optional)"}" aria-label="notes"></div></div>`
+      : `${[["wallet", "wallet", "retToWallet", "retToWalletS"], ["card", "card", "retToCard", "retToCardS"], ["replace", "refresh", "retReplace", "retReplaceS"]].map(([v, i, l, s]) => `<button class="opt ${r.method === v ? "on" : ""}" data-ret-method="${v}"><span class="radio"></span><span class="ico">${ic(i, "icon sm")}</span><span class="ob"><div class="t">${t(l)} ${v === "wallet" ? `<span class="pill success" style="margin-inline-start:6px">${S.lang === "ar" ? "الأسرع" : "Fastest"}</span>` : ""}</div><div class="s">${t(s)}</div></span></button>`).join("")}
+          <div class="card" style="margin-top:12px"><div class="row between"><span class="muted">${t("retAmount")}</span><b class="num" style="font-size:20px;color:var(--aubergine)">${money(amount)}</b></div></div>`;
+    const canNext = r.step === 0 ? r.items.size > 0 : r.step === 1 ? r.reason !== null : true;
+    return `<div class="screen">${statusbar()}<div class="topbar"><button class="icon-btn ghost" data-go="orderDetail" aria-label="back">${ic("chevS")}</button><h1>${t("retT")}</h1><span class="muted num" dir="ltr">#${o.id}</span></div>
+      ${!r.done ? `<div class="chips" style="padding-top:0;gap:6px">${steps.map((s, i) => `<span class="chip ${i <= r.step ? "on" : ""}" style="min-height:28px;padding:4px 10px;font-size:12px">${i + 1}. ${t(s)}</span>`).join("")}</div>` : ""}
+      <div class="scroll pad pb-cta">${body}</div>
+      <div class="cta-bar">${r.done ? `<button class="btn primary" data-go="orders">${t("ordersT")}</button>` : `<button class="btn primary" data-ret-next ${canNext ? "" : "disabled"}>${r.step === 2 ? t("retSubmit") : t("retNext")}</button>${r.step > 0 ? `<button class="btn ghost" style="min-height:40px" data-ret-back>${S.lang === "ar" ? "رجوع" : "Back"}</button>` : ""}`}</div></div>`;
+  };
+
+  /* ---- Wallet ---- */
+  R.wallet = () => `<div class="screen">${statusbar()}<div class="topbar"><button class="icon-btn ghost" data-go="account" aria-label="back">${ic("chevS")}</button><h1>${t("walletT")}</h1></div>
+    <div class="scroll pad pb-nav">
+      <div class="wallet-card">${wave()}<div class="muted" style="color:rgba(249,242,231,.8)">${t("balance")}</div><div class="wbal num">${T.wallet.balance}<small> ${t("egp")}</small></div><div class="row" style="gap:8px;margin-top:14px"><button class="btn sm" style="background:var(--cream);color:var(--aubergine)" data-toast="soon">${ic("plus", "icon sm")} ${t("addMoney")}</button><span class="pill" style="background:rgba(255,255,255,.15);color:#fff">${ic("lock", "icon xs")} ${t("secureBadge")}</span></div></div>
+      <div class="card earn-card"><span class="ico" style="background:var(--mandarin-100);color:var(--mandarin-600)">${ic("percent", "icon sm")}</span><div><b>${t("walletPromo")}</b><div class="muted">${S.lang === "ar" ? "الكاش باك بيتضاف تلقائي بعد التوصيل" : "Cashback is added automatically after delivery"}</div></div></div>
+      <div class="card"><h3>${t("walletHistory")}</h3>${T.wallet.ledger.map((l) => `<div class="ledger"><span class="li ${l.type}">${ic(l.type === "refund" ? "undo" : l.type === "cashback" ? "percent" : l.type === "pay" ? "cart" : "gift", "icon sm")}</span><div style="flex:1"><div style="font-weight:700;font-size:14px">${esc(S.lang === "ar" ? l.ar : l.en)}</div><div class="muted">${esc(S.lang === "ar" ? l.date : l.dateEn)}</div></div><b class="num" style="color:${l.amount > 0 ? "var(--success)" : l.amount < 0 ? "var(--ink)" : "var(--mandarin-600)"}">${l.amount > 0 ? "+" : ""}${l.amount ? money(l.amount) : `+${l.pts} ${t("ptsPl")}`}</b></div>`).join("")}</div>
+    </div>${bottomNav("account")}${toastEl()}</div>`;
+
+  /* ---- Loyalty: Twaa Points + Twaa+ ---- */
+  R.loyalty = () => {
+    const L = T.loyalty; const tiers = L.tiers; const ti = tiers.findIndex(([k]) => k === L.tier); const next = tiers[ti + 1]; const cur = tiers[ti][1];
+    const prog = next ? Math.round(((L.points - cur) / (next[1] - cur)) * 100) : 100;
+    return `<div class="screen">${statusbar()}<div class="topbar"><button class="icon-btn ghost" data-go="account" aria-label="back">${ic("chevS")}</button><h1>${t("loyaltyT")}</h1><button class="btn ghost sm" data-toast="soon">${t("history")}</button></div>
+      <div class="scroll pad pb-nav">
+        <div class="points-card"><div class="row between"><div><div style="opacity:.8;font-size:13px">${t("tier")} · <b>${t("tier" + L.tier[0].toUpperCase() + L.tier.slice(1))}</b></div><div class="wbal num">${L.points}<small> ${t("ptsPl")}</small></div></div><span class="tier-badge ${L.tier}">${ic("crown")}</span></div>
+          <div class="progress" style="background:rgba(255,255,255,.2);margin-top:14px"><i style="width:${prog}%;background:var(--mandarin)"></i></div><div class="row between" style="font-size:12px;margin-top:6px;opacity:.9"><span>${t("tier" + tiers[ti][0][0].toUpperCase() + tiers[ti][0].slice(1))}</span>${next ? `<span>${t("toNext", { n: next[1] - L.points, t: t("tier" + next[0][0].toUpperCase() + next[0].slice(1)) })}</span>` : ""}</div><div style="font-size:12px;opacity:.8;margin-top:8px">${t("earnRule")}</div></div>
+        <div class="section"><div class="section-head" style="padding:0"><h2>${ic("gift", "icon sm")} ${t("rewardsT")}</h2></div><div class="rewards">${L.rewards.map(([k, cost, i]) => `<div class="reward ${L.points >= cost ? "" : "locked"}"><span class="ico">${ic(i, "icon sm")}</span><b>${t(k)}</b><span class="muted num">${cost} ${t("ptsPl")}</span><button class="btn sm ${L.points >= cost ? "dark" : "soft"}" data-redeem="${k}" ${L.points >= cost ? "" : "disabled"}>${t("redeem")}</button></div>`).join("")}</div></div>
+        <div class="card"><h3>${ic("bolt", "icon sm")} ${t("challengesT")}</h3>${L.challenges.map(([k, r, done, total]) => `<div class="chal"><div style="flex:1"><div class="row between"><b>${t(k)}</b><span class="pill accent">${t(r)}</span></div><div class="progress" style="margin-top:8px"><i style="width:${(done / total) * 100}%"></i></div><div class="muted num" style="margin-top:4px">${done}/${total}</div></div></div>`).join("")}</div>
+        <div class="card refer-card"><div class="row"><span class="ico" style="background:var(--aubergine-100);color:var(--aubergine)">${ic("users", "icon sm")}</span><div style="flex:1"><b>${t("referT")}</b><div class="muted">${t("referS")}</div></div></div><div class="row" style="gap:8px;margin-top:12px"><div class="input" style="flex:1;height:46px;justify-content:center;font-family:var(--font-display);font-weight:800;letter-spacing:.12em" dir="ltr">${L.referral}</div><button class="btn dark sm" style="min-height:46px" data-toast="share">${ic("share", "icon sm")} ${t("share")}</button></div></div>
+        <div class="plus-card">${wave()}<div class="row between"><div><div style="font-family:var(--font-display);font-weight:800;font-size:24px">${t("plusT")} <span class="pill" style="background:var(--mandarin);color:#fff;vertical-align:middle">${t("plusSoon")}</span></div><div style="opacity:.9;font-size:13px;margin-top:4px">${t("plusS")}</div><div style="font-family:var(--font-display);font-weight:800;margin-top:8px">${t("plusPrice")}</div></div>${ic("crown", "icon")}</div><button class="btn sm" style="background:var(--cream);color:var(--aubergine);margin-top:12px" data-toast="soon">${t("plusCta")}</button></div>
+      </div>${bottomNav("account")}${toastEl()}</div>`;
+  };
+
+  /* ---- Support ---- */
+  R.support = () => `<div class="screen">${statusbar()}<div class="topbar"><button class="icon-btn ghost" data-go="account" aria-label="back">${ic("chevS")}</button><h1>${t("supportT")}</h1></div>
+    <div class="scroll pad pb-nav">
+      ${activeOrder() ? `<div class="card"><div class="row between"><div><div class="muted">${t("activeOrder")}</div><b class="num" dir="ltr">#${activeOrder().id}</b></div><button class="btn soft sm" data-go="tracking">${t("trackT")}</button></div></div>` : ""}
+      <div class="row" style="gap:8px">${[["chat", "chatNow", "help", "var(--aubergine)", "var(--cream)"], ["phone", "callUs", "call", "var(--surface)", "var(--aubergine)"], ["chat", "whatsapp", "help", "#DFF3E6", "#1E7C4A"]].map(([i, l, tt, bg, fg]) => `<button class="support-tile" style="background:${bg};color:${fg}" data-toast="${tt}">${ic(i)}<span>${t(l)}</span></button>`).join("")}</div>
+      <div class="muted" style="margin:16px 0 8px;font-weight:700">${t("faqT")}</div>
+      <div class="card" style="padding:4px 16px">${t("faq").map(([q, an]) => `<details class="faq"><summary>${esc(q)}${ic("chevD", "icon sm")}</summary><p>${esc(an)}</p></details>`).join("")}</div>
+      <div class="card" style="text-align:center"><div class="muted">${S.lang === "ar" ? "متاحين من 8 ص لـ 12 م · الرد خلال دقيقة" : "Available 8 am to midnight · reply within a minute"}</div></div>
+    </div>${bottomNav("account")}${toastEl()}</div>`;
+
+  /* ---- Notifications ---- */
+  R.notifications = () => `<div class="screen">${statusbar()}<div class="topbar"><button class="icon-btn ghost" data-go="home" aria-label="back">${ic("chevS")}</button><h1>${t("notifT")}</h1></div>
+    <div class="scroll pad pb-nav"><div class="card" style="padding:4px 16px">${t("notifs").map(([k, ttl, s, tm], i) => `<button class="notif ${i === 0 ? "unread" : ""}" data-go="${k === "out" ? "tracking" : k === "refund" ? "wallet" : k === "pts" ? "loyalty" : "deals"}"><span class="ico ${k}">${ic(k === "out" ? "bike" : k === "refund" ? "undo" : k === "pts" ? "coins" : k === "promo" ? "truck" : "percent", "icon sm")}</span><div style="flex:1"><div class="row between"><b>${esc(ttl)}</b><span class="muted" style="font-size:11px">${esc(tm)}</span></div><div class="muted">${esc(s)}</div></div></button>`).join("")}</div></div>${bottomNav("home")}${toastEl()}</div>`;
 
   /* PDP renders as a sheet over the current base screen */
   function pdpSheet() {
@@ -552,7 +694,8 @@
         <div class="pdp-thumbs">${[0, 1, 2].map((i) => `<span class="${i === 0 ? "on" : ""}" style="background:${c.bg};color:${c.fg}">${ic(c.icon)}</span>`).join("")}</div>
         <div class="pad" style="margin-top:16px"><div class="muted">${esc(p.brand || catName(c))}</div><h2 class="pdp-title">${esc(name(p))}</h2><div class="muted" style="margin-top:2px">${esc(unit(p))}</div>
           <div class="row" style="margin-top:12px;gap:10px"><span class="price num" style="font-size:28px">${p.price}<small>${t("egp")}</small></span>${p.oldPrice ? `<span class="price-old num" style="font-size:14px">${p.oldPrice} ${t("egp")}</span><span class="pill accent num">${t("off")} ${d}%</span>` : ""}<span style="margin-inline-start:auto" class="pill ${p.stock === 0 ? "danger" : p.stock <= 5 ? "warn" : "success"}">${p.stock === 0 ? t("outStock") : p.stock <= 5 ? t("lowStock", { n: p.stock }) : t("inStock")}</span></div>
-          <div class="kv" style="margin-top:16px"><div><div class="k">${t("size")}</div><div class="v">${esc(unit(p))}</div></div><div><div class="k">${t("origin")}</div><div class="v">${S.lang === "ar" ? "مصر" : "Egypt"}</div></div><div><div class="k">${t("storage")}</div><div class="v">${p.cat === "dairy" || p.cat === "frozen" ? (S.lang === "ar" ? "يحفظ مبرداً" : "Keep refrigerated") : S.lang === "ar" ? "مكان جاف وبارد" : "Cool dry place"}</div></div><div><div class="k">${t("maxQty", { n: 10 })}</div><div class="v">${S.lang === "ar" ? "لكل طلب" : "per order"}</div></div></div>
+          <div style="margin-top:12px">${trustRow(true)}</div>
+          <div class="kv" style="margin-top:12px"><div><div class="k">${t("size")}</div><div class="v">${esc(unit(p))}</div></div><div><div class="k">${t("origin")}</div><div class="v">${S.lang === "ar" ? "مصر" : "Egypt"}</div></div><div><div class="k">${t("storage")}</div><div class="v">${p.cat === "dairy" || p.cat === "frozen" ? (S.lang === "ar" ? "يحفظ مبرداً" : "Keep refrigerated") : S.lang === "ar" ? "مكان جاف وبارد" : "Cool dry place"}</div></div><div><div class="k">${t("maxQty", { n: 10 })}</div><div class="v">${S.lang === "ar" ? "لكل طلب" : "per order"}</div></div></div>
           <div class="card" style="margin-top:12px"><h3>${t("desc")}</h3><p class="muted" style="line-height:1.8">${p.descAr ? esc(S.lang === "ar" ? p.descAr : p.descEn) : S.lang === "ar" ? "منتج أصلي بضمان الجودة والصلاحية. يتم اختياره وتغليفه بعناية من متجر توّا القريب منك ويوصلك في أسرع وقت." : "Genuine product with quality and expiry guaranteed. Carefully picked and packed at your nearest Twaa store and delivered fast."}</p></div>
           <div class="card"><h3>${t("ingredients")} · ${t("nutrition")}</h3><p class="muted" style="line-height:1.8">${S.lang === "ar" ? "راجع العبوة للمكونات الكاملة والقيمة الغذائية لكل 100 جم." : "See pack for full ingredients and nutrition per 100 g."}</p></div>
         </div>
@@ -586,7 +729,7 @@
     if (bar && nb) bar.outerHTML = nb; else if (bar && !nb) bar.remove(); else if (!bar && nb) { const nav = host.querySelector(".bottomnav"); if (nav) nav.insertAdjacentHTML("beforebegin", nb); }
     if (S.pdp || S.screen === "cart" || S.screen === "checkout") render();
   }
-  const TOASTS = { soon: () => (S.lang === "ar" ? "رفع الروشتة هيتوفر قريباً" : "Prescription upload is coming soon"), notif: () => (S.lang === "ar" ? "مفيش إشعارات جديدة" : "No new notifications"), gps: () => (S.lang === "ar" ? "تم تحديد موقعك" : "Location detected"), notify: () => (S.lang === "ar" ? "هنبلّغك أول ما نوصل 🧡" : "We'll let you know when we arrive 🧡"), help: () => (S.lang === "ar" ? "فريق الدعم هيرد عليك خلال دقيقة" : "Support will reply within a minute"), call: () => (S.lang === "ar" ? "جاري الاتصال بالمندوب…" : "Calling the rider…"), thanks: () => (S.lang === "ar" ? "شكراً لتقييمك!" : "Thanks for your feedback!") };
+  const TOASTS = { share: () => (S.lang === "ar" ? "تم نسخ الرابط" : "Link copied"), photo: () => (S.lang === "ar" ? "افتح الكاميرا (في التطبيق الحقيقي)" : "Opens the camera in the real app"), soon: () => (S.lang === "ar" ? "رفع الروشتة هيتوفر قريباً" : "Prescription upload is coming soon"), notif: () => (S.lang === "ar" ? "مفيش إشعارات جديدة" : "No new notifications"), gps: () => (S.lang === "ar" ? "تم تحديد موقعك" : "Location detected"), notify: () => (S.lang === "ar" ? "هنبلّغك أول ما نوصل 🧡" : "We'll let you know when we arrive 🧡"), help: () => (S.lang === "ar" ? "فريق الدعم هيرد عليك خلال دقيقة" : "Support will reply within a minute"), call: () => (S.lang === "ar" ? "جاري الاتصال بالمندوب…" : "Calling the rider…"), thanks: () => (S.lang === "ar" ? "شكراً لتقييمك!" : "Thanks for your feedback!") };
 
   host.addEventListener("click", (e) => {
     const b = (sel) => e.target.closest(sel);
@@ -612,9 +755,25 @@
     if ((el = b("[data-sub]"))) { S.sub = el.dataset.sub; render(); return; }
     if ((el = b("[data-slot]"))) { S.slot = el.dataset.slot; render(); return; }
     if ((el = b("[data-pay]"))) { S.pay = el.dataset.pay; render(); return; }
-    if ((el = b("[data-place]"))) { el.disabled = true; el.innerHTML = `<span class="num">…</span>`; setTimeout(() => { S.orderId = "TW-" + (24818 + Math.floor(Math.random() * 90)); S.trackStep = 0; go("tracking"); toast(t("toastOrder")); }, 700); return; }
+    if ((el = b("[data-place]"))) { el.disabled = true; el.innerHTML = `<span class="num">…</span>`; setTimeout(() => { S.orderId = "TW-" + (24818 + Math.floor(Math.random() * 90)); S.trackStep = 0; S.deliveryCode = String(1000 + Math.floor(Math.random() * 9000)); go("confirmed"); }, 700); return; }
     if ((el = b("[data-track-next]"))) { S.trackStep = Math.min(3, S.trackStep + 1); render(); return; }
     if ((el = b("[data-reorder]"))) { const o = T.orders.find((x) => x.id === el.dataset.reorder); o.items.forEach((id) => { if (prod(id).stock > 0) S.cart[id] = (S.cart[id] || 0) + 1; }); const oos = o.items.filter((id) => prod(id).stock === 0).length; go("cart"); toast(oos ? (S.lang === "ar" ? `${oos} منتج غير متوفر حالياً` : `${oos} item(s) currently unavailable`) : t("toastAdded")); return; }
+    if ((el = b("[data-onb-next]"))) { if (S.onb >= 2) { S.onb = 0; go("location"); } else { S.onb++; render(); } return; }
+    if ((el = b("[data-usewallet]"))) { S.useWallet = !S.useWallet; render(); return; }
+    if ((el = b("[data-change]"))) { S.change = el.dataset.change; render(); return; }
+    if ((el = b("[data-card]"))) { S.card = +el.dataset.card; render(); return; }
+    if ((el = b("[data-handover]"))) { S.handover = el.dataset.handover; toast(S.lang === "ar" ? "تم إبلاغ المندوب" : "Rider notified"); return; }
+    if ((el = b("[data-cancel-start]"))) { S.cancel = "pick"; render(); return; }
+    if ((el = b("[data-cancel-reason]"))) { S.cancel = +el.dataset.cancelReason; render(); return; }
+    if ((el = b("[data-cancel-confirm]"))) { S.cancel = "done"; render(); return; }
+    if ((el = b("[data-order]"))) { S.viewOrder = el.dataset.order; go("orderDetail"); return; }
+    if ((el = b("[data-ret-start]"))) { S.viewOrder = el.dataset.retStart; S.ret = { step: 0, items: new Set(), reason: null, method: "wallet", done: false }; go("returns"); return; }
+    if ((el = b("[data-ret-item]"))) { const id = +el.dataset.retItem; S.ret.items.has(id) ? S.ret.items.delete(id) : S.ret.items.add(id); render(); return; }
+    if ((el = b("[data-ret-reason]"))) { S.ret.reason = +el.dataset.retReason; render(); return; }
+    if ((el = b("[data-ret-method]"))) { S.ret.method = el.dataset.retMethod; render(); return; }
+    if ((el = b("[data-ret-next]"))) { if (S.ret.step >= 2) { S.ret.done = true; if (S.ret.method === "wallet") { const amt = [...S.ret.items].reduce((s, id) => s + prod(id).price, 0); T.wallet.balance += amt; T.wallet.ledger.unshift({ type: "refund", ar: `استرداد · #${S.viewOrder}`, en: `Refund · #${S.viewOrder}`, amount: amt, date: "دلوقتي", dateEn: "Now" }); } } else S.ret.step++; render(); return; }
+    if ((el = b("[data-ret-back]"))) { S.ret.step = Math.max(0, S.ret.step - 1); render(); return; }
+    if ((el = b("[data-redeem]"))) { toast(S.lang === "ar" ? "تم استبدال النقط.. الكوبون في كوبوناتك" : "Points redeemed, coupon added"); return; }
     if ((el = b("[data-star]"))) { S.stars = +el.dataset.star; render(); return; }
     if ((el = b("[data-fb]"))) { const i = +el.dataset.fb; S.fb.has(i) ? S.fb.delete(i) : S.fb.add(i); render(); return; }
     if ((el = b("[data-otp-fill]"))) { S.otp = 0; const tick = () => { S.otp++; render(); if (S.otp < 6) setTimeout(tick, 120); }; tick(); return; }
@@ -657,6 +816,6 @@
   resolveZone(S.loc.lat, S.loc.lng);
   render();
   /* auto-advance splash */
-  setTimeout(() => { if (S.screen === "splash") go("location"); }, 2200);
+  setTimeout(() => { if (S.screen === "splash") go("onboarding"); }, 2200);
   window.TWAA_APP = { S, go, render };
 })();

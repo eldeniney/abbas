@@ -1,6 +1,6 @@
 # توّا — Twaa · Customer App Design Guideline
 
-**Version:** 1.1 · **Based on:** BRD v1.1 · **Launch scope:** Abu El Matamir city and its villages (Beheira) · **Reference pattern:** noon Minutes
+**Version:** 1.5 · **Based on:** BRD v1.1 · **Launch scope:** Abu El Matamir city and its villages (Beheira) · **Reference pattern:** noon Minutes
 **Files:** `index.html` (interactive prototype) · `design-system.html` (foundations & components) · `styles.css` · `data.js` · `app.js`
 
 Open `index.html` in a browser (no build step). The left panel jumps between screens and toggles Arabic/English; the phone on the right is fully interactive (quick add, cart, promo codes, checkout, tracking).
@@ -136,6 +136,29 @@ One codebase, one set of components; layout responds to the **container width** 
 | ≥ 1240px | Larger product and category tiles. |
 
 Preview modes in the workbench: **Fill window** (default, resize the browser to test), **Tablet** (768px frame), **Phone** (390×844 frame with status bar). On small viewports the workbench panel collapses into a drawer behind a floating button. The page carries PWA meta (theme colour, standalone, viewport-fit=cover) so it can be added to the home screen.
+
+### 4.18 Confidence layer — monitoring, returns, payment, loyalty (v1.5)
+Built to match what customers trust in noon and Amazon: always know where the order is, how to get money back, what was paid, and what they earn.
+
+**Onboarding (first run).** Three plain-language slides (اختار مكانك → اطلب اللي محتاجه → تابع الطلب لحد بابك) with the four trust badges: توصيل خلال دقايق · إرجاع واسترداد فوري · دفع آمن أو كاش · نقط على كل طلب. Skip always available.
+
+**Order confirmed.** Green check, order number, ETA with a 4-step progress, the **delivery code** (4 digits the customer tells the rider, Amazon-style OTP handover), payment status (تم الدفع / كاش عند الاستلام + amount) and points to be earned. CTAs: تابع طلبك / كمّل تسوق.
+
+**Active order card.** As soon as an order exists, a dark card at the top of Home shows status, minutes remaining and a progress bar, with "شوف مباشر". Orders list shows the same mini bar. Support screen also surfaces the active order.
+
+**Live tracking (extended).** Map + horizontal stepper, رider distance pill ("المندوب على بعد 1.2 كم"), delivery code, share-tracking link, payment status, **handover choice** (سلّمه ليّا / اتركه عند الباب) and a "جهّز الفكة" reminder for cash, a timestamped updates feed, proof-of-delivery photo card once delivered, and **free cancellation before picking** with a reason picker (refund returns to wallet instantly).
+
+**Order details.** Amazon-style single page per order: status, items with prices, payment status and points earned, address, reorder, help, invoice, and for delivered orders a prominent **"عندك مشكلة في الطلب؟ → إرجاع أو استرداد"** card with the 24-hour policy.
+
+**Return & refund wizard.** 4 steps: pick items → reason chips (منتج ناقص / غلط / تالف / منتهي الصلاحية / جودة / آخر) + optional photo → refund method (**محفظة توّا فوري** recommended, original payment 3–5 days, or replacement) → confirmation with the refund amount and a 4-stage tracker (تم الإرسال → قيد المراجعة → تم القبول → تم الاسترداد). Wallet refunds are credited immediately in the prototype.
+
+**Payment (checkout).** Secure-payment badge; **wallet balance toggle** that deducts the balance and shows the remaining amount; then كاش عند الاستلام with a **"معاك فكة لـ" selector** (exact / 100 / 200 / 500) so the rider brings change; بطاقة بنكية with saved Meeza/Visa cards and "أضف بطاقة"; محفظة إلكترونية with the phone number and a push-confirmation hint. The CTA bar shows what is due at the door. A card states the points the order will earn.
+
+**Wallet.** Balance card, "ادفع بالمحفظة وخد كاش باك 5%", top-up (Phase 2), and a ledger of refunds, cashback, payments and rewards.
+
+**Loyalty — نقط توّا.** Points card with tier (برونزي / فضي / ذهبي) and progress to the next tier, rule "كل 10 ج.م = نقطة", a rewards grid (توصيل مجاني 200 · خصم 20 ج.م 400 · خصم 50 ج.م 900 · قهوة مجانية 300) with locked states, weekly challenges with progress, referral code with share, and a **توّا+** teaser (unlimited free delivery, double points, priority support, 49 ج.م/شهر) marked قريباً per BRD Phase 2. Points chip sits in the home header; earned points appear on confirmation and order details.
+
+**Support & notifications.** Chat / call / WhatsApp tiles, active-order shortcut, FAQ accordion in Egyptian Arabic; notifications feed grouped by order, refund, points and promos, each deep-linking to the right screen.
 
 ## 5. Component library
 See `design-system.html`: colour tokens, type scale, spacing/radius/elevation, buttons, quick add, chips & pills, ETA chip, product card anatomy, category tile palette, sticky cart bar, bottom nav, timeline, option rows, inputs/OTP, toast, empty states.
