@@ -10,7 +10,7 @@ TWAA.i18n = {
     secDeals: "عروض توّا", secDealsSub: "خصومات لفترة محدودة", secPopular: "الأكثر طلباً", secUnder50: "أقل من 50 جنيه", secLocal: "منتجات محلية", secLocalSub: "من جيرانك.. لبيتك", secAgain: "اشترِ تاني", secNew: "وصل جديد", secForYou: "مخصوص ليك",
     add: "أضف", egp: "ج.م", off: "خصم",
     viewCart: "شوف السلة", items: "منتج", itemsPl: "منتجات",
-    navHome: "الرئيسية", navCats: "الأقسام", navSearch: "البحث", navCart: "السلة", food: "أكل", secFood: "أكل جاهز.. سخن", secFoodSub: "من مطبخ توّا ومطابخ بلدك", foodT: "أكل جاهز", prep: "تجهيز", foodHero: "جعان؟ هاتها توّا.", foodHeroSub: "سندوتشات ووجبات سخنة توصلك مع طلبك", kitchen: "مطبخ توّا", openNow: "مفتوح دلوقتي", navOrders: "طلباتي", navAccount: "حسابي",
+    navHome: "الرئيسية", navCats: "الأقسام", navSearch: "البحث", navCart: "السلة", food: "أكل", navDeals: "عروض", vSuper: "سوبر ماركت", vFood: "أكل", vPharma: "صيدلية", vDeals: "عروض", vLocal: "محلي", pharmacy: "صيدلية", pharmaT: "صيدلية توّا", secPharma: "صيدلية توّا", secPharmaSub: "أدوية بدون روشتة وعناية طبية.. لحد باب البيت", pharmaHero: "تعبان؟ الدوا يوصلك توّا.", pharmaHeroSub: "مسكنات، فيتامينات، إسعافات أولية وأجهزة طبية", otcNote: "منتجات بدون روشتة فقط", askPharmacist: "اسأل صيدلي", askPharmacistSub: "استشارة مجانية على الواتساب", uploadRx: "ارفع الروشتة", soon: "قريباً", recommended2: "مخصوص ليك", searchPh2: "دوّر على لبن، بانادول، شيبسي…", secFood: "أكل جاهز.. سخن", secFoodSub: "من مطبخ توّا ومطابخ بلدك", foodT: "أكل جاهز", prep: "تجهيز", foodHero: "جعان؟ هاتها توّا.", foodHeroSub: "سندوتشات ووجبات سخنة توصلك مع طلبك", kitchen: "مطبخ توّا", openNow: "مفتوح دلوقتي", navOrders: "طلباتي", navAccount: "حسابي",
     cart: "السلة", emptyCart: "سلتك فاضية", emptyCartSub: "ابدأ التسوق وهات اللي محتاجه توّا", startShopping: "ابدأ التسوق",
     upsellFree: "ضيف {n} ج.م وخد التوصيل مجاناً", upsellDone: "التوصيل عليك مجاناً 🎉", promoPh: "كود الخصم", apply: "تطبيق", promoOk: "تم تطبيق كود {c}",
     subtotal: "المجموع", delivery: "التوصيل", service: "رسوم الخدمة", discount: "الخصم", total: "الإجمالي", free: "مجاناً",
@@ -47,7 +47,7 @@ TWAA.i18n = {
     secDeals: "Twaa Deals", secDealsSub: "Limited-time discounts", secPopular: "Most ordered", secUnder50: "Under EGP 50", secLocal: "Local products", secLocalSub: "From your neighbours to your home", secAgain: "Buy again", secNew: "New arrivals", secForYou: "Picked for you",
     add: "ADD", egp: "EGP", off: "OFF",
     viewCart: "View cart", items: "item", itemsPl: "items",
-    navHome: "Home", navCats: "Categories", navSearch: "Search", navCart: "Cart", food: "Food", secFood: "Hot food, ready now", secFoodSub: "From Twaa kitchen and local kitchens", foodT: "Food", prep: "prep", foodHero: "Hungry? Get it now.", foodHeroSub: "Hot sandwiches and meals delivered with your order", kitchen: "Twaa Kitchen", openNow: "Open now", navOrders: "Orders", navAccount: "Account",
+    navHome: "Home", navCats: "Categories", navSearch: "Search", navCart: "Cart", food: "Food", navDeals: "Deals", vSuper: "Supermarket", vFood: "Food", vPharma: "Pharmacy", vDeals: "Deals", vLocal: "Local", pharmacy: "Pharmacy", pharmaT: "Twaa Pharmacy", secPharma: "Twaa Pharmacy", secPharmaSub: "OTC medicines and medical care, to your door", pharmaHero: "Feeling unwell? Medicine, delivered now.", pharmaHeroSub: "Pain relief, vitamins, first aid and medical devices", otcNote: "Over-the-counter products only", askPharmacist: "Ask a pharmacist", askPharmacistSub: "Free consultation on WhatsApp", uploadRx: "Upload prescription", soon: "Soon", recommended2: "Picked for you", searchPh2: "Search milk, Panadol, chips…", secFood: "Hot food, ready now", secFoodSub: "From Twaa kitchen and local kitchens", foodT: "Food", prep: "prep", foodHero: "Hungry? Get it now.", foodHeroSub: "Hot sandwiches and meals delivered with your order", kitchen: "Twaa Kitchen", openNow: "Open now", navOrders: "Orders", navAccount: "Account",
     cart: "Cart", emptyCart: "Your cart is empty", emptyCartSub: "Start shopping and get what you need, now", startShopping: "Start shopping",
     upsellFree: "Add EGP {n} more for free delivery", upsellDone: "You've unlocked free delivery 🎉", promoPh: "Promo code", apply: "Apply", promoOk: "Code {c} applied",
     subtotal: "Subtotal", delivery: "Delivery", service: "Service fee", discount: "Discount", total: "Total", free: "Free",
@@ -93,16 +93,17 @@ TWAA.categories = [
   { id: "care",     ar: "عناية شخصية",      en: "Personal care",   bg: "#F6E8F3", fg: "#8A3F84", icon: "soap" },
   { id: "baby",     ar: "الأطفال",          en: "Baby",            bg: "#FDECEC", fg: "#C24E6B", icon: "baby" },
   { id: "food",     ar: "أكل جاهز",          en: "Food",            bg: "#FCE9D9", fg: "#B4441E", icon: "food" },
+  { id: "pharmacy", ar: "صيدلية",            en: "Pharmacy",        bg: "#E1F1F3", fg: "#0F7C8C", icon: "pill" },
   { id: "local",    ar: "منتجات محلية",     en: "Local products",  bg: "#F1E6D6", fg: "#3A1F3D", icon: "home" },
   { id: "pets",     ar: "الحيوانات",        en: "Pets",            bg: "#EDE9E1", fg: "#6B5A45", icon: "paw" },
   { id: "electro",  ar: "إكسسوارات",       en: "Electronics",     bg: "#E9E9F2", fg: "#3E3E7A", icon: "plug" },
   { id: "seasonal", ar: "موسمي",            en: "Seasonal",        bg: "#FEE7DA", fg: "#B85A1E", icon: "star" },
 ];
-TWAA.subcatsEn = { food: ["All","Sandwiches","Meals","Breakfast","Desserts","Hot drinks"] };
+TWAA.subcatsEn = { food: ["All","Sandwiches","Meals","Breakfast","Desserts","Hot drinks"], pharmacy: ["All","Pain & cold","Vitamins","First aid","Devices","Mother & baby","Medical care"] };
 TWAA.subcats = {
   fruits: ["الكل","فواكه","خضار","ورقيات","أعشاب"], dairy: ["الكل","لبن","جبن","زبادي","بيض","زبدة"], drinks: ["الكل","غازية","عصائر","شاي وقهوة","طاقة"],
   snacks: ["الكل","شيبسي","بسكويت","مقرمشات","مكسرات"], grocery: ["الكل","أرز ومكرونة","زيوت","معلبات","توابل","سكر ودقيق"], cleaning: ["الكل","أطباق","أرضيات","غسيل","مطهرات"],
-  care: ["الكل","شامبو","صابون","عناية بالفم","حلاقة"], food: ["الكل","سندوتشات","وجبات","فطار","حلويات","مشروبات ساخنة"], baby: ["الكل","حفاضات","مناديل","طعام أطفال","استحمام"], local: ["الكل","ألبان بلدي","خضار مزارع","مخبوزات بلدي","عسل"],
+  care: ["الكل","شامبو","صابون","عناية بالفم","حلاقة"], food: ["الكل","سندوتشات","وجبات","فطار","حلويات","مشروبات ساخنة"], pharmacy: ["الكل","مسكنات وبرد","فيتامينات","إسعافات أولية","أجهزة طبية","أمومة وطفل","عناية طبية"], baby: ["الكل","حفاضات","مناديل","طعام أطفال","استحمام"], local: ["الكل","ألبان بلدي","خضار مزارع","مخبوزات بلدي","عسل"],
 };
 
 /* unit helper: "1 L", "500 g"... shown as ar/en */
@@ -165,10 +166,25 @@ TWAA.products = [
   { ...P(59, "food", "شاي بالنعناع",                   "Mint Tea",                    "كوب",        "1 cup",      12,  null,["food","under50"], 20), sub: 5, prep: 5, descAr: "شاي كشري بالنعناع الطازة", descEn: "Egyptian tea with fresh mint" },
   { ...P(60, "food", "قهوة تركي مظبوط",                "Turkish Coffee",              "كوب",        "1 cup",      20,  null,["food","under50"], 20), sub: 5, prep: 6, descAr: "قهوة تركي على الرمل", descEn: "Sand-brewed Turkish coffee" },
   { ...P(61, "food", "بطاطس مقلية كبيرة",              "Large Fries",                 "عبوة",       "1 pack",     35,  null,["food","under50"], 20), sub: 1, prep: 10, descAr: "بطاطس مقرمشة بالتتبيلة", descEn: "Crispy seasoned fries" },
+  /* Pharmacy — over-the-counter only (prescription delivery is out of MVP scope, BRD §86). sub = pharmacy sub-category index */
+  { ...P(70, "pharmacy", "بانادول إكسترا",              "Panadol Extra",              "24 قرص",    "24 tabs",   48,  null,["pharma","popular","under50"], 20, "Panadol"), sub: 1 },
+  { ...P(71, "pharmacy", "كونجستال",                     "Congestal",                  "20 قرص",    "20 tabs",   36,  null,["pharma","popular","under50"], 20), sub: 1 },
+  { ...P(72, "pharmacy", "بروفين 400",                   "Brufen 400",                 "30 قرص",    "30 tabs",   42,  null,["pharma","under50"], 20, "Brufen"), sub: 1 },
+  { ...P(73, "pharmacy", "فيتامين سي 1000 فوّار",         "Vitamin C 1000 Effervescent", "20 قرص",   "20 tabs",   65,  75,  ["pharma","deal"], 20), sub: 2 },
+  { ...P(74, "pharmacy", "زنك + فيتامين د",              "Zinc + Vitamin D",           "30 كبسولة", "30 caps",   95,  110, ["pharma","deal"], 20), sub: 2 },
+  { ...P(75, "pharmacy", "شاش وبلاستر طبي",              "Gauze & Medical Plaster",    "علبة",      "1 kit",     28,  null,["pharma","under50"], 20), sub: 3 },
+  { ...P(76, "pharmacy", "كحول طبي 70%",                 "Medical Alcohol 70%",        "250 مل",    "250 ml",    22,  null,["pharma","under50","again"], 20), sub: 3 },
+  { ...P(77, "pharmacy", "ترمومتر ديجيتال",              "Digital Thermometer",        "قطعة",      "1 pc",      120, 140, ["pharma","deal"], 8), sub: 4 },
+  { ...P(78, "pharmacy", "جهاز قياس الضغط",              "Blood Pressure Monitor",     "قطعة",      "1 pc",      850, 990, ["pharma","deal","new"], 4), sub: 4 },
+  { ...P(79, "pharmacy", "كمامات طبية",                  "Surgical Masks",             "50 قطعة",   "50 pcs",    45,  null,["pharma","under50"], 20), sub: 6 },
+  { ...P(80, "pharmacy", "لبن أطفال بيبيلاك 1",          "Bebelac 1 Infant Formula",   "400 جم",    "400 g",     185, null,["pharma","popular"], 12, "Bebelac"), sub: 5 },
+  { ...P(81, "pharmacy", "محلول معالجة الجفاف",          "Oral Rehydration Salts",     "6 أكياس",   "6 sachets", 18,  null,["pharma","under50"], 20), sub: 5 },
+  { ...P(82, "pharmacy", "معقم أيدي ديتول",              "Dettol Hand Sanitizer",      "200 مل",    "200 ml",    55,  null,["pharma","again"], 20, "Dettol"), sub: 6 },
+  { ...P(83, "pharmacy", "شراب كحة للأطفال",             "Kids Cough Syrup",           "120 مل",    "120 ml",    38,  null,["pharma","under50"], 20), sub: 1 },
 ];
 
 /* Frequently bought together / related */
-TWAA.related = { 52: [61, 9, 58], 51: [59, 57], 55: [61, 9], 1: [5, 12, 11], 18: [20, 22, 19], 36: [37], 5: [3, 1], 19: [22, 20], 9: [13, 14] };
+TWAA.related = { 70: [73, 76], 77: [70, 79], 80: [37, 36], 52: [61, 9, 58], 51: [59, 57], 55: [61, 9], 1: [5, 12, 11], 18: [20, 22, 19], 36: [37], 5: [3, 1], 19: [22, 20], 9: [13, 14] };
 
 /* Service area — Abu El Matamir markaz only (Beheira). Coordinates are approximate centroids for the
    prototype; production uses surveyed delivery polygons managed in admin (BRD §6). radius in km. */

@@ -785,3 +785,146 @@ img, svg { display: block; }
   .cat-grid { grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); }
   .hero { width: calc(33.333% - 11px); height: 210px; }
 }
+
+/* ==========================================================================
+   v1.4 — noon-style verticals: strip, light header, promo/quick tiles,
+   segmented toggles, image cards, floating +, cart pill
+   ========================================================================== */
+/* light header with a soft brand tint (noon uses a sky tint) */
+.vhead { background: linear-gradient(180deg, #EFE4EE 0%, var(--bg) 100%); padding: var(--s-2) var(--s-4) var(--s-3); flex: none; position: relative; z-index: 5; display: flex; flex-direction: column; gap: var(--s-2); }
+.vhead.v-food { background: linear-gradient(180deg, #FBE3D6 0%, var(--bg) 100%); }
+.vhead.v-pharmacy { background: linear-gradient(180deg, #DCEEF1 0%, var(--bg) 100%); }
+.vhead.v-deals { background: linear-gradient(180deg, #FDE3D4 0%, var(--bg) 100%); }
+.vhead .searchbar { margin: 0; background: var(--surface); border: 1px solid var(--line); box-shadow: none; }
+.vhead .searchbar .icon:last-child { color: var(--muted); }
+.side-tile { flex: none; width: 96px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11px; font-weight: 800; color: var(--aubergine); padding: 4px 6px; text-align: center; line-height: 1.2; }
+.side-tile .icon { color: var(--mandarin); }
+
+/* verticals strip */
+.vstrip { display: flex; gap: 10px; overflow-x: auto; padding: 2px 0 6px; scrollbar-width: none; margin-inline: -4px; padding-inline: 4px; }
+.vstrip::-webkit-scrollbar { display: none; }
+.vtile { flex: none; width: 92px; height: 78px; border-radius: 20px; background: var(--surface); border: 2px solid transparent; box-shadow: var(--sh-1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-family: var(--font-display); font-weight: 800; font-size: var(--fs-13); color: var(--ink-2); transition: transform var(--dur-1), box-shadow var(--dur-2), border-color var(--dur-2); position: relative; }
+.vtile:active { transform: scale(.96); }
+.vtile .icon { width: 26px; height: 26px; }
+.vtile.v-home { background: var(--aubergine); color: var(--cream); }
+.vtile.v-home .vlogo { width: 56px; height: 34px; display: block; color: var(--cream); }
+.vtile.v-home .vlogo .logo-img, .vtile.v-home .vlogo svg, .vtile.v-home .vlogo img { width: 100%; height: 100%; object-fit: contain; }
+.vtile.v-home span:last-child { font-size: 11px; opacity: .85; }
+.vtile.v-food { color: #B4441E; } .vtile.v-food .icon { color: #B4441E; }
+.vtile.v-pharmacy { color: #0F7C8C; } .vtile.v-pharmacy .icon { color: #0F7C8C; }
+.vtile.v-deals { color: var(--mandarin-600); } .vtile.v-deals .icon { color: var(--mandarin-600); }
+.vtile.v-plp { color: #2E7D4F; } .vtile.v-plp .icon { color: #2E7D4F; }
+.vtile.on { border-color: var(--mandarin); box-shadow: 0 6px 18px rgba(249,115,47,.28); transform: translateY(-2px); }
+.vtile.on.v-food { border-color: #B4441E; background: #B4441E; color: #fff; box-shadow: 0 6px 18px rgba(180,68,30,.3); } .vtile.on.v-food .icon { color: #fff; }
+.vtile.on.v-pharmacy { border-color: #0F7C8C; background: #0F7C8C; color: #fff; box-shadow: 0 6px 18px rgba(15,124,140,.3); } .vtile.on.v-pharmacy .icon { color: #fff; }
+.vtile.on.v-deals { border-color: var(--mandarin); background: var(--mandarin); color: #fff; } .vtile.on.v-deals .icon { color: #fff; }
+.vtile.on.v-plp { border-color: #2E7D4F; background: #2E7D4F; color: #fff; } .vtile.on.v-plp .icon { color: #fff; }
+
+/* address / minutes headline */
+.vhead-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); }
+.addr-line { text-align: start; min-height: 44px; display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.eta-head { display: flex; align-items: center; gap: 6px; font-family: var(--font-display); font-weight: 800; font-size: var(--fs-20); color: var(--ink); line-height: 1.2; }
+.eta-head .spark { color: var(--mandarin); stroke-width: 2.6; }
+.eta-head b { color: var(--mandarin-600); }
+.eta-head.small { font-size: var(--fs-16); }
+.eta-chip.mini { padding: 2px 8px; font-size: var(--fs-12); margin-inline-start: 4px; }
+.addr-sub { font-size: var(--fs-13); color: var(--ink-2); display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* promo tiles (minutes) and promo cards (food) */
+.promo-tiles { padding-top: var(--s-3); }
+.promo-tile { flex: none; width: 150px; height: 170px; border-radius: var(--r-xl); padding: 14px; text-align: start; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; position: relative; overflow: hidden; box-shadow: var(--sh-1); border: 2px solid rgba(255,255,255,.55); }
+.promo-tile .pt-title { font-family: var(--font-display); font-weight: 800; font-size: var(--fs-16); line-height: 1.2; }
+.promo-tile .pt-sub { font-size: var(--fs-11); opacity: .9; line-height: 1.4; max-height: 2.8em; overflow: hidden; }
+.promo-tile .pt-icon { position: absolute; top: 12px; inset-inline-end: 12px; width: 44px; height: 44px; opacity: .35; stroke-width: 1.4; }
+.promo-tile .code { position: absolute; top: 12px; inset-inline-start: 12px; background: rgba(255,255,255,.18); border: 1px dashed rgba(255,255,255,.7); border-radius: 6px; padding: 2px 8px; font-family: var(--font-display); font-weight: 800; letter-spacing: .1em; font-size: var(--fs-11); }
+.promo-cards { padding-top: var(--s-3); }
+.promo-card { flex: none; width: 280px; height: 150px; border-radius: var(--r-xl); padding: 16px; text-align: start; display: flex; justify-content: space-between; align-items: stretch; box-shadow: var(--sh-1); border: 1px solid rgba(0,0,0,.04); }
+.promo-card > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.promo-card .pc-title { font-family: var(--font-display); font-weight: 800; font-size: var(--fs-18); line-height: 1.2; color: var(--ink); }
+.promo-card .pc-sub { font-size: var(--fs-12); color: var(--ink-2); font-weight: 700; }
+.promo-card .pc-arrow { margin-top: auto; width: 32px; height: 32px; border-radius: 16px; display: grid; place-items: center; }
+.promo-card .pc-ill { width: 96px; display: grid; place-items: center; flex: none; }
+.promo-card .pc-ill .icon { width: 72px; height: 72px; stroke-width: 1.4; opacity: .9; }
+
+/* quick tiles (All offers / 15 mins / Latest / …) */
+.quick-tiles { padding-top: var(--s-3); }
+.quick-tile { flex: none; width: 112px; border-radius: var(--r-xl); background: var(--surface); border: 1px solid var(--line); padding: 12px 8px 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; position: relative; }
+.quick-tile .qt-ico { width: 52px; height: 52px; border-radius: 26px; display: grid; place-items: center; margin-bottom: 4px; }
+.quick-tile .qt-ico .icon { width: 26px; height: 26px; }
+.quick-tile b { font-size: var(--fs-13); font-weight: 800; line-height: 1.2; }
+.quick-tile span:not(.qt-ico) { font-size: var(--fs-11); color: var(--muted); font-weight: 600; line-height: 1.3; }
+.quick-tile.soon { opacity: .8; }
+.quick-tile em { position: absolute; top: 6px; inset-inline-end: 6px; font-style: normal; font-size: 10px; padding: 1px 6px; }
+
+/* segmented toggle */
+.seg { display: inline-flex; background: var(--cream-200); border-radius: var(--r-pill); padding: 4px; gap: 2px; }
+.seg button { padding: 8px 16px; border-radius: var(--r-pill); font-weight: 800; font-size: var(--fs-13); color: var(--ink-2); display: inline-flex; align-items: center; gap: 6px; min-height: 36px; }
+.seg button.on { background: var(--ink); color: #fff; }
+
+/* image cards (food) */
+.fcard { width: 168px; flex: none; background: var(--surface); border-radius: var(--r-lg); border: 1px solid var(--line); overflow: hidden; position: relative; text-align: start; }
+.fcard .fimg { width: 100%; height: 150px; display: grid; place-items: center; position: relative; }
+.fcard .fimg > .icon { width: 64px; height: 64px; }
+.fcard .fov { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 10px 8px; background: linear-gradient(180deg, transparent, rgba(36,22,38,.75)); color: #fff; display: flex; justify-content: space-between; align-items: flex-end; font-size: var(--fs-12); }
+.fcard .fov b { font-family: var(--font-display); font-size: var(--fs-15); }
+.fcard .fav { position: absolute; top: 8px; inset-inline-end: 8px; width: 32px; height: 32px; border-radius: 16px; background: rgba(255,255,255,.92); color: var(--aubergine); display: grid; place-items: center; }
+.fcard .fav .icon { width: 16px; height: 16px; }
+.fcard .fav.on { color: var(--mandarin); } .fcard .fav.on .icon { fill: var(--mandarin); }
+.fcard .fbody { padding: 8px 10px 10px; display: flex; flex-direction: column; gap: 6px; }
+
+/* product card: + floats over the image corner (noon minutes) */
+.product { box-shadow: none; border: 1px solid var(--line); padding: 0 0 10px; gap: 4px; overflow: visible; }
+.product .imgwrap { position: relative; margin-bottom: 14px; }
+.product .img { border-radius: var(--r-lg) var(--r-lg) 0 0; width: 100%; height: 132px; }
+.product .name, .product .unit, .product .price-row, .product > .pill { margin-inline: 10px; }
+.product .unit { display: inline-flex; align-items: center; gap: 2px; }
+.product .qa-float { position: absolute; bottom: -16px; inset-inline-end: 8px; z-index: 2; }
+.product .qa-float .qa.add { min-width: 40px; width: 40px; height: 40px; padding: 0; border-radius: 20px; background: var(--surface); border: 1.5px solid var(--mandarin); color: var(--mandarin-600); box-shadow: var(--sh-2); }
+.product .qa-float .qa.add span { display: none; }
+.product .qa-float .qa.add .icon { width: 18px; height: 18px; stroke-width: 2.6; }
+.product .qa-float .qa.stepper { height: 40px; border-radius: 20px; box-shadow: var(--sh-2); }
+.product .qa-float .qa.stepper button { width: 36px; height: 40px; }
+.product .qa-float .pill { box-shadow: var(--sh-1); }
+.product .fav { top: 6px; inset-inline-end: 6px; }
+.product.in-cart { border-color: var(--mandarin-100); }
+.p-grid .product .img, .plp-body .product .img { height: 132px; }
+.plp-body .product .img { height: 116px; }
+.plp-body .product .img svg { width: 48px; height: 48px; }
+
+/* categories: two circular rows scrolling sideways (noon) */
+.cat-scroll { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, auto); grid-auto-columns: 84px; gap: var(--s-3) var(--s-2); overflow-x: auto; padding: 4px var(--s-4) 8px; scrollbar-width: none; }
+.cat-scroll::-webkit-scrollbar { display: none; }
+.cat.round .tile { border-radius: 50%; width: 72px; height: 72px; }
+
+/* cart pill (noon minutes "View cart") */
+.cartbar.pill-bar { left: auto; right: auto; inset-inline: 50% auto; transform: translateX(50%); width: max-content; max-width: calc(100% - 32px); min-height: 56px; border-radius: 32px; background: var(--mandarin); color: #fff; padding: 8px 18px 8px 10px; gap: 10px; box-shadow: 0 10px 30px rgba(249,115,47,.4); animation: none; }
+[dir="ltr"] .cartbar.pill-bar { transform: translateX(-50%); }
+.cartbar.pill-bar .thumbs { display: flex; }
+.cartbar.pill-bar .thumbs span { width: 34px; height: 34px; border-radius: 17px; border: 2px solid #fff; display: grid; place-items: center; margin-inline-start: -10px; }
+.cartbar.pill-bar .thumbs span:first-child { margin-inline-start: 0; }
+.cartbar.pill-bar .info .t { font-family: var(--font-display); font-weight: 800; }
+.cartbar.pill-bar .info .s { opacity: .9; }
+.pharma-sec .section-head h2 .icon { color: #0F7C8C; }
+
+/* ---- responsive tweaks for the vertical layout ---- */
+@container app (min-width: 600px) {
+  .vhead { padding-inline: max(var(--s-6), calc((100% - var(--maxw, 1180px)) / 2)); }
+  .cat-scroll { grid-auto-flow: row; grid-template-rows: none; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); overflow: visible; padding-inline: var(--s-6); }
+  .promo-tiles, .promo-cards, .quick-tiles { padding-inline: var(--s-6); }
+  .promo-tile { width: 180px; height: 190px; }
+  .promo-card { width: 340px; }
+  .quick-tile { width: 140px; }
+  .fcard { width: 200px; }
+  .cartbar.pill-bar { inset-inline: 50% auto; }
+}
+@container app (min-width: 900px) {
+  .vhead { display: grid; grid-template-columns: auto 1fr; grid-template-areas: "strip strip" "addr search"; align-items: center; column-gap: var(--s-8); padding-block: var(--s-3) var(--s-4); }
+  .vhead .vstrip { grid-area: strip; }
+  .vhead .vhead-row { grid-area: addr; }
+  .vhead > .row:last-child { grid-area: search; }
+  .vhead .searchbar { max-width: 760px; }
+  .vtile { width: 104px; }
+  .screen:has(> .bottomnav) .cartbar.pill-bar { inset-inline: auto var(--s-6); transform: none; }
+  .cat-scroll { grid-template-columns: repeat(auto-fill, minmax(108px, 1fr)); }
+}
+.searchbar > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }

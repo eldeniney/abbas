@@ -62,13 +62,20 @@
     egg: '<path d="M12 22c-5 0-7-4-7-9 0-5 3-11 7-11s7 6 7 11c0 5-2 9-7 9z"/>',
     food: '<path d="M3 17h18"/><path d="M5 17a7 7 0 0 1 14 0"/><path d="M12 10V8"/><path d="M7 21h10"/>',
     flame: '<path d="M12 22c4 0 7-3 7-7 0-3-2-5-3-7-1 3-2 4-4 4 0-3-1-6-3-8-1 4-4 6-4 11 0 4 3 7 7 7z"/>',
+    pill: '<rect x="2.5" y="8.5" width="19" height="7" rx="3.5" transform="rotate(-45 12 12)"/><path d="m8.5 8.5 7 7"/>',
+    camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+    list: '<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/>',
+    arrowS: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
+    sparkle: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 17l.7 2.3L22 20l-2.3.7L19 23l-.7-2.3L16 20l2.3-.7z"/>',
+    stethoscope: '<path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6 6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6 6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/>',
+    rx: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h3a2 2 0 1 1 0 4H9v-4"/><path d="m12 17 3 3"/>',
   };
   const ic = (name, cls = "icon") => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${I[name] || ""}</svg>`;
   const wave = (cls = "wave") => `<svg class="${cls}" viewBox="0 0 240 80" aria-hidden="true"><path d="M0 40c30-30 60-30 90 0s60 30 90 0 45-25 60 0" fill="none" stroke="#F9F2E7" stroke-width="16" stroke-linecap="round"/><path d="M0 40c30 30 60 30 90 0s60-30 90 0 45 25 60 0" fill="none" stroke="#F9F2E7" stroke-width="16" stroke-linecap="round" opacity=".6"/></svg>`;
 
   /* ---------------- State ---------------- */
   const S = {
-    lang: "ar", screen: "splash", tab: "home", cart: {}, favs: new Set([2, 26]), promo: null, sub: "similar", pay: "cod", slot: "now",
+    seg: {}, psub: 0, lang: "ar", screen: "splash", tab: "home", cart: {}, favs: new Set([2, 26]), promo: null, sub: "similar", pay: "cod", slot: "now",
     zone: { area: T.zones[0], label: "homeLbl" },
     cat: "dairy", subcat: 0, query: "", homeTab: "all", sort: "recommended", pdp: null, toast: null, otp: 0, phone: "010 1234 5678", loc: { lat: T.zones[0].lat, lng: T.zones[0].lng, zone: T.zones[0], dist: 0, live: false, status: "" }, stars: 0, fb: new Set(), trackStep: 2, heroIdx: 0, orderId: null,
   };
@@ -103,7 +110,7 @@
   /* ---------------- Screen registry (for the workbench sidebar) ---------------- */
   const SCREENS = [
     ["splash", "Splash", "شاشة البداية"], ["location", "Location & serviceability", "الموقع"], ["login", "Login (mobile)", "تسجيل الدخول"], ["otp", "OTP", "كود التأكيد"],
-    ["home", "Home", "الرئيسية"], ["categories", "Categories", "الأقسام"], ["plp", "Category listing", "قائمة المنتجات"], ["search", "Search", "البحث"], ["deals", "Deal zone", "منطقة العروض"], ["food", "Food", "أكل جاهز"],
+    ["home", "Home", "الرئيسية"], ["categories", "Categories", "الأقسام"], ["plp", "Category listing", "قائمة المنتجات"], ["search", "Search", "البحث"], ["deals", "Deal zone", "منطقة العروض"], ["food", "Food vertical", "أكل"], ["pharmacy", "Pharmacy vertical", "صيدلية"],
     ["pdp", "Product detail (sheet)", "تفاصيل المنتج"], ["cart", "Cart", "السلة"], ["checkout", "Checkout", "إتمام الطلب"], ["tracking", "Order tracking", "تتبع الطلب"], ["orders", "My orders", "طلباتي"], ["rating", "Rate order", "التقييم"], ["account", "Account", "حسابي"],
   ];
 
@@ -121,13 +128,14 @@
   function productCard(p) {
     const d = pct(p);
     return `<article class="product ${S.cart[p.id] ? "in-cart" : ""}" data-pid="${p.id}">
-      <button class="img" data-open="${p.id}" style="background:${cat(p.cat).bg};color:${cat(p.cat).fg}" aria-label="${esc(name(p))}">${ic(cat(p.cat).icon)}
+      <div class="imgwrap"><button class="img" data-open="${p.id}" style="background:${cat(p.cat).bg};color:${cat(p.cat).fg}" aria-label="${esc(name(p))}">${ic(cat(p.cat).icon)}
         ${d ? `<span class="discount num">${d}% ${t("off")}</span>` : ""}</button>
-      <button class="fav ${S.favs.has(p.id) ? "on" : ""}" data-fav="${p.id}" aria-label="${t("myFavs")}">${ic("heart")}</button>
+        <button class="fav ${S.favs.has(p.id) ? "on" : ""}" data-fav="${p.id}" aria-label="${t("myFavs")}">${ic("heart")}</button>
+        <div class="qa-float">${quickAdd(p)}</div></div>
       <div class="name">${esc(name(p))}</div>
-      <div class="unit">${esc(unit(p))}</div>
+      <div class="unit">${esc(unit(p))} ${ic("chevD", "icon xs")}</div>
       ${p.stock > 0 && p.stock <= 5 ? `<span class="pill warn" style="align-self:flex-start">${t("lowStock", { n: p.stock })}</span>` : ""}
-      <div class="price-row"><div>${fmt(p.price)}${p.oldPrice ? `<div class="price-old num">${p.oldPrice} ${t("egp")}</div>` : ""}</div>${quickAdd(p)}</div>
+      <div class="price-row"><div class="row" style="gap:6px;align-items:baseline">${fmt(p.price)}${p.oldPrice ? `<span class="price-old num">${p.oldPrice} ${t("egp")}</span>` : ""}</div></div>
       ${p.stock === 0 ? `<div class="oos"><span>${t("outStock")}</span></div>` : ""}
     </article>`;
   }
@@ -143,27 +151,47 @@
     return `<div class="section-head"><div><h2>${title}${extra}</h2>${sub ? `<div class="sub">${sub}</div>` : ""}</div>${more ? `<button class="more" data-go="plp">${t("seeAll")} ${ic("chevS", "icon xs")}</button>` : ""}</div>`;
   }
   function bottomNav(active) {
-    const items = [["home", "home", "navHome"], ["categories", "grid", "navCats"], ["cart", "cart", "navCart"], ["orders", "receipt", "navOrders"], ["account", "user", "navAccount"]];
+    const items = [["home", "home", "navHome"], ["categories", "grid", "navCats"], ["deals", "percent", "navDeals"], ["account", "user", "navAccount"], ["cart", "cart", "navCart"]];
     const n = cartCount();
     return `<nav class="bottomnav" aria-label="Main">${items.map(([s, i, l]) => `<button data-go="${s}" class="${active === s ? "on" : ""} ${s === "cart" ? "cart-tab" : ""}" aria-current="${active === s ? "page" : "false"}">${ic(i)}${s === "cart" && n ? `<span class="badge num">${n}</span>` : ""}<span>${t(l)}</span></button>`).join("")}</nav>`;
   }
   function cartBar() {
     const n = cartCount(); if (!n) return "";
-    return `<button class="cartbar" data-go="cart"><span class="count num">${n}</span><span class="info"><div class="t">${t("viewCart")}</div><div class="s num">${n} ${n === 1 ? t("items") : t("itemsPl")} · ${money(subtotal())}</div></span><span class="go">${t("checkout")} ${ic("chevS", "icon xs")}</span></button>`;
+    const thumbs = cartItems().slice(0, 3).map(({ p }) => `<span style="background:${cat(p.cat).bg};color:${cat(p.cat).fg}">${ic(cat(p.cat).icon, "icon xs")}</span>`).join("");
+    return `<button class="cartbar pill-bar" data-go="cart"><span class="thumbs">${thumbs}</span><span class="info"><div class="t">${t("viewCart")}</div><div class="s num">${n} ${n === 1 ? t("items") : t("itemsPl")} · ${money(subtotal())}</div></span>${ic("chevS", "icon sm")}</button>`;
   }
-  function addrHeader() {
+  const VERTICALS = [["home", "vSuper", "brand"], ["food", "vFood", "food"], ["pharmacy", "vPharma", "pill"], ["deals", "vDeals", "percent"], ["plp", "vLocal", "home"]];
+  function vstrip(active) {
+    return `<div class="vstrip" role="tablist" aria-label="Twaa">${VERTICALS.map(([id, l, i]) => `<button role="tab" class="vtile v-${id} ${active === id ? "on" : ""}" data-go="${id}" ${id === "plp" ? 'data-cat="local"' : ""} aria-selected="${active === id}">${i === "brand" ? `<span class="vlogo">${T.logoImg(true, false)}</span>` : ic(i)}<span>${t(l)}</span></button>`).join("")}</div>`;
+  }
+  function addrLine(big) {
     const a = S.zone.area;
-    return `<div class="appbar noon"><div class="row" style="align-items:flex-start">
-      <button class="eta-block" data-go="location" aria-label="${t("locT")}">
-        <div class="lbl">${t("eta")}</div>
-        <div class="big"><span class="num">${a.eta}</span> <span class="unit">${t("min")}</span> ${ic("bolt", "icon sm spark")}</div>
-        <div class="addr">${ic("home", "icon xs")} <b>${t(S.zone.label)}</b> · <span>${placeName(a)}</span> ${ic("chevD", "icon xs")}</div>
-      </button>
-      <div class="row" style="gap:6px;margin-inline-start:auto">
-        <button class="icon-btn ghost-light" data-toast="notif" aria-label="${t("notif")}">${ic("bell")}<span class="badge">2</span></button>
-        <button class="icon-btn ghost-light" data-go="account" aria-label="${t("navAccount")}">${ic("user")}</button>
-      </div></div>
-    <button class="searchbar" data-go="search" style="width:100%">${ic("search")}<span style="flex:1;text-align:start;color:var(--muted);font-size:15px">${t("searchPh")}</span></button></div>`;
+    return `<button class="addr-line" data-go="location">
+      ${big ? `<div class="eta-head">${ic("bolt", "icon sm spark")}<span>${t("eta")} <b class="num">${a.eta}</b> ${t("min")}</span></div>` : `<div class="eta-head small">${ic("home", "icon sm")}<b>${t(S.zone.label)}</b> ${ic("chevD", "icon xs")} <span class="eta-chip mini">${ic("bolt", "icon xs")}<span class="num">${a.eta} ${t("min")}</span></span></div>`}
+      <div class="addr-sub">${big ? `${ic("home", "icon xs")} ${t(S.zone.label)} · ` : ""}${placeName(a)} ${big ? ic("chevD", "icon xs") : ""}</div></button>`;
+  }
+  function vhead(active, opts = {}) {
+    return `<div class="vhead v-${active}">${vstrip(active)}
+      <div class="vhead-row">${addrLine(!!opts.big)}<div class="row" style="gap:4px"><button class="icon-btn ghost" data-toast="notif" aria-label="${t("notif")}">${ic("bell")}<span class="badge" style="border-color:#fff">2</span></button></div></div>
+      <div class="row" style="gap:8px;align-items:stretch"><button class="searchbar" data-go="search" style="flex:1;margin:0">${ic("search")}<span style="flex:1;text-align:start;color:var(--muted);font-size:15px">${opts.search || t("searchPh2")}</span>${ic("camera", "icon sm")}</button>${opts.side ? `<button class="side-tile" data-go="${opts.side[1]}">${ic(opts.side[2], "icon sm")}<span>${opts.side[0]}</span></button>` : ""}</div></div>`;
+  }
+  function promoTiles(tiles) {
+    return `<div class="h-scroll promo-tiles">${tiles.map((x) => `<button class="promo-tile" style="background:${x.bg};color:${x.fg || "#fff"}" data-go="${x.go}" ${x.cat ? `data-cat="${x.cat}"` : ""}>${x.code ? `<span class="code">${x.code}</span>` : ""}<div class="pt-title">${x.t}</div><div class="pt-sub">${x.s}</div>${ic(x.icon, "icon pt-icon")}</button>`).join("")}</div>`;
+  }
+  function promoCards(cards) {
+    return `<div class="h-scroll promo-cards">${cards.map((c) => `<button class="promo-card" style="background:${c.bg};color:${c.fg}" data-go="${c.go}" ${c.sub != null ? `data-foodsub="${c.sub}"` : ""}><div><div class="pc-title">${c.t}</div><div class="pc-sub">${c.s}</div><span class="pc-arrow" style="background:${c.fg};color:#fff">${ic("arrowS", "icon sm")}</span></div><span class="pc-ill" style="color:${c.fg}">${ic(c.icon)}</span></button>`).join("")}</div>`;
+  }
+  function quickTiles(tiles) {
+    return `<div class="h-scroll quick-tiles">${tiles.map((q) => `<button class="quick-tile ${q.soon ? "soon" : ""}" ${q.go ? `data-go="${q.go}"` : q.toast ? `data-toast="${q.toast}"` : ""} ${q.sub != null ? `data-foodsub="${q.sub}"` : ""} ${q.psub != null ? `data-psub="${q.psub}"` : ""}><span class="qt-ico" style="background:${q.bg};color:${q.fg}">${ic(q.icon)}</span><b>${q.t}</b><span>${q.s}</span>${q.soon ? `<em class="pill accent">${t("soon")}</em>` : ""}</button>`).join("")}</div>`;
+  }
+  function segmented(key, opts) {
+    const cur = S.seg[key] ?? 0;
+    return `<div class="seg" role="tablist">${opts.map(([l, i], k) => `<button role="tab" class="${cur === k ? "on" : ""}" data-seg="${key}:${k}" aria-selected="${cur === k}">${i ? ic(i, "icon xs") : ""}${l}</button>`).join("")}</div>`;
+  }
+  function foodImgCard(p) {
+    const c = cat(p.cat); const d = pct(p);
+    return `<article class="fcard" data-pid="${p.id}"><button class="fimg" data-open="${p.id}" style="background:linear-gradient(180deg,${c.bg},#F3D9C4);color:${c.fg}" aria-label="${esc(name(p))}">${ic(c.icon)}<div class="fov">${d ? `<b>${d}% ${t("off")}</b>` : `<b>${t("free")} ${t("delivery")}</b>`}<span class="num">${p.prep} ${t("min")}</span></div></button><button class="fav ${S.favs.has(p.id) ? "on" : ""}" data-fav="${p.id}" aria-label="${t("myFavs")}">${ic("heart")}</button>
+      <div class="fbody"><div class="mname">${esc(name(p))}</div><div class="row between"><span class="price num" style="font-size:15px">${p.price}<small>${t("egp")}</small></span>${quickAdd(p)}</div></div></article>`;
   }
   function toastEl() { return S.toast ? `<div class="toast" role="status" aria-live="polite">${ic("check", "icon sm")}<span>${S.toast}</span></div>` : ""; }
   function map(h, rider) { /* static illustration used on tracking */
@@ -294,24 +322,28 @@
       <div style="text-align:center;margin-top:16px"><button class="btn ghost sm" data-otp-fill>${S.lang === "ar" ? "(للعرض) املأ الكود" : "(Demo) fill code"}</button></div></div></div>`;
 
   R.home = () => {
-    const tabs = [["all", "all"], ["deals", "deals"], ["food", "food"], ["grocery", "supermarket"], ["drinks", "drinks"], ["snacks", "snacks"], ["care", "care"], ["baby", "baby"], ["cleaning", "home"], ["electro", "electronics"]];
     const by = (tag) => T.products.filter((p) => p.tags.includes(tag));
-    const heroes = [["a", 1, "TWAA30"], ["b", 2, null], ["c", 3, null]];
-    return `<div class="screen">${statusbar(true)}${addrHeader()}
+    const tiles = [
+      { t: t("home_hero1t"), s: t("home_hero1p"), code: "TWAA30", bg: "linear-gradient(160deg,#3A1F3D,#5A2F5E)", go: "deals", icon: "tag" },
+      { t: t("home_hero2t"), s: t("home_hero2p"), bg: "linear-gradient(160deg,#E05F1C,#F9732F)", go: "deals", icon: "truck" },
+      { t: t("secFood"), s: t("secFoodSub"), bg: "linear-gradient(160deg,#8E2F14,#B4441E)", go: "food", icon: "food" },
+      { t: t("pharmaT"), s: t("otcNote"), bg: "linear-gradient(160deg,#0B5F6B,#0F7C8C)", go: "pharmacy", icon: "pill" },
+      { t: t("home_hero3t"), s: t("home_hero3p"), bg: "linear-gradient(160deg,#1F6B4A,#2E7D4F)", go: "plp", cat: "local", icon: "leaf" },
+    ];
+    const segList = (S.seg.home ?? 0) === 0 ? by("again") : T.products.filter((p) => S.favs.has(p.id));
+    return `<div class="screen">${statusbar()}${vhead("home", { big: true, side: [S.lang === "ar" ? "اطلب بقائمتك" : "Shop by list", "orders", "list"] })}
       <div class="scroll pb-nav">
-        <div class="hero-track" data-hero>${heroes.map(([cls, i, code]) => `<div class="hero ${cls}">${wave()}${code ? `<span class="code">${code}</span>` : ""}<div class="kicker">${t(`home_hero${i}k`)}</div><h3>${t(`home_hero${i}t`)}</h3><p>${t(`home_hero${i}p`)}</p><button class="cta" data-go="${i === 3 ? "plp" : "deals"}" data-cat="local">${t("shopNow")}</button></div>`).join("")}</div>
-        <div class="dots">${heroes.map((_, i) => `<span class="${i === S.heroIdx ? "on" : ""}"></span>`).join("")}</div>
-        <div class="tabs" role="tablist">${tabs.map(([id, l]) => `<button role="tab" class="tab ${id === "deals" ? "deal" : ""} ${id === "food" ? "food" : ""} ${S.homeTab === id ? "on" : ""}" data-hometab="${id}">${id === "deals" ? ic("percent", "icon xs") + " " : id === "food" ? ic("flame", "icon xs") + " " : ""}${t(l)}</button>`).join("")}</div>
-        <div class="section" style="margin-top:20px">${sectionHead(t("shopBy"), null, false)}<div class="cat-grid">${T.categories.map((c) => `<button class="cat" data-go="plp" data-cat="${c.id}"><span class="tile" style="background:${c.bg};color:${c.fg}">${ic(c.icon)}</span><span>${esc(catName(c))}</span></button>`).join("")}</div></div>
-        <div class="section">${sectionHead(t("secDeals"), t("secDealsSub"), true, ` <span class="countdown" aria-label="${t("endsIn")}"><span class="num">02</span>:<span class="num">14</span>:<span class="num">09</span></span>`)}${carousel(by("deal").slice(0, 8))}</div>
-        <div class="section">${sectionHead(t("secPopular"))}${carousel(by("popular").filter((p) => p.cat !== "food").slice(0, 8))}</div>
+        ${promoTiles(tiles)}
+        <div class="section" style="margin-top:12px"><div class="pad">${segmented("home", [[t("secAgain"), "refresh"], [t("myFavs"), "heart"]])}</div>${segList.length ? carousel(segList.slice(0, 10)) : `<div class="empty" style="padding:24px"><p>${t("emptyCartSub")}</p></div>`}</div>
+        <div class="section">${sectionHead(t("shopBy"), null, true)}<div class="cat-scroll">${T.categories.map((c) => `<button class="cat round" data-go="${c.id === "food" ? "food" : c.id === "pharmacy" ? "pharmacy" : "plp"}" data-cat="${c.id}"><span class="tile" style="background:${c.bg};color:${c.fg}">${ic(c.icon)}</span><span>${esc(catName(c))}</span></button>`).join("")}</div></div>
+        <div class="section">${sectionHead(t("recommended2"), null, false)}${carousel(by("popular").filter((p) => !["food", "pharmacy"].includes(p.cat)).slice(0, 8))}</div>
+        <div class="section">${sectionHead(t("secDeals"), t("secDealsSub"), true, ` <span class="countdown" aria-label="${t("endsIn")}"><span class="num">02</span>:<span class="num">14</span>:<span class="num">09</span></span>`).replace('data-go="plp"', 'data-go="deals"')}${carousel(by("deal").filter((p) => !["food", "pharmacy"].includes(p.cat)).slice(0, 8))}</div>
         <div class="section food-sec"><div class="section-head"><div><h2>${ic("flame", "icon sm")} ${t("secFood")}</h2><div class="sub">${t("secFoodSub")} · <span class="pill success" style="padding:1px 8px">${t("openNow")}</span></div></div><button class="more" data-go="food">${t("seeAll")} ${ic("chevS", "icon xs")}</button></div>
           <div class="h-scroll">${by("food").slice(0, 8).map((p) => mealCard(p)).join("")}</div></div>
-        <div class="section pad"><div class="deal-banner">${wave()}<div><h3>${t("dealHero")}</h3><p>${t("dealHeroSub")}</p></div><button class="btn sm" style="background:var(--mandarin);color:#fff" data-go="deals">${t("dealZone")}</button></div></div>
-        <div class="section">${sectionHead(t("secUnder50"))}${carousel(by("under50").slice(0, 8))}</div>
-        <div class="section">${sectionHead(t("secLocal"), t("secLocalSub"))}${carousel(by("local"))}</div>
-        <div class="section">${sectionHead(t("secAgain"))}${carousel(by("again").slice(0, 8))}</div>
-        <div class="section">${sectionHead(t("secNew"))}${carousel(by("new"))}</div>
+        <div class="section pharma-sec"><div class="section-head"><div><h2>${ic("pill", "icon sm")} ${t("secPharma")}</h2><div class="sub">${t("secPharmaSub")}</div></div><button class="more" data-go="pharmacy">${t("seeAll")} ${ic("chevS", "icon xs")}</button></div>${carousel(by("pharma").slice(0, 8))}</div>
+        <div class="section">${sectionHead(t("secUnder50"))}${carousel(by("under50").filter((p) => !["food", "pharmacy"].includes(p.cat)).slice(0, 8))}</div>
+        <div class="section">${sectionHead(t("secLocal"), t("secLocalSub")).replace('data-go="plp"', 'data-go="plp" data-cat="local"')}${carousel(by("local"))}</div>
+        <div class="section">${sectionHead(t("secNew"))}${carousel(by("new").filter((p) => !["food", "pharmacy"].includes(p.cat)))}</div>
       </div>${cartBar()}${bottomNav("home")}${toastEl()}</div>`;
   };
 
@@ -352,22 +384,64 @@
 
   R.deals = () => {
     const deals = T.products.filter((p) => p.tags.includes("deal")).sort((a, b) => pct(b) - pct(a));
-    return `<div class="screen">${statusbar()}
-      <div class="topbar"><button class="icon-btn ghost" data-go="home" aria-label="back">${ic("chevS")}</button><h1>${t("dealZone")}</h1></div>
-      <div class="scroll pb-nav"><div class="pad"><div class="deal-banner" style="background:linear-gradient(135deg,var(--mandarin-600),var(--mandarin));color:#fff">${wave()}<div><div style="font-size:12px;font-weight:800;opacity:.9">${t("endsIn")}</div><h3 style="margin:2px 0 4px"><span class="countdown"><span class="num" style="background:rgba(255,255,255,.2)">02</span>:<span class="num" style="background:rgba(255,255,255,.2)">14</span>:<span class="num" style="background:rgba(255,255,255,.2)">09</span></span></h3><p>${t("dealHero")} · ${t("dealHeroSub")}</p></div>${ic("percent", "icon")} </div></div>
+    return `<div class="screen">${statusbar()}${vhead("deals")}
+      <div class="scroll pb-nav"><div class="pad" style="margin-top:12px"><div class="deal-banner" style="background:linear-gradient(135deg,var(--mandarin-600),var(--mandarin));color:#fff">${wave()}<div><div style="font-size:12px;font-weight:800;opacity:.9">${t("endsIn")}</div><h3 style="margin:2px 0 4px"><span class="countdown"><span class="num" style="background:rgba(255,255,255,.2)">02</span>:<span class="num" style="background:rgba(255,255,255,.2)">14</span>:<span class="num" style="background:rgba(255,255,255,.2)">09</span></span></h3><p>${t("dealHero")} · ${t("dealHeroSub")}</p></div>${ic("percent", "icon")} </div></div>
         <div class="chips">${[["all", t("all")], ["grocery", t("supermarket")], ["drinks", t("drinks")], ["care", t("care")], ["baby", t("baby")]].map(([id, l], i) => `<button class="chip ${i === 0 ? "on" : ""}">${l}</button>`).join("")}</div>
-        <div class="p-grid">${deals.map(productCard).join("")}</div></div>${cartBar()}${bottomNav("home")}${toastEl()}</div>`;
+        <div class="p-grid">${deals.map(productCard).join("")}</div></div>${cartBar()}${bottomNav("deals")}${toastEl()}</div>`;
   };
 
   R.food = () => {
     const subs = S.lang === "ar" ? T.subcats.food : T.subcatsEn.food; const si = S.foodSub || 0;
-    const list = T.products.filter((p) => p.cat === "food" && (si === 0 || p.sub === si));
-    return `<div class="screen">${statusbar()}
-      <div class="topbar"><button class="icon-btn ghost" data-go="home" aria-label="back">${ic("chevS")}</button><h1>${t("foodT")}</h1><button class="icon-btn ghost" data-go="search" aria-label="${t("navSearch")}">${ic("search")}</button></div>
+    const all = T.products.filter((p) => p.cat === "food");
+    const list = all.filter((p) => si === 0 || p.sub === si);
+    const seg = S.seg.food ?? 0; const featured = seg === 0 ? all.filter((p) => p.tags.includes("popular") || p.oldPrice) : all.filter((p) => p.price >= 60);
+    const cards = [
+      { t: t("foodHero"), s: t("kitchen"), bg: "#FCE9D9", fg: "#B4441E", icon: "food", go: "food", sub: 0 },
+      { t: S.lang === "ar" ? "فطار بلدي لشخصين" : "Baladi breakfast for 2", s: S.lang === "ar" ? "من مطبخ توّا · 95 ج.م" : "Twaa kitchen · EGP 95", bg: "#F7E9D3", fg: "#A15B12", icon: "egg", go: "food", sub: 3 },
+      { t: S.lang === "ar" ? "حلويات سخنة" : "Warm desserts", s: S.lang === "ar" ? "أم علي ورز بلبن" : "Om Ali & rice pudding", bg: "#F3E5E8", fg: "#8E3A4B", icon: "candy", go: "food", sub: 4 },
+    ];
+    const quick = [
+      { t: S.lang === "ar" ? "كل العروض" : "All offers", s: S.lang === "ar" ? "لحد 15% خصم" : "Up to 15% off", icon: "percent", bg: "#FEE7DA", fg: "#E05F1C", go: "deals" },
+      { t: S.lang === "ar" ? "15 دقيقة" : "15 mins", s: S.lang === "ar" ? "أسرع تجهيز" : "Fastest prep", icon: "bolt", bg: "#FBF0D0", fg: "#B8860B", go: "food", sub: 1 },
+      { t: S.lang === "ar" ? "جديد" : "Latest", s: S.lang === "ar" ? "وصل حديثاً" : "New additions", icon: "sparkle", bg: "#E3F3E6", fg: "#2E7D4F", go: "food", sub: 2 },
+      { t: S.lang === "ar" ? "مشروبات" : "Drinks", s: S.lang === "ar" ? "شاي وقهوة" : "Tea & coffee", icon: "cup", bg: "#EFE5F0", fg: "#3A1F3D", go: "food", sub: 5 },
+    ];
+    return `<div class="screen">${statusbar()}${vhead("food", { search: S.lang === "ar" ? "دوّر على أكلة أو مطبخ" : "Search dishes or kitchens" })}
       <div class="scroll pb-nav">
-        <div class="pad"><div class="deal-banner food-hero">${wave()}<div><div class="row" style="gap:6px;margin-bottom:4px"><span class="pill" style="background:rgba(255,255,255,.18);color:#fff">${ic("clock", "icon xs")} 10–25 ${t("min")}</span><span class="pill" style="background:rgba(255,255,255,.18);color:#fff">${t("kitchen")}</span></div><h3>${t("foodHero")}</h3><p>${t("foodHeroSub")}</p></div>${ic("food", "icon")}</div></div>
-        <div class="chips">${subs.map((s, i) => `<button class="chip ${si === i ? "on" : ""}" data-foodsub="${i}">${esc(s)}</button>`).join("")}</div>
-        <div class="pad meal-list">${list.map((p) => mealCard(p, true)).join("")}</div>
+        ${promoCards(cards)}
+        ${quickTiles(quick)}
+        <div class="section" style="margin-top:12px"><div class="pad">${segmented("food", [[t("recommended"), null], [`${t("free")} ${t("delivery")}`, "bike"]])}</div><div class="h-scroll">${featured.map(foodImgCard).join("")}</div></div>
+        <div class="section"><div class="section-head"><div><h2>${t("foodT")}</h2><div class="sub">${t("foodHeroSub")}</div></div></div>
+          <div class="chips">${subs.map((s, i) => `<button class="chip ${si === i ? "on" : ""}" data-foodsub="${i}">${esc(s)}</button>`).join("")}</div>
+          <div class="pad meal-list">${list.map((p) => mealCard(p, true)).join("")}</div></div>
+      </div>${cartBar()}${bottomNav("home")}${toastEl()}</div>`;
+  };
+
+  /* ---- PHARMACY vertical (OTC only) ---- */
+  R.pharmacy = () => {
+    const subs = S.lang === "ar" ? T.subcats.pharmacy : T.subcatsEn.pharmacy; const si = S.psub || 0;
+    const all = T.products.filter((p) => p.cat === "pharmacy"); const list = all.filter((p) => si === 0 || p.sub === si);
+    const seg = S.seg.pharma ?? 0; const featured = seg === 0 ? all.filter((p) => p.tags.includes("popular") || p.tags.includes("again")) : all.filter((p) => p.oldPrice);
+    const cards = [
+      { t: t("pharmaHero"), s: t("otcNote"), bg: "#E1F1F3", fg: "#0F7C8C", icon: "pill", go: "pharmacy" },
+      { t: S.lang === "ar" ? "فيتامينات ومناعة" : "Vitamins & immunity", s: S.lang === "ar" ? "خصم لحد 15%" : "Up to 15% off", bg: "#FBF0D0", fg: "#B8860B", icon: "sparkle", go: "pharmacy" },
+      { t: S.lang === "ar" ? "أمومة وطفل" : "Mother & baby", s: S.lang === "ar" ? "لبن أطفال وحفاضات" : "Formula & diapers", bg: "#FDECEC", fg: "#C24E6B", icon: "baby", go: "pharmacy" },
+    ];
+    const quick = [
+      { t: S.lang === "ar" ? "مسكنات وبرد" : "Pain & cold", s: S.lang === "ar" ? "بانادول، كونجستال" : "Panadol, Congestal", icon: "pill", bg: "#E1F1F3", fg: "#0F7C8C", go: "pharmacy", psub: 1 },
+      { t: S.lang === "ar" ? "فيتامينات" : "Vitamins", s: S.lang === "ar" ? "سي، زنك، د" : "C, Zinc, D", icon: "sparkle", bg: "#FBF0D0", fg: "#B8860B", go: "pharmacy", psub: 2 },
+      { t: t("askPharmacist"), s: t("askPharmacistSub"), icon: "stethoscope", bg: "#E3F3E6", fg: "#2E7D4F", toast: "help" },
+      { t: t("uploadRx"), s: S.lang === "ar" ? "أدوية بروشتة" : "Prescription items", icon: "rx", bg: "#EFE5F0", fg: "#3A1F3D", toast: "soon", soon: true },
+    ];
+    return `<div class="screen">${statusbar()}${vhead("pharmacy", { search: S.lang === "ar" ? "دوّر على دوا أو منتج طبي" : "Search medicines or medical products" })}
+      <div class="scroll pb-nav">
+        ${promoCards(cards)}
+        ${quickTiles(quick)}
+        <div class="pad" style="margin-top:8px"><div class="row" style="gap:8px;background:var(--success-100);color:var(--success);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700">${ic("shield", "icon sm")}<span>${t("otcNote")} · ${S.lang === "ar" ? "صيدلي مرخّص يراجع كل طلب" : "A licensed pharmacist reviews every order"}</span></div></div>
+        <div class="section" style="margin-top:12px"><div class="pad">${segmented("pharma", [[t("recommended"), null], [t("deals"), "percent"]])}</div>${carousel(featured)}</div>
+        <div class="section"><div class="section-head"><div><h2>${t("pharmaT")}</h2><div class="sub">${t("pharmaHeroSub")}</div></div></div>
+          <div class="chips">${subs.map((s, i) => `<button class="chip ${si === i ? "on" : ""}" data-psub="${i}">${esc(s)}</button>`).join("")}</div>
+          <div class="p-grid">${list.map(productCard).join("")}</div></div>
       </div>${cartBar()}${bottomNav("home")}${toastEl()}</div>`;
   };
 
@@ -502,16 +576,16 @@
     if (S.screen === "location" && !S.pdp) { LM.leaflet = null; LM.fallback = null; requestAnimationFrame(mountLiveMap); }
     const ht = host.querySelector("[data-hero]"); if (ht) ht.addEventListener("scroll", () => { const i = Math.round(ht.scrollLeft / (ht.firstElementChild.offsetWidth + 12)); const idx = Math.abs(i); if (idx !== S.heroIdx) { S.heroIdx = idx; host.querySelectorAll(".dots span").forEach((d, k) => d.classList.toggle("on", k === idx)); } }, { passive: true });
   }
-  function go(screen) { S.pdp = null; S.screen = screen; if (["home", "categories", "search", "orders", "account"].includes(screen)) S.tab = screen; render(); }
+  function go(screen) { S.pdp = null; S.screen = screen; if (["home", "categories", "search", "orders", "account", "deals", "food", "pharmacy"].includes(screen)) S.tab = screen; render(); }
   let toastTimer;
   function toast(msg) { S.toast = msg; render(); clearTimeout(toastTimer); toastTimer = setTimeout(() => { S.toast = null; render(); }, 1800); }
   function patchProduct(id) { /* re-render only affected product cards + bars (keeps scroll position) */
-    host.querySelectorAll(`[data-pid="${id}"]`).forEach((el) => { const p = prod(id); const n = h(el.classList.contains("meal") ? mealCard(p, el.classList.contains("wide")) : productCard(p)); el.replaceWith(n); });
+    host.querySelectorAll(`[data-pid="${id}"]`).forEach((el) => { const p = prod(id); const n = h(el.classList.contains("meal") ? mealCard(p, el.classList.contains("wide")) : el.classList.contains("fcard") ? foodImgCard(p) : productCard(p)); el.replaceWith(n); });
     const bar = host.querySelector(".cartbar"); const nb = cartBar();
     if (bar && nb) bar.outerHTML = nb; else if (bar && !nb) bar.remove(); else if (!bar && nb) { const nav = host.querySelector(".bottomnav"); if (nav) nav.insertAdjacentHTML("beforebegin", nb); }
     if (S.pdp || S.screen === "cart" || S.screen === "checkout") render();
   }
-  const TOASTS = { notif: () => (S.lang === "ar" ? "مفيش إشعارات جديدة" : "No new notifications"), gps: () => (S.lang === "ar" ? "تم تحديد موقعك" : "Location detected"), notify: () => (S.lang === "ar" ? "هنبلّغك أول ما نوصل 🧡" : "We'll let you know when we arrive 🧡"), help: () => (S.lang === "ar" ? "فريق الدعم هيرد عليك خلال دقيقة" : "Support will reply within a minute"), call: () => (S.lang === "ar" ? "جاري الاتصال بالمندوب…" : "Calling the rider…"), thanks: () => (S.lang === "ar" ? "شكراً لتقييمك!" : "Thanks for your feedback!") };
+  const TOASTS = { soon: () => (S.lang === "ar" ? "رفع الروشتة هيتوفر قريباً" : "Prescription upload is coming soon"), notif: () => (S.lang === "ar" ? "مفيش إشعارات جديدة" : "No new notifications"), gps: () => (S.lang === "ar" ? "تم تحديد موقعك" : "Location detected"), notify: () => (S.lang === "ar" ? "هنبلّغك أول ما نوصل 🧡" : "We'll let you know when we arrive 🧡"), help: () => (S.lang === "ar" ? "فريق الدعم هيرد عليك خلال دقيقة" : "Support will reply within a minute"), call: () => (S.lang === "ar" ? "جاري الاتصال بالمندوب…" : "Calling the rider…"), thanks: () => (S.lang === "ar" ? "شكراً لتقييمك!" : "Thanks for your feedback!") };
 
   host.addEventListener("click", (e) => {
     const b = (sel) => e.target.closest(sel);
@@ -525,7 +599,9 @@
     if ((el = b("[data-hometab]"))) { S.homeTab = el.dataset.hometab; if (S.homeTab === "deals") return go("deals"); if (S.homeTab === "food") return go("food"); if (S.homeTab !== "all") { S.cat = S.homeTab; S.subcat = 0; return go("plp"); } render(); return; }
     if ((el = b("[data-cat-switch]"))) { S.cat = el.dataset.catSwitch; S.subcat = 0; render(); return; }
     if ((el = b("[data-subcat]"))) { S.subcat = +el.dataset.subcat; render(); return; }
-    if ((el = b("[data-foodsub]"))) { S.foodSub = +el.dataset.foodsub; render(); return; }
+    if ((el = b("[data-foodsub]")) && !el.dataset.go) { S.foodSub = +el.dataset.foodsub; render(); return; }
+    if ((el = b("[data-psub]")) && !el.dataset.go) { S.psub = +el.dataset.psub; render(); return; }
+    if ((el = b("[data-seg]"))) { const [k, v] = el.dataset.seg.split(":"); S.seg[k] = +v; render(); return; }
     if ((el = b("[data-sort]"))) { S.sort = el.dataset.sort; render(); return; }
     if ((el = b("[data-q-set]"))) { S.query = el.dataset.qSet; render(); return; }
     if ((el = b("[data-clear-q]"))) { S.query = ""; render(); return; }
@@ -547,7 +623,7 @@
     if ((el = b("[data-lm-zoom]"))) { LM.zoom = Math.min(17, Math.max(11, LM.zoom + (+el.dataset.lmZoom))); if (LM.mode === "leaflet" && LM.leaflet) LM.leaflet.setZoom(LM.zoom); else if (LM.fallback) LM.fallback.draw(); return; }
     if ((el = b("[data-lang-toggle]"))) { S.lang = S.lang === "ar" ? "en" : "ar"; render(); return; }
     if ((el = b("[data-toast]"))) { toast(TOASTS[el.dataset.toast]()); return; }
-    if ((el = b("[data-go]"))) { if (el.dataset.cat) { S.cat = el.dataset.cat; S.subcat = 0; } if (el.dataset.go === "checkout" && !S.loggedIn) { S.loggedIn = true; return go("login"); } go(el.dataset.go); return; }
+    if ((el = b("[data-go]"))) { if (el.dataset.cat) { S.cat = el.dataset.cat; S.subcat = 0; } if (el.dataset.foodsub != null) S.foodSub = +el.dataset.foodsub; if (el.dataset.psub != null) S.psub = +el.dataset.psub; if (el.dataset.go === "checkout" && !S.loggedIn) { S.loggedIn = true; return go("login"); } go(el.dataset.go); return; }
   });
   host.addEventListener("input", (e) => {
     if (e.target.matches("[data-q]")) { S.query = e.target.value; const sc = host.querySelector(".scroll"); const html = R.search(); const tmp = h(html); host.querySelector(".screen").querySelector(".scroll").innerHTML = tmp.querySelector(".scroll").innerHTML; const cb = host.querySelector(".cartbar"); return; }

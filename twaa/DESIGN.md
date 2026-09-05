@@ -33,7 +33,8 @@ Open `index.html` in a browser (no build step). The left panel jumps between scr
 ```
 Splash → Location & serviceability → Home
 Home tabs: الكل · عروض · أكل · سوبر ماركت …  →  Deal Zone / Food / Category listing
-Bottom nav: الرئيسية · الأقسام · السلة · طلباتي · حسابي   (noon pattern: cart in the tab bar with a badge; search lives in the header; cart bar still floats above nav when cart > 0)
+Verticals strip (top of every vertical home): توّا/سوبر ماركت · أكل · صيدلية · عروض · محلي
+Bottom nav (noon order): الرئيسية · الأقسام · عروض · حسابي · السلة   (view-cart pill floats above nav when cart > 0)
 Home ─ hero banners ─ category tabs ─ category grid ─ merchandising sections ─ deal banner
 Categories → Category listing (rail + sub-chips + grid) → Product sheet
 Search → recent / trending / popular → results grid → Product sheet
@@ -58,14 +59,28 @@ Aubergine full-bleed, wordmark, tagline **من هنا لك.. توّا**, wave mo
 ### 4.3 Login / OTP (BRD §10)
 Mobile number with +20 prefix, `inputmode="tel"`. OTP: 6 boxes (LTR), countdown, resend, terms acknowledgement. Guest browsing is allowed; login is requested at checkout.
 
-### 4.4 Home (BRD §11)
-Order of blocks, top to bottom:
-1. **App bar** (Aubergine, noon-style): small "التوصيل في" label, the ETA as the biggest element on screen (**20 دقيقة** with a Mandarin bolt), address line "البيت · وسط المدينة، أبو المطامير ▾", notifications and profile icons. Search field **"بتدور على إيه؟"**.
-2. **Hero banners** — swipeable, 150px, with promo code pill (first-order discount, free delivery threshold, local products). Dots indicator.
-3. **Category tabs** — الكل · عروض (Mandarin-tinted) · سوبر ماركت · مشروبات · سناكس · العناية · الأطفال · البيت · إلكترونيات. Tapping a tab opens the category listing; عروض opens Deal Zone.
-4. **Category grid** — dense 4-column grid of all 16 categories ("اطلب حسب القسم"), as in noon Minutes.
-5. **Merchandising carousels** (admin-configurable): عروض توّا (with countdown) → الأكثر طلباً → deal banner → أقل من 50 جنيه → منتجات محلية → اشترِ تاني → وصل جديد. مخصوص ليك is added once personalisation data exists.
-6. Sticky cart bar + bottom nav.
+### 4.4 Home — noon structure (BRD §11)
+The app is organised as **verticals** exactly like noon: a strip of tiles at the very top switches between them, and each vertical has its own home under the same strip.
+
+**Verticals strip** (persistent on every vertical home): **توّا · سوبر ماركت** (main, Aubergine tile with the logo) · **أكل** (terracotta) · **صيدلية** (teal) · **عروض** (Mandarin) · **محلي** (green). The active tile is filled in its colour and lifted; the others are white.
+
+**Main home (سوبر ماركت) — noon Minutes pattern**, top to bottom:
+1. Light tinted header: strip → headline **⚡ التوصيل في 20 دقيقة** with the address line "البيت · وسط المدينة، أبو المطامير ▾" and notifications → search **"دوّر على لبن، بانادول، شيبسي…"** with a camera icon and a side tile **اطلب بقائمتك** (shop by list → reorder).
+2. **Promo tiles** — tall rounded squares scrolling sideways: خصم 30% أول طلب (TWAA30), توصيل مجاني فوق 150, أكل جاهز, صيدلية توّا, منتجات محلية.
+3. **Segmented toggle** اشترِ تاني | المفضلة above a product row.
+4. **Categories** — two rows of circular icon tiles scrolling sideways ("اطلب حسب القسم"); food and pharmacy tiles open their verticals.
+5. **مخصوص ليك** → **عروض توّا** (countdown) → **أكل جاهز.. سخن** (meal cards) → **صيدلية توّا** → أقل من 50 جنيه → منتجات محلية → وصل جديد. All sections are admin-configurable.
+6. **View-cart pill** (Mandarin, item thumbnails, count and subtotal) floating above the tab bar.
+
+**Product card (noon Minutes):** image tile with the discount badge and favourite, a round **+** floating over the image's bottom corner that turns into a stepper, name, size with a chevron (variant picker), price with the old price beside it.
+
+**Food vertical — noon Food pattern:** strip (أكل active) → address with ETA chip → search "دوّر على أكلة أو مطبخ" → **promo cards** (wide tinted cards with an arrow button: جعان؟ هاتها توّا · فطار بلدي لشخصين · حلويات سخنة) → **quick tiles** (كل العروض · 15 دقيقة · جديد · مشروبات) → segmented **المقترح | توصيل مجاني** → **image cards** with an offer overlay ("13% خصم", prep minutes) → full menu by sub-category chips.
+
+**Pharmacy vertical — same pattern:** promo cards (تعبان؟ الدوا يوصلك توّا · فيتامينات ومناعة · أمومة وطفل) → quick tiles (مسكنات وبرد · فيتامينات · **اسأل صيدلي** (free WhatsApp consultation) · **ارفع الروشتة** marked قريباً) → OTC notice "منتجات بدون روشتة فقط · صيدلي مرخّص يراجع كل طلب" → segmented المقترح | عروض → product grid by sub-category (مسكنات وبرد · فيتامينات · إسعافات أولية · أجهزة طبية · أمومة وطفل · عناية طبية). 14 demo OTC products; prescription delivery stays out of MVP scope (BRD §86).
+
+**Deals vertical:** strip (عروض active) → countdown banner → deal grid.
+
+**Bottom nav (noon order):** الرئيسية · الأقسام · عروض · حسابي · السلة (with badge). Orders live under حسابي and via the tracking flow.
 
 ### 4.5 Categories (BRD §13)
 3-column grid of all categories with tinted tiles. Category → listing.
