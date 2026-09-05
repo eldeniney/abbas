@@ -568,6 +568,7 @@
     const base = S.screen === "pdp" ? (S.tab || "home") : S.screen;
     host.innerHTML = (R[base] || R.home)() + (S.pdp ? pdpSheet() : "");
     if (host.firstElementChild) host.firstElementChild.dataset.screen = base;
+    const vt = host.querySelector(".vtile.on"); if (vt) requestAnimationFrame(() => vt.scrollIntoView({ block: "nearest", inline: "center" }));
     document.documentElement.lang = S.lang; document.documentElement.dir = T.i18n[S.lang].dir;
     const sc = host.querySelector(".scroll"); if (sc && scrollMemo[S.screen] != null && !S.pdp) sc.scrollTop = scrollMemo[S.screen];
     document.querySelectorAll("[data-wb-screen]").forEach((b) => b.classList.toggle("active", b.dataset.wbScreen === (S.pdp ? "pdp" : S.screen)));
