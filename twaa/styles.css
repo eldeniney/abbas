@@ -626,3 +626,9 @@ img, svg { display: block; }
 .meal.wide .mdesc { height: auto; max-height: 3em; }
 .meal-list { padding-top: var(--s-2); }
 .food-sec .section-head h2 .icon { color: #B4441E; }
+
+/* logo bitmap wrapper: the image is the brand file; the vector only shows if the file is missing */
+.logo-img { display: block; line-height: 0; }
+.logo-img img { width: 100%; height: auto; display: block; object-fit: contain; }
+.logo-img.mark img { clip-path: inset(0 0 22% 0); margin-bottom: -22%; } /* mark only: crop the TWAA line */
+.logo-img svg { width: 100%; height: auto; }

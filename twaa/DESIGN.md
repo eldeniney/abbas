@@ -26,7 +26,7 @@ Open `index.html` in a browser (no build step). The left panel jumps between scr
 | Display type | Baloo Bhaijaan 2 (rounded, echoes the logo): headings, prices, buttons |
 | Body type | Cairo 400–800 |
 | Motif | Cream wave ribbon at ~15–22 % opacity on hero banners, splash, deal banner |
-| Logo | Official artwork traced to vector in `TWAA.logo(ink, spark, withName)` and `assets/logo.svg` (full, with TWAA lettering), `assets/logo-cream.svg` (on dark), `assets/logo-mark.svg` (app icon, mark only). Logo ink `#2E1338`, coral shadda strokes `#E85A3F`. Splash uses the full logo; login, sidebar and icons use the mark alone. Never set the name in UI text next to the logo. |
+| Logo | **The official logo file is used as-is**, via `TWAA.logoImg()`: `assets/logo.png` (aubergine on transparent, for light surfaces) and `assets/logo-cream.png` (cream version for the aubergine splash and dark tiles). Mark-only placements crop the TWAA line with `clip-path`. Splash uses the full logo; login, sidebar and icons use the mark alone. Never set the name in UI text next to the logo. The vector trace in `TWAA.logo()` / `assets/logo*.svg` is only a fallback that appears automatically if the PNG is missing. |
 
 ## 3. Information architecture
 

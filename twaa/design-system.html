@@ -175,7 +175,7 @@
 </div>
 <script src="data.js"></script>
 <script>
-  document.querySelectorAll("[data-logo]").forEach(e => e.innerHTML = TWAA.logo()); document.querySelectorAll("[data-logo-mono]").forEach(e => e.innerHTML = TWAA.logo("currentColor", "currentColor")); document.querySelectorAll("[data-logo-tile]").forEach(e => e.innerHTML = TWAA.logo("#F9F2E7", TWAA.logoSpark, false));
+  document.querySelectorAll("[data-logo]").forEach((e, i) => e.innerHTML = TWAA.logoImg(i === 1, true)); document.querySelectorAll("[data-logo-mono]").forEach(e => e.innerHTML = TWAA.logoImg(true, true)); document.querySelectorAll("[data-logo-tile]").forEach(e => e.innerHTML = TWAA.logoImg(true, false));
   document.getElementById("cat-sw").innerHTML = TWAA.categories.map(c => `<div style="background:${c.bg};color:${c.fg}">${c.ar} · ${c.en}<code>${c.bg} / ${c.fg}</code></div>`).join("");
 </script>
 </body>

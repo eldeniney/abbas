@@ -197,6 +197,20 @@ TWAA.orders = [
 /* Brand logo — vector of the official artwork (traced from the supplied 1536×1024 image).
    ink = letterforms + TWAA, spark = the two coral shadda strokes. `withName` toggles the TWAA lettering. */
 TWAA.logoInk = "#2E1338"; TWAA.logoSpark = "#E85A3F";
+/* Official logo bitmap. Put the brand file at assets/logo.png (transparent background, full wordmark with TWAA)
+   and assets/logo-cream.png (cream version for dark surfaces). TWAA.logoImg is used everywhere; the vector below is only a
+   fallback while the file is missing or when the page is bundled without assets. */
+TWAA.logoFiles = { light: "assets/logo.png", dark: "assets/logo-cream.png" };
+TWAA.logoImg = (onDark = false, withName = true) => {
+  const src = (TWAA.logoData && TWAA.logoData[onDark ? "dark" : "light"]) || TWAA.logoFiles[onDark ? "dark" : "light"];
+  return `<span class="logo-img ${withName ? "" : "mark"}" data-logo-fallback="${withName ? "name" : "mark"}"><img src="${src}" alt="توّا Twaa" decoding="async"></span>`;
+};
+/* If the brand file is missing (or blocked), swap in the vector trace so the UI never shows a broken image. */
+document.addEventListener("error", (e) => {
+  const img = e.target; if (!(img instanceof HTMLImageElement)) return;
+  const wrap = img.closest("[data-logo-fallback]"); if (!wrap) return;
+  wrap.innerHTML = TWAA.logo("currentColor", TWAA.logoSpark, wrap.dataset.logoFallback === "name");
+}, true);
 TWAA.logo = (ink = "currentColor", spark = TWAA.logoSpark, withName = true) => `<svg viewBox="${withName ? "180 120 1200 800" : "180 120 1200 660"}" aria-label="توّا" role="img">
   <g fill="none" stroke="${ink}" stroke-width="172" stroke-linecap="round" stroke-linejoin="round">
     <path d="M322 332 V596 C322 690 372 738 470 738 L600 738"/>

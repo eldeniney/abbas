@@ -259,7 +259,7 @@
 
   /* ---------------- Screens ---------------- */
   const R = {};
-  R.splash = () => `<div class="screen dark"><div class="splash">${statusbar(true)}${wave()}<div class="splash-bag" aria-hidden="true"></div><div class="brand-logo lg" style="color:var(--cream)">${T.logo("currentColor", T.logoSpark, true)}</div><div class="tagline">${t("tagline")}</div><div class="en-tag">Local roots. Closer days.</div><button class="btn primary" style="position:absolute;bottom:56px;left:24px;right:24px" data-go="location">${t("shopNow")}</button></div></div>`;
+  R.splash = () => `<div class="screen dark"><div class="splash">${statusbar(true)}${wave()}<div class="splash-bag" aria-hidden="true"></div><div class="brand-logo lg" style="color:var(--cream)">${T.logoImg(true, true)}</div><div class="tagline">${t("tagline")}</div><div class="en-tag">Local roots. Closer days.</div><button class="btn primary" style="position:absolute;bottom:56px;left:24px;right:24px" data-go="location">${t("shopNow")}</button></div></div>`;
 
   R.location = () => {
     return `<div class="screen">${statusbar()}
@@ -279,7 +279,7 @@
 
   R.login = () => `<div class="screen">${statusbar()}
     <div class="topbar"><button class="icon-btn ghost" data-go="cart" aria-label="back">${ic("chevS")}</button></div>
-    <div class="scroll pad"><div style="text-align:center;margin:24px 0 28px"><div class="brand-logo md" style="color:var(--aubergine);margin:0 auto">${T.logo("currentColor", T.logoSpark, false)}</div></div>
+    <div class="scroll pad"><div style="text-align:center;margin:24px 0 28px"><div class="brand-logo md" style="color:var(--aubergine);margin:0 auto">${T.logoImg(false, false)}</div></div>
       <h2 style="font-family:var(--font-display);font-size:26px;color:var(--aubergine)">${t("loginT")}</h2><p class="muted" style="margin:6px 0 24px;line-height:1.7">${t("loginSub")}</p>
       <div class="field"><label>${t("phone")}</label><div class="input"><span class="prefix" dir="ltr">🇪🇬 +20</span><input inputmode="tel" autocomplete="tel" value="${S.phone}" aria-label="${t("phone")}" dir="ltr"></div><div class="hint">${S.lang === "ar" ? "هنبعت كود تأكيد برسالة SMS" : "We'll text you a verification code"}</div></div>
       <button class="btn primary" data-go="otp">${t("sendOtp")}</button>
