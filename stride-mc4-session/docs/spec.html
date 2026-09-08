@@ -1,0 +1,323 @@
+<title>STRIDE MC4 Registration Rebuild</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #faf7f7;
+    --surface: #ffffff;
+    --surface-2: #f3eded;
+    --ink: #221b1d;
+    --ink-2: #5d5256;
+    --ink-3: #8c8085;
+    --line: #e6dcdf;
+    --accent: #7c0124;
+    --accent-ink: #ffffff;
+    --accent-tint: #f8e9ee;
+    --ok: #1e7a3c;
+    --ok-tint: #e6f4ea;
+    --warn: #b4530f;
+    --warn-tint: #fdf0e3;
+    --bad: #b3261e;
+    --bad-tint: #fbe9e7;
+    --code-bg: #f4eff0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #171214; --surface: #201a1c; --surface-2: #2a2224; --ink: #f2e9eb; --ink-2: #c7b8bd; --ink-3: #8f7f85;
+      --line: #3a2f33; --accent: #e8557f; --accent-ink: #1a0810; --accent-tint: #3a1a25;
+      --ok: #6cc98a; --ok-tint: #1d3125; --warn: #f0a15b; --warn-tint: #3a2818; --bad: #f2867e; --bad-tint: #3d1f1d; --code-bg: #2a2224;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #171214; --surface: #201a1c; --surface-2: #2a2224; --ink: #f2e9eb; --ink-2: #c7b8bd; --ink-3: #8f7f85;
+    --line: #3a2f33; --accent: #e8557f; --accent-ink: #1a0810; --accent-tint: #3a1a25;
+    --ok: #6cc98a; --ok-tint: #1d3125; --warn: #f0a15b; --warn-tint: #3a2818; --bad: #f2867e; --bad-tint: #3d1f1d; --code-bg: #2a2224;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: "Public Sans", "Segoe UI", system-ui, sans-serif; font-size: 15.5px; line-height: 1.55; margin: 0; }
+  h1, h2, h3 { font-family: "Sora", "Segoe UI", system-ui, sans-serif; text-wrap: balance; letter-spacing: -0.01em; margin: 0; }
+  h1 { font-size: 2rem; font-weight: 700; line-height: 1.15; }
+  h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+  h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+  p { margin: 0 0 0.9rem; max-width: 68ch; }
+  code, pre { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 0.86em; }
+  code { background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+  pre { background: var(--code-bg); padding: 1rem 1.1rem; border-radius: 8px; overflow-x: auto; line-height: 1.5; margin: 0.6rem 0 1rem; }
+  pre code { background: none; padding: 0; }
+  .eyebrow { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+  .shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 0; min-height: 100vh; }
+  nav { border-right: 1px solid var(--line); padding: 2rem 1.25rem; position: sticky; top: 0; height: 100vh; overflow: auto; background: var(--surface); }
+  nav .brand { font-family: "Sora", sans-serif; font-weight: 700; color: var(--accent); font-size: 1.1rem; margin-bottom: 1.5rem; }
+  nav a { display: block; color: var(--ink-2); text-decoration: none; padding: 0.35rem 0; font-size: 0.9rem; border-left: 2px solid transparent; padding-left: 0.6rem; margin-left: -0.6rem; }
+  nav a:hover, nav a:focus-visible { color: var(--accent); border-left-color: var(--accent); outline: none; }
+  main { padding: 2.5rem 3rem 4rem; max-width: 1080px; }
+  header.hero { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 2rem; align-items: end; padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); margin-bottom: 2rem; }
+  header.hero p { color: var(--ink-2); margin: 0.6rem 0 0; }
+  .meta { display: grid; gap: 0.35rem; font-size: 0.85rem; color: var(--ink-2); text-align: right; }
+  .meta b { color: var(--ink); font-weight: 600; }
+  section { margin-bottom: 2.75rem; scroll-margin-top: 1.5rem; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.9rem; margin: 0.5rem 0 1.25rem; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.1rem; }
+  .tile .n { font-family: "Sora", sans-serif; font-size: 1.7rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .tile .l { font-size: 0.82rem; color: var(--ink-2); margin-top: 0.25rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .tablewrap { overflow-x: auto; margin: 0.4rem 0 1.2rem; }
+  th, td { text-align: left; padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); background: var(--surface-2); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; }
+  .pill { display: inline-block; font-size: 0.74rem; font-weight: 600; padding: 0.15em 0.6em; border-radius: 999px; letter-spacing: 0.02em; }
+  .pill.ok { background: var(--ok-tint); color: var(--ok); }
+  .pill.warn { background: var(--warn-tint); color: var(--warn); }
+  .pill.bad { background: var(--bad-tint); color: var(--bad); }
+  .pill.acc { background: var(--accent-tint); color: var(--accent); }
+  .callout { border-left: 3px solid var(--accent); background: var(--accent-tint); padding: 0.8rem 1rem; border-radius: 0 8px 8px 0; margin: 0.6rem 0 1.2rem; max-width: 72ch; }
+  .callout.warn { border-left-color: var(--warn); background: var(--warn-tint); }
+  .callout p:last-child { margin-bottom: 0; }
+  .flow { display: grid; gap: 0.5rem; margin: 0.6rem 0 1.2rem; max-width: 720px; }
+  .step { display: grid; grid-template-columns: 34px minmax(0,1fr); gap: 0.8rem; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.7rem 0.9rem; }
+  .step .k { font-family: "Sora", sans-serif; font-weight: 700; color: var(--accent); font-size: 0.9rem; padding-top: 0.1rem; }
+  .step .t { font-weight: 600; }
+  .step .d { color: var(--ink-2); font-size: 0.9rem; margin-top: 0.15rem; }
+  .step .d code { font-size: 0.8rem; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.2rem; }
+  .card ul { margin: 0.3rem 0 0; padding-left: 1.1rem; }
+  .card li { margin-bottom: 0.3rem; }
+  ul.plain { padding-left: 1.1rem; max-width: 72ch; }
+  ul.plain li { margin-bottom: 0.35rem; }
+  .mock { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+  .mock .bar { background: var(--accent); color: var(--accent-ink); padding: 0.7rem 1rem; font-family: "Sora", sans-serif; font-weight: 600; font-size: 0.9rem; display: flex; justify-content: space-between; }
+  .mock .body { padding: 0.9rem 1rem; display: grid; gap: 0.6rem; font-size: 0.86rem; }
+  .field { border: 1px solid var(--line); border-radius: 6px; padding: 0.45rem 0.6rem; color: var(--ink-2); display: flex; justify-content: space-between; }
+  .field b { color: var(--ink); font-weight: 500; }
+  .meter { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .meter i { display: block; height: 100%; background: var(--ok); }
+  .meter i.warn { background: var(--warn); }
+  .meter i.bad { background: var(--bad); }
+  .row { display: grid; grid-template-columns: 110px 44px minmax(0,1fr) 120px; gap: 0.6rem; align-items: center; font-size: 0.84rem; }
+  .row .r { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .btn { display: inline-block; padding: 0.45rem 0.9rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; }
+  .btn.p { background: var(--accent); color: var(--accent-ink); }
+  .btn.s { border: 1px solid var(--line); color: var(--ink-2); }
+  @media (max-width: 820px) { .shell { grid-template-columns: 1fr; } nav { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line); } main { padding: 1.5rem 1.2rem 3rem; } header.hero { grid-template-columns: 1fr; } .meta { text-align: left; } }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="shell">
+  <nav aria-label="Sections">
+    <div class="brand">STRIDE MC4</div>
+    <a href="#summary">Summary</a>
+    <a href="#rules">Business rules</a>
+    <a href="#journey">User journey</a>
+    <a href="#validation">Submit validation</a>
+    <a href="#data">Data model</a>
+    <a href="#deploy">Deployment</a>
+    <a href="#tests">Acceptance tests</a>
+    <a href="#risks">Risks &amp; decisions</a>
+  </nav>
+  <main>
+    <header class="hero">
+      <div>
+        <div class="eyebrow">e&amp; UAE · SMB Prime · Power Apps</div>
+        <h1>STRIDE MC4 Session Registration – rebuild &amp; validation</h1>
+        <p>What was broken, what changed, the capacity rules now enforced at submit, and how to deploy either the patched app or the rebuilt v2.</p>
+      </div>
+      <div class="meta">
+        <div><b>App</b> Stride MS4 Session</div>
+        <div><b>Source list</b> Stride MC4 Registration (SharePoint)</div>
+        <div><b>Prepared</b> 8 Sep 2026</div>
+      </div>
+    </header>
+
+    <section id="summary">
+      <h2>Summary</h2>
+      <p>The current app never enforced capacity: the Submit button's formula referenced a list that does not exist (<code>Stride MC5 Registration</code>) and two undefined variables, so the button compiled with errors and did nothing. Registrations were only saved through the form's default behaviour with no checks at all.</p>
+      <div class="tiles">
+        <div class="tile"><div class="n">8</div><div class="l">seats per PB session date</div></div>
+        <div class="tile"><div class="n">28</div><div class="l">seats per date for other SMB segments</div></div>
+        <div class="tile"><div class="n">20</div><div class="l">session dates in the catalogue (8 PB, 12 SMB)</div></div>
+        <div class="tile"><div class="n">2</div><div class="l">deliverables: patched .msapp and rebuilt v2 source</div></div>
+      </div>
+      <div class="cols">
+        <div class="card">
+          <h3>Tier 1 · Patched app <span class="pill ok">ready to import</span></h3>
+          <ul>
+            <li>Same screens, same look. Submit button rewritten.</li>
+            <li>Mandatory fields, duplicate check, PB 8 / SMB 28 capacity check, fresh server count.</li>
+            <li>Populates <code>Email</code> and <code>Title</code> for cleaner lists and reporting.</li>
+            <li>Summary screen gallery fixed (it referenced missing fields).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Tier 2 · Rebuilt v2 <span class="pill acc">paste YAML into Studio</span></h3>
+          <ul>
+            <li>Self-service screen: defaults to the signed-in user, dates filtered by segment, live "seats left" per date, confirm disabled until complete.</li>
+            <li>"You are registered" card with change and cancel.</li>
+            <li>Coordinator screen: KPI tiles, sessions with progress bars, registrants per session with search.</li>
+            <li>Rules and calendar in one place (App formulas). Registration window switch.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="rules">
+      <h2>Business rules enforced at submit</h2>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Rule</th><th>Check</th><th>Outcome</th></tr></thead>
+          <tbody>
+            <tr><td>Mandatory fields</td><td>Employee, Segment, Session date selected</td><td><span class="pill warn">Warning</span> nothing saved</td></tr>
+            <tr><td>PB capacity</td><td>Segment = PB and PB registrations on that date ≥ 8</td><td><span class="pill bad">Error</span> "The selected session is full. Please choose another date."</td></tr>
+            <tr><td>Other SMB capacity</td><td>Segment ≠ PB and registrations on that date ≥ 28</td><td><span class="pill bad">Error</span> same message, nothing saved</td></tr>
+            <tr><td>One per employee</td><td>Existing record with the same email</td><td><span class="pill warn">Warning</span> shows their current session; v2 offers Change session</td></tr>
+            <tr><td>Fresh count</td><td><code>Refresh</code> then <code>CountRows(Filter(...))</code> on SharePoint at submit</td><td>Cached availability is never trusted for the decision</td></tr>
+            <tr><td>Concurrency guard (v2)</td><td>Re-count after save; if over capacity remove the new record</td><td><span class="pill bad">Error</span> user asked to pick another date</td></tr>
+            <tr><td>Registration window (v2)</td><td><code>fxRegistrationOpen = false</code></td><td>Banner shown, form hidden, change/cancel disabled</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout warn">
+        <p><b>Assumption to confirm.</b> "Other SMB segment … 28 registered" is implemented as 28 registrations in total on that date across all non-PB segments (they share one session per date; PB and SMB dates do not overlap). If each non-PB segment should have its own 28 seats, change one filter line to <code>Segment.Value = varSegment</code>.</p>
+      </div>
+    </section>
+
+    <section id="journey">
+      <h2>User journey (v2)</h2>
+      <div class="cols">
+        <div class="mock" aria-label="Registration screen sketch">
+          <div class="bar"><span>STRIDE MC4 | Session Registration</span><span>Availability ↗</span></div>
+          <div class="body">
+            <div class="field"><span>Employee *</span><b>Signed-in user (searchable)</b></div>
+            <div class="field"><span>Segment *</span><b>PB</b></div>
+            <div class="field"><span>Session date *</span><b>13 Oct 2026 | 3 of 8 seats left</b></div>
+            <div style="font-size:0.8rem;color:var(--warn);font-weight:600">5 of 8 seats booked | 3 left</div>
+            <div class="meter"><i class="warn" style="width:62%"></i></div>
+            <div style="display:flex;gap:0.5rem;justify-content:flex-end"><span class="btn s">Reset</span><span class="btn p">Confirm registration</span></div>
+          </div>
+        </div>
+        <div class="mock" aria-label="Availability screen sketch">
+          <div class="bar"><span>← STRIDE MC4 | Session Availability</span><span>⟳</span></div>
+          <div class="body">
+            <div class="row"><span>12 Oct 2026</span><span class="pill acc">PB</span><div class="meter"><i class="bad" style="width:100%"></i></div><span class="r" style="color:var(--bad);font-weight:600">FULL 8 / 8</span></div>
+            <div class="row"><span>13 Oct 2026</span><span class="pill acc">PB</span><div class="meter"><i class="warn" style="width:62%"></i></div><span class="r">5 / 8 · 3 left</span></div>
+            <div class="row"><span>21 Sep 2026</span><span class="pill">SMB</span><div class="meter"><i style="width:39%"></i></div><span class="r">11 / 28 · 17 left</span></div>
+            <div class="row"><span>22 Sep 2026</span><span class="pill">SMB</span><div class="meter"><i style="width:14%"></i></div><span class="r">4 / 28 · 24 left</span></div>
+            <div style="font-size:0.78rem;color:var(--ink-3)">Example figures for illustration only.</div>
+          </div>
+        </div>
+      </div>
+      <div class="flow" style="margin-top:1rem">
+        <div class="step"><div class="k">1</div><div><div class="t">Open app</div><div class="d">Signed-in user is recognised. If already registered, a green card shows their session with Change / Cancel; otherwise the form is shown.</div></div></div>
+        <div class="step"><div class="k">2</div><div><div class="t">Pick segment</div><div class="d">Session date list switches to PB dates (Oct) or SMB dates (Sep/Nov). Each option carries live seats left or FULL.</div></div></div>
+        <div class="step"><div class="k">3</div><div><div class="t">Pick date</div><div class="d">Seat meter under the field turns green / amber / red. Confirm button enables only when the form is complete.</div></div></div>
+        <div class="step"><div class="k">4</div><div><div class="t">Confirm</div><div class="d">Server-side validation (next section). Success toast, availability refreshes, registration card appears.</div></div></div>
+        <div class="step"><div class="k">5</div><div><div class="t">Coordinator view</div><div class="d">Availability screen: KPI tiles, per-session progress, registrants with search. Same collections, one refresh action.</div></div></div>
+      </div>
+    </section>
+
+    <section id="validation">
+      <h2>Submit validation – order of checks</h2>
+      <p>The same sequence runs in both tiers; v2 adds the edit path and the post-save guard. Order matters: cheap checks first, the write last.</p>
+      <pre><code>Set(varSegment, Trim(cmbSegment.Selected.Value));
+Set(varSession, Trim(cmbSession.Selected.SessionDate));
+Set(varIsPB,    varSegment = fxPBSegmentValue);          // "PB"
+Set(varCapacity, If(varIsPB, fxPBCapacity, fxSMBCapacity)); // 8 : 28
+
+Refresh('Stride MC4 Registration');
+Set(varBooked, If(varIsPB,
+    CountRows(Filter('Stride MC4 Registration', Date.Value = varSession, Segment.Value = varSegment)),
+    CountRows(Filter('Stride MC4 Registration', Date.Value = varSession))));
+Set(varExisting, LookUp('Stride MC4 Registration', Email = varEmail || 'Employee Name'.Email = varEmail));
+
+If(
+    !fxRegistrationOpen,                        Notify("Registration is closed.", Error),
+    IsBlank(varSegment) || IsBlank(varSession), Notify("Please select ...", Warning),
+    !varEditMode && !IsBlank(varExisting),      Notify("... already registered for " &amp; varExisting.Date.Value, Warning),
+    varBooked >= varCapacity,                   Notify("The selected session is full. Please choose another date.", Error),
+    IfError(
+        Set(varSaved, Patch('Stride MC4 Registration', Defaults(...), { ... })),
+        Notify("Registration could not be saved: " &amp; FirstError.Message, Error),
+        /* re-count; if varBookedAfter > varCapacity → Remove(varSaved) and show the full message */
+        /* else success toast, reload colReg / colAvailability, refresh varMyReg */
+    )
+)</code></pre>
+    </section>
+
+    <section id="data">
+      <h2>Data model (from the app's imported list metadata)</h2>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Column (display)</th><th>Internal name</th><th>Type</th><th>Role in the app</th></tr></thead>
+          <tbody>
+            <tr><td>Title</td><td>Title</td><td>Text</td><td>Auto-filled <code>Name | Segment | Date</code></td></tr>
+            <tr><td>Employee Name</td><td>Employee_x0020_Name</td><td>Person</td><td>Registrant; people picker defaults to signed-in user</td></tr>
+            <tr><td>Segment</td><td>Segment</td><td>Choice</td><td>PB vs other SMB – selects the capacity rule</td></tr>
+            <tr><td>Date</td><td>FirstPreferencesession</td><td>Choice</td><td>Session date; values must equal the catalogue strings</td></tr>
+            <tr><td>Email</td><td>Email</td><td>Text</td><td>Now written on every save; delegable duplicate check</td></tr>
+            <tr><td>PT</td><td>PT</td><td>Text</td><td>Unused, left intact</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="cols">
+        <div class="card"><h3>Stride MC4 || Sessions</h3><p style="margin:0;font-size:0.9rem;color:var(--ink-2)">Title, Date, Capacity, Booked, Remaining, Status. Not required by either tier; can later replace the <code>fxSessions</code> catalogue so coordinators manage dates in SharePoint.</p></div>
+        <div class="card"><h3>Stride new <span class="pill warn">personal OneDrive</span></h3><p style="margin:0;font-size:0.9rem;color:var(--ink-2)">Roster list on an individual's personal site. Unused by the app. Recommend removing it or moving it to the team site to avoid a single-person dependency.</p></div>
+      </div>
+    </section>
+
+    <section id="deploy">
+      <h2>Deployment</h2>
+      <div class="cols">
+        <div class="card">
+          <h3>Tier 1 · 10 minutes</h3>
+          <ul>
+            <li>Power Apps → Apps → Import canvas app → <code>Stride_MS4_Session_patched.msapp</code>.</li>
+            <li>Re-select the SharePoint and Outlook connections.</li>
+            <li>Open <code>SubmitButton3</code>, confirm no red errors, Save, Publish.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Tier 2 · about 45 minutes</h3>
+          <ul>
+            <li>New blank tablet app; add the <b>Stride MC4 Registration</b> list; data row limit 2000.</li>
+            <li>App → paste <b>Formulas</b> and <b>OnStart</b> from <code>App.pa.yaml</code>.</li>
+            <li>Add screens <code>scrRegister</code> and <code>scrSessionSummary</code>; set Fill/OnVisible; paste the <code>conRoot</code> YAML onto each.</li>
+            <li>Set the approved e&amp; logo on <code>imgLogo</code>; set StartScreen; run App checker; publish.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="tests">
+      <h2>Acceptance tests</h2>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>#</th><th>Scenario</th><th>Expected</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>Segment or date empty</td><td>Warning; nothing saved (v2: button disabled)</td></tr>
+            <tr><td class="num">2</td><td>PB date already at 8</td><td>Full error; nothing saved</td></tr>
+            <tr><td class="num">3</td><td>PB date at 7</td><td>Saved; date shows 8 / 8 FULL</td></tr>
+            <tr><td class="num">4</td><td>SMB date already at 28</td><td>Full error; nothing saved</td></tr>
+            <tr><td class="num">5</td><td>SMB date at 27</td><td>Saved; date shows 28 / 28</td></tr>
+            <tr><td class="num">6</td><td>Same employee twice</td><td>Blocked; existing session shown (v2: Change session offered)</td></tr>
+            <tr><td class="num">7</td><td>v2 change to a full date</td><td>Error; original registration untouched</td></tr>
+            <tr><td class="num">8</td><td>v2 cancel registration</td><td>Second click removes record; count drops; form returns</td></tr>
+            <tr><td class="num">9</td><td>Two users, last seat, same moment</td><td>v2: one succeeds; the other gets the full error and no record remains</td></tr>
+            <tr><td class="num">10</td><td><code>fxRegistrationOpen = false</code></td><td>Banner; form hidden; change/cancel disabled</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="risks">
+      <h2>Risks and decisions for you</h2>
+      <ul class="plain">
+        <li><b>Confirm the 28-seat interpretation</b> (shared per date vs per segment). One-line change either way.</li>
+        <li><b>Confirm the PB choice value</b> is exactly <code>PB</code>. The rule keys on it via <code>fxPBSegmentValue</code>.</li>
+        <li><b>Atomic capacity</b> needs a Power Automate flow on item creation if sessions routinely fill in the last minutes; the v2 post-save guard covers the realistic case.</li>
+        <li><b>Confirmation email</b> is not wired. Outlook is already connected; add <code>Office365Outlook.SendEmailV2</code> after the success toast once sender and wording are approved.</li>
+        <li><b>Visibility</b>: the availability screen lists registrant names to all users. Gate it behind a coordinator group if that is sensitive.</li>
+        <li><b>Branding</b>: colours reuse the app's existing burgundy palette; swap the tokens in <code>App.Formulas</code> for the approved e&amp; values and add the logo media file.</li>
+      </ul>
+    </section>
+  </main>
+</div>

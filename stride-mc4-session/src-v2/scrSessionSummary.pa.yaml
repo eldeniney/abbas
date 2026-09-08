@@ -1,0 +1,584 @@
+# ************************************************************************************************
+# STRIDE MC4 Session Registration - rebuilt app (v2)
+# Screen 2 of 2: scrSessionSummary (coordinator / leadership availability view)
+# How to use: add a new blank screen, rename it to scrSessionSummary, set the screen properties
+# below, then copy the YAML under "Children:" starting at "- conRoot:" and paste it onto the screen.
+# ************************************************************************************************
+Screens:
+  scrSessionSummary:
+    Properties:
+      Fill: =fxCanvas
+      LoadingSpinnerColor: =fxBrand
+      OnVisible: |-
+        =Refresh('Stride MC4 Registration');
+        ClearCollect(colReg, 'Stride MC4 Registration');
+        ClearCollect(
+            colAvailability,
+            AddColumns(
+                ForAll(
+                    fxSessions As s,
+                    {
+                        Group: s.Group,
+                        SessionDate: s.SessionDate,
+                        SortKey: s.SortKey,
+                        Capacity: If(s.Group = "PB", fxPBCapacity, fxSMBCapacity),
+                        Booked: If(
+                            s.Group = "PB",
+                            CountRows(Filter(colReg, Date.Value = s.SessionDate, Segment.Value = fxPBSegmentValue)),
+                            CountRows(Filter(colReg, Date.Value = s.SessionDate))
+                        )
+                    }
+                ),
+                Remaining, Max(0, Capacity - Booked),
+                IsFull, Booked >= Capacity,
+                Label, SessionDate & "   |   " & If(Booked >= Capacity, "FULL", Max(0, Capacity - Booked) & " of " & Capacity & " seats left")
+            )
+        );
+        Set(varSelectedSession, Blank());
+        Reset(txtSearch)
+    Children:
+      - conRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =fxCanvas
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =0
+            Width: =Parent.Width
+          Children:
+            - conHeader:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Stretch
+                  Fill: =fxBrand
+                  FillPortions: =0
+                  Height: =96
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =16
+                  PaddingBottom: =12
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =12
+                Children:
+                  - icoBack:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        AccessibleLabel: ="Back to registration"
+                        Color: =RGBA(255, 255, 255, 1)
+                        Height: =40
+                        Icon: =Icon.BackArrow
+                        OnSelect: =Navigate(scrRegister, ScreenTransition.Fade)
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                        Tooltip: ="Back to registration"
+                        Width: =40
+                  - conTitleBlock:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Start
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =2
+                        LayoutJustifyContent: =LayoutJustifyContent.Center
+                      Children:
+                        - lblTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              Color: =RGBA(255, 255, 255, 1)
+                              FontWeight: =FontWeight.Semibold
+                              Height: =34
+                              Size: =22
+                              Text: ="STRIDE MC4 | Session Availability"
+                        - lblSubtitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              Color: =RGBA(255, 255, 255, 0.85)
+                              Height: =24
+                              Size: =13
+                              Text: ="Live seat count per session date. Select a session to see who is registered."
+                  - icoRefresh:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        AccessibleLabel: ="Refresh"
+                        Color: =RGBA(255, 255, 255, 1)
+                        Height: =40
+                        Icon: =Icon.Reload
+                        OnSelect: |-
+                          =Refresh('Stride MC4 Registration');
+                          ClearCollect(colReg, 'Stride MC4 Registration');
+                          ClearCollect(
+                              colAvailability,
+                              AddColumns(
+                                  ForAll(
+                                      fxSessions As s,
+                                      {
+                                          Group: s.Group,
+                                          SessionDate: s.SessionDate,
+                                          SortKey: s.SortKey,
+                                          Capacity: If(s.Group = "PB", fxPBCapacity, fxSMBCapacity),
+                                          Booked: If(
+                                              s.Group = "PB",
+                                              CountRows(Filter(colReg, Date.Value = s.SessionDate, Segment.Value = fxPBSegmentValue)),
+                                              CountRows(Filter(colReg, Date.Value = s.SessionDate))
+                                          )
+                                      }
+                                  ),
+                                  Remaining, Max(0, Capacity - Booked),
+                                  IsFull, Booked >= Capacity,
+                                  Label, SessionDate & "   |   " & If(Booked >= Capacity, "FULL", Max(0, Capacity - Booked) & " of " & Capacity & " seats left")
+                              )
+                          );
+                          Notify("Availability refreshed.", NotificationType.Information, 2000)
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                        Tooltip: ="Refresh"
+                        Width: =40
+            - conBody:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Stretch
+                  FillPortions: =1
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =16
+                  PaddingBottom: =24
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =24
+                Children:
+                  - conKpis:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        FillPortions: =0
+                        Height: =96
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =12
+                      Children:
+                        - conKpiTotal:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.Light
+                              Fill: =fxSurface
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutJustifyContent: =LayoutJustifyContent.Center
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - lblKpiTotalValue:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxBrand
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =40
+                                    Size: =28
+                                    Text: =CountRows(colReg)
+                              - lblKpiTotalLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxInkMuted
+                                    Height: =22
+                                    Size: =12
+                                    Text: ="Total registered"
+                        - conKpiPB:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.Light
+                              Fill: =fxSurface
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutJustifyContent: =LayoutJustifyContent.Center
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - lblKpiPBValue:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxBrand
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =40
+                                    Size: =28
+                                    Text: =CountRows(Filter(colReg, Segment.Value = fxPBSegmentValue))
+                              - lblKpiPBLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxInkMuted
+                                    Height: =22
+                                    Size: =12
+                                    Text: ="PB registered"
+                        - conKpiSMB:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.Light
+                              Fill: =fxSurface
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutJustifyContent: =LayoutJustifyContent.Center
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - lblKpiSMBValue:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxBrand
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =40
+                                    Size: =28
+                                    Text: =CountRows(Filter(colReg, Segment.Value <> fxPBSegmentValue))
+                              - lblKpiSMBLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxInkMuted
+                                    Height: =22
+                                    Size: =12
+                                    Text: ="Other SMB segments registered"
+                        - conKpiFull:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.Light
+                              Fill: =fxSurface
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Start
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =0
+                              LayoutJustifyContent: =LayoutJustifyContent.Center
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              RadiusBottomLeft: =10
+                              RadiusBottomRight: =10
+                              RadiusTopLeft: =10
+                              RadiusTopRight: =10
+                            Children:
+                              - lblKpiFullValue:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =If(CountRows(Filter(colAvailability, IsFull)) > 0, fxDanger, fxSuccess)
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =40
+                                    Size: =28
+                                    Text: =CountRows(Filter(colAvailability, IsFull)) & " / " & CountRows(colAvailability)
+                              - lblKpiFullLabel:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxInkMuted
+                                    Height: =22
+                                    Size: =12
+                                    Text: ="Sessions full"
+                  - conFilters:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        FillPortions: =0
+                        Height: =48
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =12
+                      Children:
+                        - lblFilter:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =fxInk
+                              FontWeight: =FontWeight.Semibold
+                              Height: =40
+                              Size: =13
+                              Text: ="Show"
+                              Width: =50
+                        - ddGroup:
+                            Control: Classic/DropDown@2.3.1
+                            Properties:
+                              AccessibleLabel: ="Filter sessions by group"
+                              BorderColor: =fxLine
+                              Default: ="All"
+                              Height: =40
+                              HoverBorderColor: =fxBrand
+                              Items: =["All", "PB", "SMB"]
+                              OnChange: =Set(varSelectedSession, Blank())
+                              SelectionFill: =fxBrand
+                              Size: =13
+                              Width: =140
+                        - txtSearch:
+                            Control: Classic/TextInput@2.3.2
+                            Properties:
+                              AccessibleLabel: ="Search registrants"
+                              BorderColor: =fxLine
+                              FillPortions: =1
+                              Height: =40
+                              HintText: ="Search registrant name or email"
+                              HoverBorderColor: =fxBrand
+                              Size: =13
+                  - conSplit:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =16
+                      Children:
+                        - conSessions:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.Light
+                              Fill: =fxSurface
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =8
+                              PaddingBottom: =12
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              PaddingTop: =16
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                            Children:
+                              - lblSessionsTitle:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxBrand
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =30
+                                    Size: =16
+                                    Text: ="Sessions (" & CountRows(galSessions.AllItems) & ")"
+                              - galSessions:
+                                  Control: Gallery@2.15.0
+                                  Variant: galleryVertical
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Stretch
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    FillPortions: =1
+                                    Items: |-
+                                      =Sort(
+                                          Filter(colAvailability, ddGroup.Selected.Value = "All" || Group = ddGroup.Selected.Value),
+                                          SortKey
+                                      )
+                                    OnSelect: =Set(varSelectedSession, ThisItem)
+                                    ShowScrollbar: =true
+                                    TemplatePadding: =0
+                                    TemplateSize: =76
+                                  Children:
+                                    - recSelected:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Fill: =fxBrand
+                                          Height: =Parent.TemplateHeight - 1
+                                          OnSelect: =Select(Parent)
+                                          Visible: =ThisItem.SessionDate = varSelectedSession.SessionDate
+                                          Width: =4
+                                          X: =0
+                                          Y: =0
+                                    - lblSesDate:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =fxInk
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =28
+                                          OnSelect: =Select(Parent)
+                                          Size: =15
+                                          Text: =ThisItem.SessionDate
+                                          Width: =150
+                                          X: =12
+                                          Y: =8
+                                    - lblSesGroup:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          Color: =If(ThisItem.Group = "PB", fxBrand, fxInkMuted)
+                                          Fill: =If(ThisItem.Group = "PB", fxBrandTint, fxCanvas)
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =24
+                                          OnSelect: =Select(Parent)
+                                          Size: =11
+                                          Text: =ThisItem.Group
+                                          Width: =48
+                                          X: =166
+                                          Y: =10
+                                    - lblSesStatus:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Right
+                                          Color: =If(ThisItem.IsFull, fxDanger, fxInk)
+                                          FontWeight: =If(ThisItem.IsFull, FontWeight.Bold, FontWeight.Semibold)
+                                          Height: =28
+                                          OnSelect: =Select(Parent)
+                                          Size: =13
+                                          Text: =If(ThisItem.IsFull, "FULL  " & ThisItem.Booked & " / " & ThisItem.Capacity, ThisItem.Booked & " / " & ThisItem.Capacity & "   |   " & ThisItem.Remaining & " left")
+                                          Width: =200
+                                          X: =Parent.TemplateWidth - 212
+                                          Y: =8
+                                    - recSesBg:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Fill: =fxLine
+                                          Height: =8
+                                          OnSelect: =Select(Parent)
+                                          Width: =Parent.TemplateWidth - 24
+                                          X: =12
+                                          Y: =48
+                                    - recSesFill:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Fill: =If(ThisItem.IsFull, fxDanger, ThisItem.Booked / ThisItem.Capacity >= 0.75, fxWarning, fxSuccess)
+                                          Height: =8
+                                          OnSelect: =Select(Parent)
+                                          Width: =(Parent.TemplateWidth - 24) * Min(1, ThisItem.Booked / Max(1, ThisItem.Capacity))
+                                          X: =12
+                                          Y: =48
+                                    - recSesSep:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Fill: =fxLine
+                                          Height: =1
+                                          OnSelect: =Select(Parent)
+                                          Width: =Parent.TemplateWidth
+                                          X: =0
+                                          Y: =Parent.TemplateHeight - 1
+                        - conRegistrants:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              DropShadow: =DropShadow.Light
+                              Fill: =fxSurface
+                              FillPortions: =1
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =8
+                              PaddingBottom: =12
+                              PaddingLeft: =16
+                              PaddingRight: =16
+                              PaddingTop: =16
+                              RadiusBottomLeft: =12
+                              RadiusBottomRight: =12
+                              RadiusTopLeft: =12
+                              RadiusTopRight: =12
+                            Children:
+                              - lblRegTitle:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxBrand
+                                    FontWeight: =FontWeight.Bold
+                                    Height: =30
+                                    Size: =16
+                                    Text: |-
+                                      =If(
+                                          IsBlank(varSelectedSession),
+                                          "Registrants (select a session)",
+                                          "Registrants | " & varSelectedSession.SessionDate & " (" & CountRows(galRegistrants.AllItems) & ")"
+                                      )
+                              - lblRegEmpty:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxInkMuted
+                                    Height: =40
+                                    Size: =13
+                                    Text: =If(IsBlank(varSelectedSession), "Select a session on the left to list who is registered.", "No registrations for this session yet.")
+                                    Visible: =IsBlank(varSelectedSession) || CountRows(galRegistrants.AllItems) = 0
+                                    Wrap: =true
+                              - galRegistrants:
+                                  Control: Gallery@2.15.0
+                                  Variant: galleryVertical
+                                  Properties:
+                                    AlignInContainer: =AlignInContainer.Stretch
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    FillPortions: =1
+                                    Items: |-
+                                      =Sort(
+                                          Filter(
+                                              colReg,
+                                              !IsBlank(varSelectedSession),
+                                              Date.Value = varSelectedSession.SessionDate,
+                                              varSelectedSession.Group <> "PB" || Segment.Value = fxPBSegmentValue,
+                                              IsBlank(txtSearch.Text) || txtSearch.Text in 'Employee Name'.DisplayName || txtSearch.Text in Email
+                                          ),
+                                          'Employee Name'.DisplayName
+                                      )
+                                    ShowScrollbar: =true
+                                    TemplatePadding: =0
+                                    TemplateSize: =64
+                                    Visible: =!IsBlank(varSelectedSession)
+                                  Children:
+                                    - lblRegName:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =fxInk
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =26
+                                          Size: =14
+                                          Text: =ThisItem.'Employee Name'.DisplayName
+                                          Width: =Parent.TemplateWidth - 120
+                                          X: =12
+                                          Y: =6
+                                    - lblRegEmail:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Color: =fxInkMuted
+                                          Height: =22
+                                          Size: =12
+                                          Text: =Coalesce(ThisItem.Email, ThisItem.'Employee Name'.Email) & "   |   registered " & Text(ThisItem.Created, "dd mmm yyyy hh:mm")
+                                          Width: =Parent.TemplateWidth - 120
+                                          X: =12
+                                          Y: =32
+                                    - lblRegSegment:
+                                        Control: Label@2.5.1
+                                        Properties:
+                                          Align: =Align.Center
+                                          Color: =If(ThisItem.Segment.Value = fxPBSegmentValue, fxBrand, fxInkMuted)
+                                          Fill: =If(ThisItem.Segment.Value = fxPBSegmentValue, fxBrandTint, fxCanvas)
+                                          FontWeight: =FontWeight.Semibold
+                                          Height: =24
+                                          Size: =11
+                                          Text: =ThisItem.Segment.Value
+                                          Width: =90
+                                          X: =Parent.TemplateWidth - 102
+                                          Y: =20
+                                    - recRegSep:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Fill: =fxLine
+                                          Height: =1
+                                          Width: =Parent.TemplateWidth
+                                          X: =0
+                                          Y: =Parent.TemplateHeight - 1

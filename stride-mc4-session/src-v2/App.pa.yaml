@@ -1,0 +1,108 @@
+# ************************************************************************************************
+# STRIDE MC4 Session Registration - rebuilt app (v2)
+# App-level source. Paste the Formulas / OnStart / StartScreen values into App > Properties in
+# Power Apps Studio (Tree view > App). Requires the SharePoint data source
+# 'Stride MC4 Registration' to be added to the app before pasting.
+# ************************************************************************************************
+App:
+  Properties:
+    Theme: =PowerAppsTheme
+    StartScreen: =scrRegister
+    Formulas: |-
+      // =====================================================================
+      // UI TOKENS (single place to align to approved e& brand assets)
+      // =====================================================================
+      fxBrand = RGBA(124, 1, 36, 1);
+      fxBrandDark = RGBA(92, 0, 26, 1);
+      fxBrandTint = RGBA(250, 242, 244, 1);
+      fxInk = RGBA(32, 31, 30, 1);
+      fxInkMuted = RGBA(96, 94, 92, 1);
+      fxLine = RGBA(225, 223, 221, 1);
+      fxSurface = RGBA(255, 255, 255, 1);
+      fxCanvas = RGBA(243, 242, 241, 1);
+      fxSuccess = RGBA(16, 124, 16, 1);
+      fxSuccessTint = RGBA(236, 247, 236, 1);
+      fxWarning = RGBA(202, 80, 16, 1);
+      fxWarningTint = RGBA(255, 244, 236, 1);
+      fxDanger = RGBA(196, 43, 28, 1);
+      fxDangerTint = RGBA(253, 236, 234, 1);
+
+      // =====================================================================
+      // BUSINESS RULES (change here, nowhere else)
+      // =====================================================================
+      // Segment choice value that identifies the PB sessions.
+      fxPBSegmentValue = "PB";
+      // Seats per session date.
+      fxPBCapacity = 8;
+      fxSMBCapacity = 28;
+      // Master switch for the registration window.
+      fxRegistrationOpen = true;
+      // Message shown when a session is at capacity.
+      fxMsgSessionFull = "The selected session is full. Please choose another date.";
+
+      // =====================================================================
+      // SESSION CATALOGUE
+      // Group must be "PB" or "SMB". SessionDate must match a choice value of
+      // the 'Date' column in the 'Stride MC4 Registration' list exactly.
+      // =====================================================================
+      fxSessions = Table(
+          {Group: "SMB", SessionDate: "21 Sep 2026", SortKey: Date(2026, 9, 21)},
+          {Group: "SMB", SessionDate: "22 Sep 2026", SortKey: Date(2026, 9, 22)},
+          {Group: "SMB", SessionDate: "23 Sep 2026", SortKey: Date(2026, 9, 23)},
+          {Group: "SMB", SessionDate: "28 Sep 2026", SortKey: Date(2026, 9, 28)},
+          {Group: "SMB", SessionDate: "29 Sep 2026", SortKey: Date(2026, 9, 29)},
+          {Group: "SMB", SessionDate: "30 Sep 2026", SortKey: Date(2026, 9, 30)},
+          {Group: "SMB", SessionDate: "1 Oct 2026", SortKey: Date(2026, 10, 1)},
+          {Group: "PB", SessionDate: "12 Oct 2026", SortKey: Date(2026, 10, 12)},
+          {Group: "PB", SessionDate: "13 Oct 2026", SortKey: Date(2026, 10, 13)},
+          {Group: "PB", SessionDate: "14 Oct 2026", SortKey: Date(2026, 10, 14)},
+          {Group: "PB", SessionDate: "15 Oct 2026", SortKey: Date(2026, 10, 15)},
+          {Group: "PB", SessionDate: "19 Oct 2026", SortKey: Date(2026, 10, 19)},
+          {Group: "PB", SessionDate: "20 Oct 2026", SortKey: Date(2026, 10, 20)},
+          {Group: "PB", SessionDate: "21 Oct 2026", SortKey: Date(2026, 10, 21)},
+          {Group: "PB", SessionDate: "22 Oct 2026", SortKey: Date(2026, 10, 22)},
+          {Group: "SMB", SessionDate: "2 Nov 2026", SortKey: Date(2026, 11, 2)},
+          {Group: "SMB", SessionDate: "3 Nov 2026", SortKey: Date(2026, 11, 3)},
+          {Group: "SMB", SessionDate: "4 Nov 2026", SortKey: Date(2026, 11, 4)},
+          {Group: "SMB", SessionDate: "5 Nov 2026", SortKey: Date(2026, 11, 5)},
+          {Group: "SMB", SessionDate: "9 Nov 2026", SortKey: Date(2026, 11, 9)}
+      );
+
+      // Current user identity (lower-cased once for comparisons).
+      fxMyEmail = Lower(User().Email);
+      fxMyName = User().FullName;
+    OnStart: |-
+      =// Load registrations once, then derive availability per session date.
+      ClearCollect(
+          colReg,
+          'Stride MC4 Registration'
+      );
+      ClearCollect(
+          colAvailability,
+          AddColumns(
+              ForAll(
+                  fxSessions As s,
+                  {
+                      Group: s.Group,
+                      SessionDate: s.SessionDate,
+                      SortKey: s.SortKey,
+                      Capacity: If(s.Group = "PB", fxPBCapacity, fxSMBCapacity),
+                      Booked: If(
+                          s.Group = "PB",
+                          CountRows(Filter(colReg, Date.Value = s.SessionDate, Segment.Value = fxPBSegmentValue)),
+                          CountRows(Filter(colReg, Date.Value = s.SessionDate))
+                      )
+                  }
+              ),
+              Remaining, Max(0, Capacity - Booked),
+              IsFull, Booked >= Capacity,
+              Label, SessionDate & "   |   " & If(Booked >= Capacity, "FULL", Max(0, Capacity - Booked) & " of " & Capacity & " seats left")
+          )
+      );
+      // The signed-in user's existing registration (blank when none).
+      Set(
+          varMyReg,
+          LookUp('Stride MC4 Registration', Email = fxMyEmail || 'Employee Name'.Email = fxMyEmail)
+      );
+      Set(varEditMode, false);
+      Set(varConfirmCancel, false)

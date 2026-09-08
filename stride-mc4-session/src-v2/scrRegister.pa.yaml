@@ -1,0 +1,850 @@
+# ************************************************************************************************
+# STRIDE MC4 Session Registration - rebuilt app (v2)
+# Screen 1 of 2: scrRegister (employee self-registration)
+# How to use: in Power Apps Studio add a new blank screen, rename it to scrRegister, set the two
+# screen properties (Fill, OnVisible) shown below, then copy the YAML under "Children:" starting
+# at "- conRoot:" and paste it onto the screen (Ctrl+V in the Tree view).
+# ************************************************************************************************
+Screens:
+  scrRegister:
+    Properties:
+      Fill: =fxCanvas
+      LoadingSpinnerColor: =fxBrand
+      OnVisible: |-
+        =Refresh('Stride MC4 Registration');
+        ClearCollect(colReg, 'Stride MC4 Registration');
+        ClearCollect(
+            colAvailability,
+            AddColumns(
+                ForAll(
+                    fxSessions As s,
+                    {
+                        Group: s.Group,
+                        SessionDate: s.SessionDate,
+                        SortKey: s.SortKey,
+                        Capacity: If(s.Group = "PB", fxPBCapacity, fxSMBCapacity),
+                        Booked: If(
+                            s.Group = "PB",
+                            CountRows(Filter(colReg, Date.Value = s.SessionDate, Segment.Value = fxPBSegmentValue)),
+                            CountRows(Filter(colReg, Date.Value = s.SessionDate))
+                        )
+                    }
+                ),
+                Remaining, Max(0, Capacity - Booked),
+                IsFull, Booked >= Capacity,
+                Label, SessionDate & "   |   " & If(Booked >= Capacity, "FULL", Max(0, Capacity - Booked) & " of " & Capacity & " seats left")
+            )
+        );
+        Set(varMyReg, LookUp('Stride MC4 Registration', Email = fxMyEmail || 'Employee Name'.Email = fxMyEmail));
+        Set(varConfirmCancel, false)
+    Children:
+      - conRoot:
+          Control: GroupContainer@1.5.0
+          Variant: AutoLayout
+          Properties:
+            Fill: =fxCanvas
+            Height: =Parent.Height
+            LayoutAlignItems: =LayoutAlignItems.Stretch
+            LayoutDirection: =LayoutDirection.Vertical
+            LayoutGap: =0
+            Width: =Parent.Width
+          Children:
+            - conHeader:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Stretch
+                  Fill: =fxBrand
+                  FillPortions: =0
+                  Height: =96
+                  LayoutAlignItems: =LayoutAlignItems.Center
+                  LayoutDirection: =LayoutDirection.Horizontal
+                  LayoutGap: =16
+                  PaddingBottom: =12
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =12
+                Children:
+                  - imgLogo:
+                      Control: Image@2.2.3
+                      Properties:
+                        AccessibleLabel: ="e& logo"
+                        Height: =48
+                        ImagePosition: =ImagePosition.Fit
+                        Tooltip: ="Replace with the approved e& logo media file"
+                        Width: =48
+                  - lblWordmark:
+                      Control: Label@2.5.1
+                      Properties:
+                        Color: =RGBA(255, 255, 255, 1)
+                        FontWeight: =FontWeight.Bold
+                        Height: =48
+                        Size: =28
+                        Text: ="e&"
+                        Width: =56
+                  - conTitleBlock:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        FillPortions: =1
+                        LayoutAlignItems: =LayoutAlignItems.Start
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =2
+                        LayoutJustifyContent: =LayoutJustifyContent.Center
+                      Children:
+                        - lblTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              Color: =RGBA(255, 255, 255, 1)
+                              FontWeight: =FontWeight.Semibold
+                              Height: =34
+                              Size: =22
+                              Text: ="STRIDE MC4 | Session Registration"
+                        - lblSubtitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              Color: =RGBA(255, 255, 255, 0.85)
+                              Height: =24
+                              Size: =13
+                              Text: ="SMB Prime | Choose your preferred session date"
+                  - conUser:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        FillPortions: =0
+                        LayoutAlignItems: =LayoutAlignItems.End
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =2
+                        LayoutJustifyContent: =LayoutJustifyContent.Center
+                        Width: =220
+                      Children:
+                        - lblUserName:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Right
+                              AlignInContainer: =AlignInContainer.Stretch
+                              Color: =RGBA(255, 255, 255, 1)
+                              FontWeight: =FontWeight.Semibold
+                              Height: =24
+                              Size: =13
+                              Text: =fxMyName
+                        - lblUserEmail:
+                            Control: Label@2.5.1
+                            Properties:
+                              Align: =Align.Right
+                              AlignInContainer: =AlignInContainer.Stretch
+                              Color: =RGBA(255, 255, 255, 0.85)
+                              Height: =20
+                              Size: =11
+                              Text: =fxMyEmail
+                  - btnAvailability:
+                      Control: Button@0.0.45
+                      Properties:
+                        AccessibleLabel: ="Open session availability"
+                        Appearance: ='ButtonCanvas.Appearance'.Secondary
+                        FontSize: =14
+                        Height: =40
+                        OnSelect: =Navigate(scrSessionSummary, ScreenTransition.Fade)
+                        Text: ="Availability"
+                        Width: =130
+                  - icoRefresh:
+                      Control: Classic/Icon@2.5.0
+                      Properties:
+                        AccessibleLabel: ="Refresh availability"
+                        Color: =RGBA(255, 255, 255, 1)
+                        Height: =40
+                        Icon: =Icon.Reload
+                        OnSelect: |-
+                          =Refresh('Stride MC4 Registration');
+                          ClearCollect(colReg, 'Stride MC4 Registration');
+                          ClearCollect(
+                              colAvailability,
+                              AddColumns(
+                                  ForAll(
+                                      fxSessions As s,
+                                      {
+                                          Group: s.Group,
+                                          SessionDate: s.SessionDate,
+                                          SortKey: s.SortKey,
+                                          Capacity: If(s.Group = "PB", fxPBCapacity, fxSMBCapacity),
+                                          Booked: If(
+                                              s.Group = "PB",
+                                              CountRows(Filter(colReg, Date.Value = s.SessionDate, Segment.Value = fxPBSegmentValue)),
+                                              CountRows(Filter(colReg, Date.Value = s.SessionDate))
+                                          )
+                                      }
+                                  ),
+                                  Remaining, Max(0, Capacity - Booked),
+                                  IsFull, Booked >= Capacity,
+                                  Label, SessionDate & "   |   " & If(Booked >= Capacity, "FULL", Max(0, Capacity - Booked) & " of " & Capacity & " seats left")
+                              )
+                          );
+                          Set(varMyReg, LookUp('Stride MC4 Registration', Email = fxMyEmail || 'Employee Name'.Email = fxMyEmail));
+                          Notify("Availability refreshed.", NotificationType.Information, 2000)
+                        PaddingBottom: =8
+                        PaddingLeft: =8
+                        PaddingRight: =8
+                        PaddingTop: =8
+                        Tooltip: ="Refresh availability"
+                        Width: =40
+            - conBody:
+                Control: GroupContainer@1.5.0
+                Variant: AutoLayout
+                Properties:
+                  AlignInContainer: =AlignInContainer.Stretch
+                  FillPortions: =1
+                  LayoutAlignItems: =LayoutAlignItems.Stretch
+                  LayoutDirection: =LayoutDirection.Vertical
+                  LayoutGap: =16
+                  LayoutOverflowY: =LayoutOverflow.Scroll
+                  PaddingBottom: =24
+                  PaddingLeft: =24
+                  PaddingRight: =24
+                  PaddingTop: =24
+                Children:
+                  - conClosed:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        Fill: =fxDangerTint
+                        FillPortions: =0
+                        Height: =60
+                        LayoutAlignItems: =LayoutAlignItems.Center
+                        LayoutDirection: =LayoutDirection.Horizontal
+                        LayoutGap: =12
+                        PaddingLeft: =16
+                        PaddingRight: =16
+                        RadiusBottomLeft: =8
+                        RadiusBottomRight: =8
+                        RadiusTopLeft: =8
+                        RadiusTopRight: =8
+                        Visible: =!fxRegistrationOpen
+                      Children:
+                        - icoClosed:
+                            Control: Classic/Icon@2.5.0
+                            Properties:
+                              Color: =fxDanger
+                              Height: =28
+                              Icon: =Icon.Warning
+                              Width: =28
+                        - lblClosed:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =fxDanger
+                              FillPortions: =1
+                              FontWeight: =FontWeight.Semibold
+                              Height: =40
+                              Size: =15
+                              Text: ="Registration is closed. Please contact the STRIDE coordinator if you need assistance."
+                              Wrap: =true
+                  - conMyReg:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        Fill: =fxSuccessTint
+                        FillPortions: =0
+                        Height: =156
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =6
+                        PaddingBottom: =16
+                        PaddingLeft: =20
+                        PaddingRight: =20
+                        PaddingTop: =16
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                        Visible: =!IsBlank(varMyReg)
+                      Children:
+                        - lblMyRegTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =fxSuccess
+                              FontWeight: =FontWeight.Bold
+                              Height: =30
+                              Size: =17
+                              Text: ="You are registered"
+                        - lblMyRegDetail:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =fxInk
+                              Height: =28
+                              Size: =14
+                              Text: |-
+                                ="Session: " & varMyReg.Date.Value & "   |   Segment: " & varMyReg.Segment.Value & "   |   Registered on " & Text(varMyReg.Created, "dd mmm yyyy")
+                              Wrap: =true
+                        - conMyRegActions:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              FillPortions: =0
+                              Height: =48
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                            Children:
+                              - btnChange:
+                                  Control: Button@0.0.45
+                                  Properties:
+                                    AccessibleLabel: ="Change my session"
+                                    Appearance: ='ButtonCanvas.Appearance'.Primary
+                                    BasePaletteColor: =fxBrand
+                                    DisplayMode: =If(fxRegistrationOpen, DisplayMode.Edit, DisplayMode.Disabled)
+                                    FontSize: =14
+                                    Height: =40
+                                    OnSelect: |-
+                                      =Set(varEditMode, true);
+                                      Set(varConfirmCancel, false);
+                                      Reset(cmbSegment);
+                                      Reset(cmbSession)
+                                    Text: =If(varEditMode, "Changing session...", "Change session")
+                                    Width: =170
+                              - btnCancelReg:
+                                  Control: Button@0.0.45
+                                  Properties:
+                                    AccessibleLabel: ="Cancel my registration"
+                                    Appearance: ='ButtonCanvas.Appearance'.Secondary
+                                    BasePaletteColor: =fxDanger
+                                    DisplayMode: =If(fxRegistrationOpen, DisplayMode.Edit, DisplayMode.Disabled)
+                                    FontSize: =14
+                                    Height: =40
+                                    OnSelect: |-
+                                      =If(
+                                          !varConfirmCancel,
+                                          Set(varConfirmCancel, true),
+                                          IfError(
+                                              Remove('Stride MC4 Registration', varMyReg),
+                                              Notify("Could not cancel the registration: " & FirstError.Message, NotificationType.Error),
+                                              Notify("Your registration has been cancelled.", NotificationType.Success);
+                                              Set(varConfirmCancel, false);
+                                              Set(varEditMode, false);
+                                              Refresh('Stride MC4 Registration');
+                                              ClearCollect(colReg, 'Stride MC4 Registration');
+                                              ClearCollect(
+                                                  colAvailability,
+                                                  AddColumns(
+                                                      ForAll(
+                                                          fxSessions As s,
+                                                          {
+                                                              Group: s.Group,
+                                                              SessionDate: s.SessionDate,
+                                                              SortKey: s.SortKey,
+                                                              Capacity: If(s.Group = "PB", fxPBCapacity, fxSMBCapacity),
+                                                              Booked: If(
+                                                                  s.Group = "PB",
+                                                                  CountRows(Filter(colReg, Date.Value = s.SessionDate, Segment.Value = fxPBSegmentValue)),
+                                                                  CountRows(Filter(colReg, Date.Value = s.SessionDate))
+                                                              )
+                                                          }
+                                                      ),
+                                                      Remaining, Max(0, Capacity - Booked),
+                                                      IsFull, Booked >= Capacity,
+                                                      Label, SessionDate & "   |   " & If(Booked >= Capacity, "FULL", Max(0, Capacity - Booked) & " of " & Capacity & " seats left")
+                                                  )
+                                              );
+                                              Set(varMyReg, LookUp('Stride MC4 Registration', Email = fxMyEmail || 'Employee Name'.Email = fxMyEmail))
+                                          )
+                                      )
+                                    Text: =If(varConfirmCancel, "Click again to confirm", "Cancel registration")
+                                    Width: =190
+                              - lblCancelHint:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxDanger
+                                    FillPortions: =1
+                                    Height: =40
+                                    Size: =12
+                                    Text: ="This removes your seat. Click 'Click again to confirm' to proceed."
+                                    Visible: =varConfirmCancel
+                                    Wrap: =true
+                  - conForm:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =fxSurface
+                        FillPortions: =0
+                        Height: =700
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =10
+                        PaddingBottom: =24
+                        PaddingLeft: =24
+                        PaddingRight: =24
+                        PaddingTop: =24
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                        Visible: =fxRegistrationOpen && (IsBlank(varMyReg) || varEditMode)
+                      Children:
+                        - lblFormTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =fxBrand
+                              FontWeight: =FontWeight.Bold
+                              Height: =34
+                              Size: =20
+                              Text: =If(varEditMode, "Change your session", "Register for a session")
+                        - lblFormHint:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =fxInkMuted
+                              Height: =24
+                              Size: =12
+                              Text: ="Fields marked * are required. One registration per employee. Seats are confirmed on submit."
+                              Wrap: =true
+                        - lblEmployee:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =fxInk
+                              FontWeight: =FontWeight.Semibold
+                              Height: =28
+                              PaddingTop: =6
+                              Size: =14
+                              Text: ="Employee *"
+                        - cmbEmployee:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              AccessibleLabel: ="Employee"
+                              AlignInContainer: =AlignInContainer.Stretch
+                              BorderColor: =fxLine
+                              DefaultSelectedItems: |-
+                                =[
+                                    {
+                                        '@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser",
+                                        Claims: "i:0#.f|membership|" & fxMyEmail,
+                                        DisplayName: fxMyName,
+                                        Email: User().Email,
+                                        Department: "",
+                                        JobTitle: "",
+                                        Picture: ""
+                                    }
+                                ]
+                              DisplayFields: =["DisplayName", "Email", "Picture"]
+                              DisplayMode: =If(varEditMode, DisplayMode.View, DisplayMode.Edit)
+                              Font: =Font.'Segoe UI'
+                              Height: =48
+                              HoverBorderColor: =fxBrand
+                              InputTextPlaceholder: ="Search employee name"
+                              IsSearchable: =true
+                              Items: =Choices([@'Stride MC4 Registration'].'Employee Name')
+                              PressedBorderColor: =fxBrand
+                              SearchFields: =["Claims"]
+                              SelectMultiple: =false
+                              SelectionFill: =fxBrand
+                              Size: =14
+                              Tooltip: ="Defaults to you. Pick another employee only when registering on their behalf."
+                        - lblSegment:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =fxInk
+                              FontWeight: =FontWeight.Semibold
+                              Height: =28
+                              PaddingTop: =6
+                              Size: =14
+                              Text: ="Segment *"
+                        - cmbSegment:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              AccessibleLabel: ="Segment"
+                              AlignInContainer: =AlignInContainer.Stretch
+                              BorderColor: =fxLine
+                              DefaultSelectedItems: |-
+                                =If(
+                                    varEditMode,
+                                    Filter(Choices([@'Stride MC4 Registration'].Segment), Value = varMyReg.Segment.Value),
+                                    Blank()
+                                )
+                              DisplayFields: =["Value"]
+                              Font: =Font.'Segoe UI'
+                              Height: =48
+                              HoverBorderColor: =fxBrand
+                              InputTextPlaceholder: ="Select your segment"
+                              IsSearchable: =true
+                              Items: =Choices([@'Stride MC4 Registration'].Segment)
+                              OnChange: =Reset(cmbSession)
+                              PressedBorderColor: =fxBrand
+                              SearchFields: =["Value"]
+                              SelectMultiple: =false
+                              SelectionFill: =fxBrand
+                              Size: =14
+                        - lblSession:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =fxInk
+                              FontWeight: =FontWeight.Semibold
+                              Height: =28
+                              PaddingTop: =6
+                              Size: =14
+                              Text: |-
+                                ="Session date *" & If(
+                                    IsBlank(cmbSegment.Selected),
+                                    "   (select a segment first)",
+                                    cmbSegment.Selected.Value = fxPBSegmentValue,
+                                    "   (PB sessions, " & fxPBCapacity & " seats each)",
+                                    "   (SMB sessions, " & fxSMBCapacity & " seats each)"
+                                )
+                        - cmbSession:
+                            Control: Classic/ComboBox@2.4.0
+                            Properties:
+                              AccessibleLabel: ="Session date"
+                              AlignInContainer: =AlignInContainer.Stretch
+                              BorderColor: =fxLine
+                              DisplayFields: =["Label"]
+                              DisplayMode: =If(IsBlank(cmbSegment.Selected), DisplayMode.Disabled, DisplayMode.Edit)
+                              Font: =Font.'Segoe UI'
+                              Height: =48
+                              HoverBorderColor: =fxBrand
+                              InputTextPlaceholder: =If(IsBlank(cmbSegment.Selected), "Select a segment first", "Select a session date")
+                              IsSearchable: =true
+                              Items: |-
+                                =Sort(
+                                    Filter(
+                                        colAvailability,
+                                        !IsBlank(cmbSegment.Selected.Value),
+                                        Group = If(cmbSegment.Selected.Value = fxPBSegmentValue, "PB", "SMB")
+                                    ),
+                                    SortKey
+                                )
+                              PressedBorderColor: =fxBrand
+                              SearchFields: =["SessionDate"]
+                              SelectMultiple: =false
+                              SelectionFill: =fxBrand
+                              Size: =14
+                        - conMeter:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              FillPortions: =0
+                              Height: =52
+                              LayoutAlignItems: =LayoutAlignItems.Stretch
+                              LayoutDirection: =LayoutDirection.Vertical
+                              LayoutGap: =6
+                              Visible: =!IsBlank(cmbSession.Selected)
+                            Children:
+                              - lblMeter:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =If(cmbSession.Selected.IsFull, fxDanger, cmbSession.Selected.Booked / cmbSession.Selected.Capacity >= 0.75, fxWarning, fxSuccess)
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =24
+                                    Size: =13
+                                    Text: |-
+                                      =If(
+                                          cmbSession.Selected.IsFull,
+                                          "This session is full (" & cmbSession.Selected.Booked & " of " & cmbSession.Selected.Capacity & "). Please choose another date.",
+                                          cmbSession.Selected.Booked & " of " & cmbSession.Selected.Capacity & " seats booked   |   " & cmbSession.Selected.Remaining & " left"
+                                      )
+                              - conMeterBar:
+                                  Control: GroupContainer@1.5.0
+                                  Variant: ManualLayout
+                                  Properties:
+                                    FillPortions: =0
+                                    Height: =10
+                                  Children:
+                                    - recMeterBg:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Fill: =fxLine
+                                          Height: =10
+                                          Width: =Parent.Width
+                                          X: =0
+                                          Y: =0
+                                    - recMeterFill:
+                                        Control: Rectangle@2.3.0
+                                        Properties:
+                                          BorderColor: =RGBA(0, 0, 0, 0)
+                                          Fill: =If(cmbSession.Selected.IsFull, fxDanger, cmbSession.Selected.Booked / cmbSession.Selected.Capacity >= 0.75, fxWarning, fxSuccess)
+                                          Height: =10
+                                          Width: =Parent.Width * Min(1, cmbSession.Selected.Booked / Max(1, cmbSession.Selected.Capacity))
+                                          X: =0
+                                          Y: =0
+                        - conActions:
+                            Control: GroupContainer@1.5.0
+                            Variant: AutoLayout
+                            Properties:
+                              FillPortions: =0
+                              Height: =60
+                              LayoutAlignItems: =LayoutAlignItems.Center
+                              LayoutDirection: =LayoutDirection.Horizontal
+                              LayoutGap: =12
+                              LayoutJustifyContent: =LayoutJustifyContent.End
+                              PaddingTop: =8
+                            Children:
+                              - btnReset:
+                                  Control: Button@0.0.45
+                                  Properties:
+                                    AccessibleLabel: ="Reset the form"
+                                    Appearance: ='ButtonCanvas.Appearance'.Secondary
+                                    FontSize: =15
+                                    Height: =44
+                                    OnSelect: |-
+                                      =Reset(cmbEmployee);
+                                      Reset(cmbSegment);
+                                      Reset(cmbSession);
+                                      Set(varEditMode, false)
+                                    Text: =If(varEditMode, "Keep current session", "Reset")
+                                    Width: =180
+                              - btnSubmit:
+                                  Control: Button@0.0.45
+                                  Properties:
+                                    AccessibleLabel: ="Confirm registration"
+                                    Appearance: ='ButtonCanvas.Appearance'.Primary
+                                    BasePaletteColor: =fxBrand
+                                    DisplayMode: |-
+                                      =If(
+                                          fxRegistrationOpen && !IsBlank(cmbEmployee.Selected) && !IsBlank(cmbSegment.Selected) && !IsBlank(cmbSession.Selected),
+                                          DisplayMode.Edit,
+                                          DisplayMode.Disabled
+                                      )
+                                    FontSize: =15
+                                    Height: =44
+                                    OnSelect: |-
+                                      =// ---- 1. Capture inputs ----
+                                      Set(varSegment, Trim(cmbSegment.Selected.Value));
+                                      Set(varSession, Trim(cmbSession.Selected.SessionDate));
+                                      Set(varEmail, Trim(cmbEmployee.Selected.Email));
+                                      Set(varIsPB, varSegment = fxPBSegmentValue);
+                                      Set(varCapacity, If(varIsPB, fxPBCapacity, fxSMBCapacity));
+                                      // ---- 2. Fresh server-side checks (never trust the cached collection at submit time) ----
+                                      Refresh('Stride MC4 Registration');
+                                      Set(
+                                          varBooked,
+                                          If(
+                                              varIsPB,
+                                              // PB: 8 seats per date, counted on PB registrations for that date
+                                              CountRows(Filter('Stride MC4 Registration', Date.Value = varSession, Segment.Value = varSegment)),
+                                              // Other SMB segments share one session per date: 28 seats across all registrations on that date
+                                              CountRows(Filter('Stride MC4 Registration', Date.Value = varSession))
+                                          )
+                                      );
+                                      Set(varExisting, LookUp('Stride MC4 Registration', Email = varEmail || 'Employee Name'.Email = varEmail));
+                                      // ---- 3. Validate ----
+                                      If(
+                                          !fxRegistrationOpen,
+                                          Notify("Registration is closed.", NotificationType.Error),
+                                          IsBlank(cmbEmployee.Selected) || IsBlank(varSegment) || IsBlank(varSession),
+                                          Notify("Please select Employee, Segment and Session date before submitting.", NotificationType.Warning),
+                                          !varEditMode && !IsBlank(varExisting),
+                                          Notify(
+                                              cmbEmployee.Selected.DisplayName & " is already registered for " & varExisting.Date.Value & " (" & varExisting.Segment.Value & "). Use 'Change session' to move to another date.",
+                                              NotificationType.Warning
+                                          ),
+                                          varEditMode && !IsBlank(varExisting) && varExisting.Date.Value = varSession,
+                                          Notify("You are already registered for " & varSession & ".", NotificationType.Information),
+                                          varBooked >= varCapacity,
+                                          Notify(fxMsgSessionFull, NotificationType.Error),
+                                          // ---- 4. Save ----
+                                          IfError(
+                                              Set(
+                                                  varSaved,
+                                                  If(
+                                                      varEditMode && !IsBlank(varExisting),
+                                                      Patch(
+                                                          'Stride MC4 Registration',
+                                                          varExisting,
+                                                          {
+                                                              Title: cmbEmployee.Selected.DisplayName & " | " & varSegment & " | " & varSession,
+                                                              Email: cmbEmployee.Selected.Email,
+                                                              Segment: {Value: varSegment},
+                                                              Date: {Value: varSession}
+                                                          }
+                                                      ),
+                                                      Patch(
+                                                          'Stride MC4 Registration',
+                                                          Defaults('Stride MC4 Registration'),
+                                                          {
+                                                              Title: cmbEmployee.Selected.DisplayName & " | " & varSegment & " | " & varSession,
+                                                              'Employee Name': {
+                                                                  '@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser",
+                                                                  Claims: cmbEmployee.Selected.Claims,
+                                                                  DisplayName: cmbEmployee.Selected.DisplayName,
+                                                                  Email: cmbEmployee.Selected.Email,
+                                                                  Department: "",
+                                                                  JobTitle: "",
+                                                                  Picture: ""
+                                                              },
+                                                              Email: cmbEmployee.Selected.Email,
+                                                              Segment: {Value: varSegment},
+                                                              Date: {Value: varSession}
+                                                          }
+                                                      )
+                                                  )
+                                              ),
+                                              Notify("Registration could not be saved: " & FirstError.Message, NotificationType.Error),
+                                              // ---- 5. Post-save guard against two people taking the last seat at the same moment ----
+                                              Set(
+                                                  varBookedAfter,
+                                                  If(
+                                                      varIsPB,
+                                                      CountRows(Filter('Stride MC4 Registration', Date.Value = varSession, Segment.Value = varSegment)),
+                                                      CountRows(Filter('Stride MC4 Registration', Date.Value = varSession))
+                                                  )
+                                              );
+                                              If(
+                                                  varBookedAfter > varCapacity,
+                                                  If(
+                                                      varEditMode && !IsBlank(varExisting),
+                                                      Patch('Stride MC4 Registration', varSaved, {Segment: {Value: varExisting.Segment.Value}, Date: {Value: varExisting.Date.Value}}),
+                                                      Remove('Stride MC4 Registration', varSaved)
+                                                  );
+                                                  Notify(fxMsgSessionFull & " Another registration was saved at the same moment.", NotificationType.Error),
+                                                  Notify("Registration confirmed: " & varSession & " (" & varSegment & ").", NotificationType.Success);
+                                                  Set(varEditMode, false);
+                                                  Reset(cmbSegment);
+                                                  Reset(cmbSession)
+                                              );
+                                              // ---- 6. Reload availability and my registration ----
+                                              ClearCollect(colReg, 'Stride MC4 Registration');
+                                              ClearCollect(
+                                                  colAvailability,
+                                                  AddColumns(
+                                                      ForAll(
+                                                          fxSessions As s,
+                                                          {
+                                                              Group: s.Group,
+                                                              SessionDate: s.SessionDate,
+                                                              SortKey: s.SortKey,
+                                                              Capacity: If(s.Group = "PB", fxPBCapacity, fxSMBCapacity),
+                                                              Booked: If(
+                                                                  s.Group = "PB",
+                                                                  CountRows(Filter(colReg, Date.Value = s.SessionDate, Segment.Value = fxPBSegmentValue)),
+                                                                  CountRows(Filter(colReg, Date.Value = s.SessionDate))
+                                                              )
+                                                          }
+                                                      ),
+                                                      Remaining, Max(0, Capacity - Booked),
+                                                      IsFull, Booked >= Capacity,
+                                                      Label, SessionDate & "   |   " & If(Booked >= Capacity, "FULL", Max(0, Capacity - Booked) & " of " & Capacity & " seats left")
+                                                  )
+                                              );
+                                              Set(varMyReg, LookUp('Stride MC4 Registration', Email = fxMyEmail || 'Employee Name'.Email = fxMyEmail))
+                                          )
+                                      )
+                                    Text: =If(varEditMode, "Confirm new session", "Confirm registration")
+                                    Width: =220
+                        - lblRules:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =fxInkMuted
+                              Height: =40
+                              Size: =12
+                              Text: |-
+                                ="Capacity rules: PB sessions " & fxPBCapacity & " seats per date; other SMB segments " & fxSMBCapacity & " seats per date. Availability shown is as of the last refresh; the seat is re-checked on the server when you confirm."
+                              Wrap: =true
+                  - conOverview:
+                      Control: GroupContainer@1.5.0
+                      Variant: AutoLayout
+                      Properties:
+                        DropShadow: =DropShadow.Light
+                        Fill: =fxSurface
+                        FillPortions: =0
+                        Height: =420
+                        LayoutAlignItems: =LayoutAlignItems.Stretch
+                        LayoutDirection: =LayoutDirection.Vertical
+                        LayoutGap: =8
+                        PaddingBottom: =16
+                        PaddingLeft: =24
+                        PaddingRight: =24
+                        PaddingTop: =20
+                        RadiusBottomLeft: =12
+                        RadiusBottomRight: =12
+                        RadiusTopLeft: =12
+                        RadiusTopRight: =12
+                      Children:
+                        - lblOverviewTitle:
+                            Control: Label@2.5.1
+                            Properties:
+                              Color: =fxBrand
+                              FontWeight: =FontWeight.Bold
+                              Height: =30
+                              Size: =17
+                              Text: |-
+                                ="Seat overview" & If(IsBlank(cmbSegment.Selected), " (all sessions)", " (" & If(cmbSegment.Selected.Value = fxPBSegmentValue, "PB", "SMB") & " sessions)")
+                        - galOverview:
+                            Control: Gallery@2.15.0
+                            Variant: galleryVertical
+                            Properties:
+                              AlignInContainer: =AlignInContainer.Stretch
+                              BorderColor: =RGBA(0, 0, 0, 0)
+                              FillPortions: =1
+                              Items: |-
+                                =Sort(
+                                    Filter(
+                                        colAvailability,
+                                        IsBlank(cmbSegment.Selected) || Group = If(cmbSegment.Selected.Value = fxPBSegmentValue, "PB", "SMB")
+                                    ),
+                                    SortKey
+                                )
+                              ShowScrollbar: =true
+                              TemplatePadding: =0
+                              TemplateSize: =44
+                            Children:
+                              - lblOvDate:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Color: =fxInk
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =40
+                                    Size: =13
+                                    Text: =ThisItem.SessionDate
+                                    Width: =120
+                                    X: =0
+                                    Y: =2
+                              - lblOvGroup:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Center
+                                    Color: =If(ThisItem.Group = "PB", fxBrand, fxInkMuted)
+                                    Fill: =If(ThisItem.Group = "PB", fxBrandTint, fxCanvas)
+                                    FontWeight: =FontWeight.Semibold
+                                    Height: =24
+                                    Size: =11
+                                    Text: =ThisItem.Group
+                                    Width: =48
+                                    X: =124
+                                    Y: =10
+                              - recOvBg:
+                                  Control: Rectangle@2.3.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Fill: =fxLine
+                                    Height: =8
+                                    Width: =Parent.TemplateWidth - 330
+                                    X: =190
+                                    Y: =18
+                              - recOvFill:
+                                  Control: Rectangle@2.3.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Fill: =If(ThisItem.IsFull, fxDanger, ThisItem.Booked / ThisItem.Capacity >= 0.75, fxWarning, fxSuccess)
+                                    Height: =8
+                                    Width: =(Parent.TemplateWidth - 330) * Min(1, ThisItem.Booked / Max(1, ThisItem.Capacity))
+                                    X: =190
+                                    Y: =18
+                              - lblOvStatus:
+                                  Control: Label@2.5.1
+                                  Properties:
+                                    Align: =Align.Right
+                                    Color: =If(ThisItem.IsFull, fxDanger, fxInk)
+                                    FontWeight: =If(ThisItem.IsFull, FontWeight.Bold, FontWeight.Normal)
+                                    Height: =40
+                                    Size: =12
+                                    Text: =If(ThisItem.IsFull, "FULL", ThisItem.Booked & " / " & ThisItem.Capacity & "   |   " & ThisItem.Remaining & " left")
+                                    Width: =130
+                                    X: =Parent.TemplateWidth - 130
+                                    Y: =2
+                              - recOvSep:
+                                  Control: Rectangle@2.3.0
+                                  Properties:
+                                    BorderColor: =RGBA(0, 0, 0, 0)
+                                    Fill: =fxLine
+                                    Height: =1
+                                    Width: =Parent.TemplateWidth
+                                    X: =0
+                                    Y: =Parent.TemplateHeight - 1
