@@ -1,0 +1,12 @@
+# Power BI Desktop local state (recreated on open)
+*.SemanticModel/.pbi/
+*.Report/.pbi/
+*.SemanticModel/cache.abf
+**/.pbi/cache.abf
+**/.pbi/localSettings.json
+**/.pbi/editorSettings.json
+**/.pbi/unappliedChanges.json
+
+# Excel / Python scratch
+~$*.xlsx
+__pycache__/

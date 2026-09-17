@@ -1,0 +1,56 @@
+table Dim_Product
+	lineageTag: 28a92567-38ba-55d6-afee-227e0f00d602
+
+	column Product_ID
+		dataType: string
+		lineageTag: 1fb6623f-3374-5b90-aebe-b54778fcba24
+		summarizeBy: none
+		sourceColumn: Product_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Group'
+		dataType: string
+		lineageTag: d7bb2085-02df-5de8-94f7-989ebe8ca625
+		summarizeBy: none
+		sourceColumn: Product Group
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		lineageTag: d68e06ce-f6f2-5334-98be-e2ec17cdb664
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Reporting Line'
+		dataType: string
+		lineageTag: 22d3b086-5ddf-5f8a-be63-48df0e2b6f43
+		summarizeBy: none
+		sourceColumn: Reporting Line
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Base Points'
+		dataType: double
+		isHidden
+		formatString: 0.0
+		lineageTag: 5b813857-82e9-5c6c-96d8-7e95fcc20616
+		summarizeBy: none
+		sourceColumn: Base Points
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Product = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFile), null, true),
+				    Tbl = Source{[Item="Dim_Product",Kind="Table"]}[Data],
+				    Typed = Table.TransformColumnTypes(Tbl, {{"Product_ID", type text}, {"Product Group", type text}, {"Product", type text}, {"Reporting Line", type text}, {"Base Points", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

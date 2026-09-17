@@ -1,0 +1,108 @@
+table Fact_Activations
+	lineageTag: d00856dc-feba-5bba-a278-9801e639ce0e
+
+	column ActivationID
+		dataType: string
+		lineageTag: f1ec8a39-26a0-5ebe-8b84-357db4b65989
+		summarizeBy: none
+		sourceColumn: ActivationID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ActivationDate
+		dataType: dateTime
+		formatString: dd-mmm-yyyy
+		lineageTag: 8d2ec152-fb30-5265-ab91-62c29a79c162
+		summarizeBy: none
+		sourceColumn: ActivationDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column KAM_ID
+		dataType: string
+		lineageTag: 3cda33f0-76fe-5085-a125-f0bab8be6e5b
+		summarizeBy: none
+		sourceColumn: KAM_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product_ID
+		dataType: string
+		lineageTag: 1fb6623f-3374-5b90-aebe-b54778fcba24
+		summarizeBy: none
+		sourceColumn: Product_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_PID
+		dataType: string
+		lineageTag: de7f5a0d-9da1-583b-8c50-03cf30eaa95f
+		summarizeBy: none
+		sourceColumn: Customer_PID
+
+		annotation SummarizationSetBy = Automatic
+
+	column PortIn
+		dataType: string
+		lineageTag: d4030ed6-a7eb-52c8-b61f-25bbc7281ae5
+		summarizeBy: none
+		sourceColumn: PortIn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 7872e538-379a-5ce6-8345-1011290c1f91
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column Points
+		dataType: double
+		formatString: #,0.00
+		lineageTag: e43e46a1-c42c-5243-8f9d-30963737ccb2
+		summarizeBy: sum
+		sourceColumn: Points
+
+		annotation SummarizationSetBy = Automatic
+
+	column PointsEligible
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: e1da234d-cd70-5ca7-ab8a-bf76d5672ada
+		summarizeBy: none
+		sourceColumn: PointsEligible
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Exception Type' =
+			SWITCH (
+			    TRUE (),
+			    ISBLANK ( RELATED ( Dim_KAM[KAM] ) ), "Unmapped seller",
+			    ISBLANK ( RELATED ( Dim_Product[Product] ) ), "Unmapped product",
+			    Fact_Activations[ActivationDate] > TODAY (), "Future-dated",
+			    Fact_Activations[PointsEligible] && Fact_Activations[Points] <= 0, "Zero points (eligible)",
+			    CALCULATE ( COUNTROWS ( Fact_Activations ), ALLEXCEPT ( Fact_Activations, Fact_Activations[ActivationID] ) ) > 1, "Duplicate ID",
+			    "OK"
+			)
+		dataType: string
+		lineageTag: 19dfecb5-5080-541c-9cd1-acc28e9f1812
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Fact_Activations = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFile), null, true),
+				    Tbl = Source{[Item="Fact_Activations",Kind="Table"]}[Data],
+				    Typed = Table.TransformColumnTypes(Tbl, {{"ActivationID", type text}, {"ActivationDate", type date}, {"KAM_ID", type text}, {"Product_ID", type text}, {"Customer_PID", type text}, {"PortIn", type text}, {"Quantity", Int64.Type}, {"Points", type number}, {"PointsEligible", type logical}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

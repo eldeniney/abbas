@@ -1,0 +1,148 @@
+table Dim_Date
+	lineageTag: 2a294635-c9cf-5ab8-a521-5f76e812982d
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: dd-mmm-yyyy
+		lineageTag: a124361a-4cfb-5cbe-8771-ac66b0998b7a
+		summarizeBy: none
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 841a8959-3b60-527b-abf2-da11bbaa7c72
+		summarizeBy: none
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 090d7e01-68c4-58f7-a18f-8812f79e58a9
+		summarizeBy: none
+		sourceColumn: [Month Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: 0189f01b-98d4-5a31-a825-ecadec5fcbfd
+		summarizeBy: none
+		sourceColumn: [Month]
+		sortByColumn: 'Year Month'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Start'
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 26f87fc0-d573-5f3e-ab0a-4b229fe531ab
+		summarizeBy: none
+		sourceColumn: [Month Start]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Day
+		dataType: int64
+		formatString: 0
+		lineageTag: 3d7a8a76-369c-5975-9c5b-62acda16e218
+		summarizeBy: none
+		sourceColumn: [Day]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Weekday
+		dataType: string
+		lineageTag: e96cf074-d3ba-5caf-80e2-1356b8fb3ccb
+		summarizeBy: none
+		sourceColumn: [Weekday]
+		sortByColumn: 'Weekday Number'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Weekday Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 857e4e83-ab0f-5a08-a745-3436f4eca97d
+		summarizeBy: none
+		sourceColumn: [Weekday Number]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Weekend'
+		dataType: boolean
+		lineageTag: 59d1f036-1e57-54d6-b049-756dbf145425
+		summarizeBy: none
+		sourceColumn: [Is Weekend]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Month'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b75f01dd-30b8-5f9a-b121-62832eac30a9
+		summarizeBy: none
+		sourceColumn: [Year Month]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Offset' =
+			VAR AsOf = CALCULATE ( MAX ( Fact_Activations[ActivationDate] ), REMOVEFILTERS () )
+			RETURN
+			    DATEDIFF ( DATE ( YEAR ( AsOf ), MONTH ( AsOf ), 1 ), Dim_Date[Month Start], MONTH )
+		dataType: int64
+		formatString: 0
+		lineageTag: 21306314-033e-5637-b6af-98d291a7b144
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is Latest Month' = Dim_Date[Month Offset] = 0
+		dataType: boolean
+		lineageTag: 5009b215-2a74-5329-a3b9-2e481dc68c53
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Relative Month' =
+			SWITCH ( TRUE (), Dim_Date[Month Offset] = 0, "Latest month", Dim_Date[Month Offset] = -1, "Previous month",
+			    Dim_Date[Month Offset] < -1, "Earlier", "Future" )
+		dataType: string
+		lineageTag: 05a169b7-ef61-53fb-b601-13f71221ae3f
+		summarizeBy: none
+		sortByColumn: 'Month Offset'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Date = calculated
+		mode: import
+		source =
+				VAR MinD = DATE ( YEAR ( MIN ( Fact_Activations[ActivationDate] ) ), 1, 1 )
+				VAR MaxD = DATE ( YEAR ( MAX ( Fact_Activations[ActivationDate] ) ), 12, 31 )
+				RETURN
+				    ADDCOLUMNS (
+				        CALENDAR ( MinD, MaxD ),
+				        "Year", YEAR ( [Date] ),
+				        "Month Number", MONTH ( [Date] ),
+				        "Month", FORMAT ( [Date], "MMM yyyy" ),
+				        "Month Start", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ),
+				        "Day", DAY ( [Date] ),
+				        "Weekday", FORMAT ( [Date], "ddd" ),
+				        "Weekday Number", WEEKDAY ( [Date], 2 ),
+				        "Is Weekend", WEEKDAY ( [Date], 2 ) >= 6,
+				        "Year Month", YEAR ( [Date] ) * 100 + MONTH ( [Date] )
+				    )
+
+	annotation PBI_Id = 33062f06345255f6b108

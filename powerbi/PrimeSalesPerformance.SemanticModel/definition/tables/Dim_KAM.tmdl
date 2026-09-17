@@ -1,0 +1,69 @@
+table Dim_KAM
+	lineageTag: 86126f8c-945e-5ea7-8334-5823163ddaa9
+
+	column KAM_ID
+		dataType: string
+		lineageTag: 3cda33f0-76fe-5085-a125-f0bab8be6e5b
+		summarizeBy: none
+		sourceColumn: KAM_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column KAM
+		dataType: string
+		lineageTag: 6f92e49f-d520-51e0-8749-c6f81f0b9511
+		summarizeBy: none
+		sourceColumn: KAM
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Team Leader'
+		dataType: string
+		lineageTag: 6eab2e61-cdeb-5671-b86c-2d21a6640ff7
+		summarizeBy: none
+		sourceColumn: Team Leader
+
+		annotation SummarizationSetBy = Automatic
+
+	column Director
+		dataType: string
+		lineageTag: 3d3eb13d-4378-5122-806a-200358d3a36d
+		summarizeBy: none
+		sourceColumn: Director
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 20d08caa-763f-5079-bbc4-4b3c06b07b7c
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Sales Hierarchy'
+		lineageTag: 8908dc40-796b-5333-8e16-89a5fe2e74a8
+
+		level Director
+			lineageTag: 10b5ce98-496a-5395-9689-31e40d9100fd
+			column: Director
+
+		level 'Team Leader'
+			lineageTag: 7059f7ca-c59e-5bbf-b581-a870e5992ca2
+			column: 'Team Leader'
+
+		level KAM
+			lineageTag: c3a507df-0ab9-523a-9fd7-f0d0548a0244
+			column: KAM
+
+	partition Dim_KAM = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFile), null, true),
+				    Tbl = Source{[Item="Dim_KAM",Kind="Table"]}[Data],
+				    Typed = Table.TransformColumnTypes(Tbl, {{"KAM_ID", type text}, {"KAM", type text}, {"Team Leader", type text}, {"Director", type text}, {"Status", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

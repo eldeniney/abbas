@@ -1,0 +1,25 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["DataFile", "Fact_Activations", "Dim_KAM", "Dim_Product", "Dim_Target", "Last_Refresh", "_Measures"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table Fact_Activations
+ref table Dim_KAM
+ref table Dim_Product
+ref table Dim_Target
+ref table Dim_Date
+ref table Last_Refresh
+ref table _Measures
+ref table 'Metric Selector'
+ref table 'Top N'
+
+ref cultureInfo en-US

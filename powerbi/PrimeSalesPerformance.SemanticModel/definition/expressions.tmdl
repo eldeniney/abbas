@@ -1,0 +1,5 @@
+expression DataFile = "C:\PrimeSales\PrimeSales_SampleData.xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 61dafa13-d3ac-57d6-a5cc-caf42ca90f3e
+
+	annotation PBI_ResultType = Text
+

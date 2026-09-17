@@ -1,0 +1,467 @@
+table _Measures
+	lineageTag: c09664d7-39cc-56f0-9814-667a07bec851
+
+	/// Incentive points credited on activations in the current filter context.
+	measure 'Total Points' = SUM ( Fact_Activations[Points] )
+		formatString: #,0
+		lineageTag: 9e6b0c79-b633-5174-95da-e6fdd7db1980
+		displayFolder: 01 Core
+
+	/// Volume of activations (activated lines/services).
+	measure 'Total VOA' = SUM ( Fact_Activations[Quantity] )
+		formatString: #,0
+		lineageTag: 7cbe6091-afae-5bf1-a9f7-a508af45b9b9
+		displayFolder: 01 Core
+
+	/// Activations that are eligible for points (the QTY shown in the director/product matrix).
+	measure 'Points QTY' = CALCULATE ( [Total VOA], Fact_Activations[PointsEligible] = TRUE () )
+		formatString: #,0
+		lineageTag: f736872d-1e04-5b2d-8414-12b5ee595867
+		displayFolder: 01 Core
+
+	/// Row count of the fact table.
+	measure 'Activation Rows' = COUNTROWS ( Fact_Activations )
+		formatString: #,0
+		lineageTag: ebcdec00-79a8-5b2e-bbaf-fe5b3a33e57f
+		displayFolder: 01 Core
+
+	/// Average points per activated unit.
+	measure 'Points per Activation' = DIVIDE ( [Total Points], [Total VOA] )
+		formatString: 0.00
+		lineageTag: 44724dca-c0ef-5c88-8ca0-bbb5c27b56af
+		displayFolder: 01 Core
+
+	/// Sellers with at least one activation in context.
+	measure 'Active Sellers' = COUNTROWS ( FILTER ( VALUES ( Dim_KAM[KAM_ID] ), [Total VOA] > 0 ) )
+		formatString: #,0
+		lineageTag: 87882422-4500-5152-9854-e26ff3592088
+		displayFolder: 01 Core
+
+	/// Productivity: points per seller with activations.
+	measure 'Points per Active Seller' = DIVIDE ( [Total Points], [Active Sellers] )
+		formatString: #,0
+		lineageTag: edd0d9eb-a832-5fdb-a909-728e2917d999
+		displayFolder: 01 Core
+
+	/// Share of total points across all sellers currently selected.
+	measure 'Contribution %' = DIVIDE ( [Total Points], CALCULATE ( [Total Points], ALLSELECTED ( Dim_KAM ) ) )
+		formatString: 0.0%
+		lineageTag: 36bb1176-99a2-540a-b077-2ecb44feaf50
+		displayFolder: 01 Core
+
+	measure 'Mobile VOA' = CALCULATE ( [Total VOA], Dim_Product[Product Group] = "Mobile" )
+		formatString: #,0
+		lineageTag: 0a0ab642-e363-5a93-b817-6efb7acc2a11
+		displayFolder: 02 Product
+
+	measure 'Fixed VOA' = CALCULATE ( [Total VOA], Dim_Product[Product Group] = "Fixed" )
+		formatString: #,0
+		lineageTag: 144a73b0-b5c1-5283-8c1f-111595f246ae
+		displayFolder: 02 Product
+
+	measure 'Digital VOA' = CALCULATE ( [Total VOA], Dim_Product[Product Group] = "Digital" )
+		formatString: #,0
+		lineageTag: 884f714a-bdba-5abe-8e5e-77ef640f2439
+		displayFolder: 02 Product
+
+	measure 'Devices VOA' = CALCULATE ( [Total VOA], Dim_Product[Product Group] = "Devices" )
+		formatString: #,0
+		lineageTag: b812533c-4f6d-57a2-b7bb-116ee1f992ca
+		displayFolder: 02 Product
+
+	measure 'Mobile Points' = CALCULATE ( [Total Points], Dim_Product[Product Group] = "Mobile" )
+		formatString: #,0
+		lineageTag: 898f3026-dbde-505e-86e3-432c1dc862b2
+		displayFolder: 02 Product
+
+	measure 'Fixed Points' = CALCULATE ( [Total Points], Dim_Product[Product Group] = "Fixed" )
+		formatString: #,0
+		lineageTag: bd2cda81-0523-5ec2-8aa3-7822ae24ad07
+		displayFolder: 02 Product
+
+	measure 'Digital Points' = CALCULATE ( [Total Points], Dim_Product[Product Group] = "Digital" )
+		formatString: #,0
+		lineageTag: 077b4e42-d822-53d1-ac26-fe5cd25b2460
+		displayFolder: 02 Product
+
+	measure 'Devices Points' = CALCULATE ( [Total Points], Dim_Product[Product Group] = "Devices" )
+		formatString: #,0
+		lineageTag: f98ebcff-a3e9-5a57-8fb3-1dd1c6445387
+		displayFolder: 02 Product
+
+	/// Total GSM activations.
+	measure 'GSM VOA' = CALCULATE ( [Total VOA], Dim_Product[Reporting Line] = "GSM" )
+		formatString: #,0
+		lineageTag: c46d2407-7360-5bc8-a4cf-922d151eb236
+		displayFolder: 02 Product
+
+	measure 'Fiber VOA' = CALCULATE ( [Total VOA], Dim_Product[Reporting Line] = "Fiber" )
+		formatString: #,0
+		lineageTag: da5e5b4e-52df-51fa-a1f9-3cc7b0b62f73
+		displayFolder: 02 Product
+
+	measure 'WFA VOA' = CALCULATE ( [Total VOA], Dim_Product[Reporting Line] = "WFA" )
+		formatString: #,0
+		lineageTag: 6543e534-271e-5831-93e6-07776cbacfe3
+		displayFolder: 02 Product
+
+	measure 'BIB VOA' = CALCULATE ( [Total VOA], Dim_Product[Reporting Line] = "BIB" )
+		formatString: #,0
+		lineageTag: 5dfaa060-bc3f-5f93-93f6-0a3f637125bd
+		displayFolder: 02 Product
+
+	/// Mobile number portability activations.
+	measure 'MNP VOA' = CALCULATE ( [Total VOA], Fact_Activations[PortIn] = "MNP" )
+		formatString: #,0
+		lineageTag: 58139661-fec4-5e1f-95d1-a5da31e07e44
+		displayFolder: 02 Product
+
+	/// Fixed number portability activations.
+	measure 'FNP VOA' = CALCULATE ( [Total VOA], Fact_Activations[PortIn] = "FNP" )
+		formatString: #,0
+		lineageTag: ae21cbed-fe44-5839-b7f2-8fc2096a4ded
+		displayFolder: 02 Product
+
+	measure 'MNP Share of GSM %' = DIVIDE ( [MNP VOA], [GSM VOA] )
+		formatString: 0.0%
+		lineageTag: 470e34b8-df86-52c8-8566-b46b6e8a78cc
+		displayFolder: 02 Product
+
+	measure 'FNP Share of Fixed %' = DIVIDE ( [FNP VOA], [Fixed VOA] )
+		formatString: 0.0%
+		lineageTag: 05bb49c9-0270-5d97-a1d7-aa892951c6ef
+		displayFolder: 02 Product
+
+	measure 'Fiber Share of Fixed %' = DIVIDE ( [Fiber VOA], [Fixed VOA] )
+		formatString: 0.0%
+		lineageTag: 18b40a2b-491d-5640-997c-fa9aacb989ad
+		displayFolder: 02 Product
+
+	measure 'Mobile Share of Points %' = DIVIDE ( [Mobile Points], [Total Points] )
+		formatString: 0.0%
+		lineageTag: 16704743-0ac2-5906-90fd-1a29d961afc4
+		displayFolder: 02 Product
+
+	/// Latest activation date in the whole fact table. Replace with TODAY() if the extract is refreshed daily.
+	measure 'As-Of Date' = CALCULATE ( MAX ( Fact_Activations[ActivationDate] ), REMOVEFILTERS () )
+		formatString: dd-mmm-yyyy
+		lineageTag: 3ffd693b-5a7b-57ae-b646-d0305663e793
+		displayFolder: 03 Time
+
+	measure 'Last Activation Date' = MAX ( Fact_Activations[ActivationDate] )
+		formatString: dd-mmm-yyyy
+		lineageTag: 4553c4d7-28e9-526e-aa1b-fa28ef2e5d2b
+		displayFolder: 03 Time
+
+	measure 'Days Since Last Activation' = IF ( NOT ISBLANK ( [Last Activation Date] ), DATEDIFF ( [Last Activation Date], [As-Of Date], DAY ) )
+		formatString: 0
+		lineageTag: 4c8889f6-7514-5584-ba6e-a14deb93846d
+		displayFolder: 03 Time
+
+	/// Calendar days in the selected period up to the as-of date.
+	measure 'Days Elapsed' =
+			VAR AsOf = [As-Of Date]
+			RETURN
+			    COUNTROWS ( FILTER ( VALUES ( Dim_Date[Date] ), Dim_Date[Date] <= AsOf ) )
+		formatString: 0
+		lineageTag: 68d7aaa8-ae55-59e6-8c9d-49481f5629d3
+		displayFolder: 03 Time
+
+	measure 'Days In Period' = COUNTROWS ( VALUES ( Dim_Date[Date] ) )
+		formatString: 0
+		lineageTag: 1034ddeb-c7e3-56ea-b1df-b8d594bfe0da
+		displayFolder: 03 Time
+
+	measure 'Days Remaining' = [Days In Period] - [Days Elapsed]
+		formatString: 0
+		lineageTag: 5ea5bb14-9697-5d75-98ef-b1d65ffc6f8f
+		displayFolder: 03 Time
+
+	measure 'Points MTD' = TOTALMTD ( [Total Points], Dim_Date[Date] )
+		formatString: #,0
+		lineageTag: f66e3dd5-b920-575b-9d14-db13d43b11f8
+		displayFolder: 03 Time
+
+	measure 'VOA MTD' = TOTALMTD ( [Total VOA], Dim_Date[Date] )
+		formatString: #,0
+		lineageTag: 9b3524a7-53e8-5f52-a704-1ab97b7935b3
+		displayFolder: 03 Time
+
+	/// Month-to-date cumulative points, blank after the as-of date so the line stops.
+	measure 'Points Cumulative' = IF ( MAX ( Dim_Date[Date] ) <= [As-Of Date], [Points MTD] )
+		formatString: #,0
+		lineageTag: df765352-61a3-5101-b51a-50fbe0d25bf0
+		displayFolder: 03 Time
+
+	measure 'Points Prev Month' = CALCULATE ( [Total Points], PREVIOUSMONTH ( Dim_Date[Date] ) )
+		formatString: #,0
+		lineageTag: 5764e4a4-ce9f-5ffc-8f08-453748b97288
+		displayFolder: 03 Time
+
+	/// Same day-range of the previous month (like-for-like comparison).
+	measure 'Points Prev Month Same Period' =
+			VAR AsOf = MIN ( [As-Of Date], MAX ( Dim_Date[Date] ) )
+			VAR PeriodStart = DATE ( YEAR ( MIN ( Dim_Date[Date] ) ), MONTH ( MIN ( Dim_Date[Date] ) ), 1 )
+			RETURN
+			    CALCULATE (
+			        [Total Points],
+			        DATEADD ( DATESBETWEEN ( Dim_Date[Date], PeriodStart, AsOf ), -1, MONTH )
+			    )
+		formatString: #,0
+		lineageTag: c7334603-d150-5379-a7fa-b34fb54326c9
+		displayFolder: 03 Time
+
+	measure 'Points MoM %' = DIVIDE ( [Total Points] - [Points Prev Month Same Period], [Points Prev Month Same Period] )
+		formatString: +0.0%;-0.0%;0.0%
+		lineageTag: 6c6b440c-96b6-5859-9c3e-da40e8e5b3e2
+		displayFolder: 03 Time
+
+	measure 'VOA Prev Month Same Period' =
+			VAR AsOf = MIN ( [As-Of Date], MAX ( Dim_Date[Date] ) )
+			VAR PeriodStart = DATE ( YEAR ( MIN ( Dim_Date[Date] ) ), MONTH ( MIN ( Dim_Date[Date] ) ), 1 )
+			RETURN
+			    CALCULATE (
+			        [Total VOA],
+			        DATEADD ( DATESBETWEEN ( Dim_Date[Date], PeriodStart, AsOf ), -1, MONTH )
+			    )
+		formatString: #,0
+		lineageTag: d237087d-1546-5f58-a47b-44ee5e1e277e
+		displayFolder: 03 Time
+
+	measure 'VOA MoM %' = DIVIDE ( [Total VOA] - [VOA Prev Month Same Period], [VOA Prev Month Same Period] )
+		formatString: +0.0%;-0.0%;0.0%
+		lineageTag: f97743dd-a0de-59e9-a3a9-c4f53f5e37dc
+		displayFolder: 03 Time
+
+	/// Average points per calendar day so far.
+	measure 'Daily Run-Rate (Points)' = DIVIDE ( [Total Points], [Days Elapsed] )
+		formatString: #,0.0
+		lineageTag: cb1c6295-4765-5208-9d76-bb768e4dd82d
+		displayFolder: 03 Time
+
+	measure 'Daily Run-Rate (VOA)' = DIVIDE ( [Total VOA], [Days Elapsed] )
+		formatString: #,0.0
+		lineageTag: 49babe1f-9d31-5cad-a72a-03a900d4fe57
+		displayFolder: 03 Time
+
+	/// Linear run-rate projection to period end. Method: MTD + daily run-rate x days remaining.
+	measure 'Points Forecast (Run-Rate)' = [Total Points] + [Daily Run-Rate (Points)] * [Days Remaining]
+		formatString: #,0
+		lineageTag: 97fecfbf-2096-596c-b3c5-f162391cb1a3
+		displayFolder: 03 Time
+
+	measure 'VOA Forecast (Run-Rate)' = [Total VOA] + [Daily Run-Rate (VOA)] * [Days Remaining]
+		formatString: #,0
+		lineageTag: b3f0a4d4-0290-53c5-8838-02d70692920c
+		displayFolder: 03 Time
+
+	measure 'VOA Last 7 Days' =
+			VAR AsOf = [As-Of Date]
+			RETURN
+			    CALCULATE ( [Total VOA], DATESBETWEEN ( Dim_Date[Date], AsOf - 6, AsOf ) )
+		formatString: #,0
+		lineageTag: 19c68b1d-9ef4-5178-86d9-bc200842894c
+		displayFolder: 03 Time
+
+	measure 'Avg Daily VOA Last 7 Days' = DIVIDE ( [VOA Last 7 Days], 7 )
+		formatString: #,0.0
+		lineageTag: dfbcc53b-8eb0-55e4-b9c4-95b93f4d7559
+		displayFolder: 03 Time
+
+	/// Full-month target for the month(s) in context (targets are stored per month per seller).
+	measure 'Points Target' =
+			VAR StartD = DATE ( YEAR ( MIN ( Dim_Date[Date] ) ), MONTH ( MIN ( Dim_Date[Date] ) ), 1 )
+			VAR EndD = EOMONTH ( MAX ( Dim_Date[Date] ), 0 )
+			RETURN
+			    CALCULATE ( SUM ( Dim_Target[Points Target] ), DATESBETWEEN ( Dim_Date[Date], StartD, EndD ) )
+		formatString: #,0
+		lineageTag: f96d2c06-6f84-5a26-a285-8e59185a231b
+		displayFolder: 04 Target
+
+	measure 'VOA Target' =
+			VAR StartD = DATE ( YEAR ( MIN ( Dim_Date[Date] ) ), MONTH ( MIN ( Dim_Date[Date] ) ), 1 )
+			VAR EndD = EOMONTH ( MAX ( Dim_Date[Date] ), 0 )
+			RETURN
+			    CALCULATE ( SUM ( Dim_Target[VOA Target] ), DATESBETWEEN ( Dim_Date[Date], StartD, EndD ) )
+		formatString: #,0
+		lineageTag: a6247c32-29ad-53b4-be1c-2ef440f78dca
+		displayFolder: 04 Target
+
+	/// Full-month target prorated linearly to the as-of date.
+	measure 'Points Target To Date' = [Points Target] * DIVIDE ( [Days Elapsed], [Days In Period] )
+		formatString: #,0
+		lineageTag: 545fb8b3-f4df-5987-9c39-dadbf01227ae
+		displayFolder: 04 Target
+
+	measure 'Achievement % (To Date)' = DIVIDE ( [Total Points], [Points Target To Date] )
+		formatString: 0.0%
+		lineageTag: 14dea59e-df94-5d09-969c-bb6d63f155d8
+		displayFolder: 04 Target
+
+	measure 'Achievement % (Full Month)' = DIVIDE ( [Total Points], [Points Target] )
+		formatString: 0.0%
+		lineageTag: 19b0ad43-1991-54b3-a4e5-5bffaf31e57a
+		displayFolder: 04 Target
+
+	measure 'VOA Achievement %' = DIVIDE ( [Total VOA], [VOA Target] )
+		formatString: 0.0%
+		lineageTag: 39b2acbf-acca-53d8-b6d7-543d3add0401
+		displayFolder: 04 Target
+
+	/// Points still needed to reach the full-month target.
+	measure 'Gap to Target' = [Points Target] - [Total Points]
+		formatString: #,0
+		lineageTag: f4b77fad-bccb-5902-b5fe-47782cc335dd
+		displayFolder: 04 Target
+
+	/// Points per remaining day needed to close the gap.
+	measure 'Required Daily Run-Rate' = MAX ( 0, DIVIDE ( [Gap to Target], [Days Remaining] ) )
+		formatString: #,0.0
+		lineageTag: 10630ea6-935d-597e-903c-b61b4acbcb40
+		displayFolder: 04 Target
+
+	measure 'Forecast Achievement %' = DIVIDE ( [Points Forecast (Run-Rate)], [Points Target] )
+		formatString: 0.0%
+		lineageTag: c508d3ad-4b5d-50f9-93f8-667ffbb22b50
+		displayFolder: 04 Target
+
+	/// Linear target line by day of month.
+	measure 'Cumulative Target' = [Points Target] * DIVIDE ( DAY ( MAX ( Dim_Date[Date] ) ), DAY ( EOMONTH ( MAX ( Dim_Date[Date] ), 0 ) ) )
+		formatString: #,0
+		lineageTag: c3e5c4f9-efae-5479-b9d9-31477eb801f4
+		displayFolder: 04 Target
+
+	/// RAG status against the prorated target.
+	measure 'Target Status' =
+			SWITCH (
+			    TRUE (),
+			    ISBLANK ( [Points Target] ), "No target",
+			    [Achievement % (To Date)] >= 1, "On track",
+			    [Achievement % (To Date)] >= 0.9, "At risk",
+			    "Behind"
+			)
+		lineageTag: b50074b0-67e7-596a-b283-8281f03d09be
+		displayFolder: 04 Target
+
+	/// Hex colour used for conditional formatting.
+	measure 'Target Status Colour' = SWITCH ( [Target Status], "On track", "#1E5E3E", "At risk", "#E0A800", "Behind", "#A3122E", "#7F7F7F" )
+		lineageTag: 23d10ffd-4307-59a5-ac2b-f9443961d43f
+		displayFolder: 04 Target
+
+	measure 'Seller Rank (Points)' = IF ( NOT ISBLANK ( [Total Points] ), RANKX ( ALLSELECTED ( Dim_KAM[KAM] ), [Total Points], , DESC, DENSE ) )
+		formatString: 0
+		lineageTag: fad3a639-6f98-55c5-a8cc-bd3e51230148
+		displayFolder: 05 Ranking
+
+	measure 'Seller Rank (VOA)' = IF ( NOT ISBLANK ( [Total VOA] ), RANKX ( ALLSELECTED ( Dim_KAM[KAM] ), [Total VOA], , DESC, DENSE ) )
+		formatString: 0
+		lineageTag: 58bd7a76-e23e-5476-8fd9-bed0daf0c92b
+		displayFolder: 05 Ranking
+
+	/// Driven by the Top N slicer (default 10).
+	measure 'Top N Value' = SELECTEDVALUE ( 'Top N'[Top N], 10 )
+		formatString: 0
+		lineageTag: 8973cb30-7ce7-5d99-9b6f-f718fc424243
+		displayFolder: 05 Ranking
+
+	/// 1 for sellers inside the Top N.
+	measure 'Top N Flag' = IF ( [Seller Rank (Points)] <= [Top N Value], 1, 0 )
+		formatString: 0
+		lineageTag: a7328447-3a81-5f0d-8371-ccd447da54ad
+		displayFolder: 05 Ranking
+
+	measure 'Director Rank' = RANKX ( ALLSELECTED ( Dim_KAM[Director] ), [Total Points], , DESC, DENSE )
+		formatString: 0
+		lineageTag: 21bd8d6b-4fb7-530f-9157-a726cbdf81ac
+		displayFolder: 05 Ranking
+
+	/// Top director highlighted in red, as in the reference.
+	measure 'Director Bar Colour' = IF ( [Director Rank] = 1, "#A3122E", "#2F6B45" )
+		lineageTag: 6b0966dc-b41a-5855-a3ee-f201531a5685
+		displayFolder: 05 Ranking
+
+	measure 'Seller Activity Status' =
+			SWITCH (
+			    TRUE (),
+			    ISBLANK ( [Last Activation Date] ), "No activations",
+			    [Days Since Last Activation] > 7, "Inactive 7d+",
+			    [Days Since Last Activation] > 3, "Quiet 3d+",
+			    "Active"
+			)
+		lineageTag: bfe78e1c-fe86-56fc-9cd7-6c14464a6f26
+		displayFolder: 05 Ranking
+
+	measure 'Inactive Sellers (7d+)' =
+			COUNTROWS (
+			    FILTER (
+			        VALUES ( Dim_KAM[KAM_ID] ),
+			        ISBLANK ( [Last Activation Date] ) || [Days Since Last Activation] > 7
+			    )
+			)
+		formatString: #,0
+		lineageTag: 4fccd719-e691-51b5-b1b6-7f4e76bae766
+		displayFolder: 05 Ranking
+
+	/// Fact rows whose KAM_ID is not in Dim_KAM.
+	measure 'DQ Rows Missing Seller' = COUNTROWS ( FILTER ( Fact_Activations, ISBLANK ( RELATED ( Dim_KAM[KAM] ) ) ) )
+		formatString: #,0
+		lineageTag: f43c4104-6a23-550e-ba92-9f26a9855c3f
+		displayFolder: 06 Data Quality
+
+	measure 'DQ Rows Missing Product' = COUNTROWS ( FILTER ( Fact_Activations, ISBLANK ( RELATED ( Dim_Product[Product] ) ) ) )
+		formatString: #,0
+		lineageTag: eb090738-3474-5406-b1e7-fd203dd1a605
+		displayFolder: 06 Data Quality
+
+	measure 'DQ Zero-Point Eligible Rows' = CALCULATE ( COUNTROWS ( Fact_Activations ), Fact_Activations[PointsEligible] = TRUE (), Fact_Activations[Points] <= 0 )
+		formatString: #,0
+		lineageTag: 3921e2a9-a8a7-5d62-9d58-0e1e2b3a26e5
+		displayFolder: 06 Data Quality
+
+	measure 'DQ Future-Dated Rows' = COUNTROWS ( FILTER ( Fact_Activations, Fact_Activations[ActivationDate] > TODAY () ) )
+		formatString: #,0
+		lineageTag: a719732c-5c75-5fd0-8a3d-2852ae2f1d3b
+		displayFolder: 06 Data Quality
+
+	measure 'DQ Duplicate IDs' = COUNTROWS ( Fact_Activations ) - DISTINCTCOUNT ( Fact_Activations[ActivationID] )
+		formatString: #,0
+		lineageTag: e5ea3998-0e1c-5e39-a895-bd76e299e7aa
+		displayFolder: 06 Data Quality
+
+	measure 'DQ Exceptions Total' = [DQ Rows Missing Seller] + [DQ Rows Missing Product] + [DQ Zero-Point Eligible Rows] + [DQ Future-Dated Rows] + [DQ Duplicate IDs]
+		formatString: #,0
+		lineageTag: 0c823094-9cab-5512-8c4b-320b8a053370
+		displayFolder: 06 Data Quality
+
+	measure 'DQ Exception Rate %' = DIVIDE ( [DQ Exceptions Total], [Activation Rows] )
+		formatString: 0.00%
+		lineageTag: 30a855ad-6917-5402-bc77-f38756bff4a3
+		displayFolder: 06 Data Quality
+
+	/// Timestamp captured by Power Query at refresh time.
+	measure 'Refresh Label' = "T: " & FORMAT ( MAX ( Last_Refresh[Refreshed] ), "dd MMM yyyy - hh:mm AM/PM" )
+		lineageTag: 2155149e-fa76-571b-a98f-d965b68f6606
+		displayFolder: 07 Labels
+
+	measure 'Period Label' = "Data to " & FORMAT ( [As-Of Date], "dd MMM yyyy" )
+		lineageTag: aa66705a-53c1-545b-bb85-7d72004ded4a
+		displayFolder: 07 Labels
+
+	column Measures
+		dataType: string
+		isHidden
+		lineageTag: 37801f36-6b5f-5f6d-904f-912075e1ed6c
+		summarizeBy: none
+		sourceColumn: Measures
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table({"Measures"}, {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,20 @@
+relationship 7e3e2c8d-06bf-5991-b20b-1d572ec2368d
+	fromColumn: Fact_Activations.KAM_ID
+	toColumn: Dim_KAM.KAM_ID
+
+relationship 9278c4ef-55e5-520a-b0b3-b5360ec2c14a
+	fromColumn: Fact_Activations.Product_ID
+	toColumn: Dim_Product.Product_ID
+
+relationship b846a310-a627-554b-a852-121080e20432
+	fromColumn: Fact_Activations.ActivationDate
+	toColumn: Dim_Date.Date
+
+relationship 3bf865fe-52dc-5e4c-bf9b-678455bdf5ad
+	fromColumn: Dim_Target.KAM_ID
+	toColumn: Dim_KAM.KAM_ID
+
+relationship c985db8b-bac6-5a25-a9a1-2ff755b5e512
+	fromColumn: Dim_Target.MonthStart
+	toColumn: Dim_Date.Date
+

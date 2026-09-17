@@ -1,0 +1,8 @@
+Product_ID,Product Group,Product,Reporting Line,Base Points
+P-MOB-GSM,Mobile,GSM Postpaid,GSM,1.0
+P-MOB-OTH,Mobile,Mobile Broadband,Mobile Other,1.5
+P-FIX-FBR,Fixed,Fiber,Fiber,10.0
+P-FIX-WFA,Fixed,WFA,WFA,6.0
+P-FIX-BIB,Fixed,BIB_CloudPro_AI_Main,BIB,15.0
+P-DIG-SVC,Digital,Digital Service,Digital,5.5
+P-DEV-DEV,Devices,Device,Devices,5.0

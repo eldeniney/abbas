@@ -1,0 +1,51 @@
+table Dim_Target
+	lineageTag: 574712c0-4e11-5a72-beb5-a6debf65ea99
+
+	column MonthStart
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 2aa80b81-d783-5cd9-9940-1b827936043a
+		summarizeBy: none
+		sourceColumn: MonthStart
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column KAM_ID
+		dataType: string
+		lineageTag: 3cda33f0-76fe-5085-a125-f0bab8be6e5b
+		summarizeBy: none
+		sourceColumn: KAM_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Points Target'
+		dataType: int64
+		formatString: #,0
+		lineageTag: 4c96260e-97b9-5620-a2d3-a8d16b3553be
+		summarizeBy: sum
+		sourceColumn: Points Target
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'VOA Target'
+		dataType: int64
+		formatString: #,0
+		lineageTag: 6d48b86b-495b-5f9d-b698-f9f8b44b67ef
+		summarizeBy: sum
+		sourceColumn: VOA Target
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Target = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents(DataFile), null, true),
+				    Tbl = Source{[Item="Dim_Target",Kind="Table"]}[Data],
+				    Typed = Table.TransformColumnTypes(Tbl, {{"MonthStart", type date}, {"KAM_ID", type text}, {"Points Target", Int64.Type}, {"VOA Target", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

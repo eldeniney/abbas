@@ -1,0 +1,17 @@
+table 'Top N'
+	lineageTag: c1558988-909b-5096-86ec-150afbbdbc9a
+
+	column 'Top N'
+		dataType: int64
+		formatString: 0
+		lineageTag: a9ada495-a8bc-515b-9776-03d3edb3c2ac
+		summarizeBy: none
+		sourceColumn: [Top N]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Top N' = calculated
+		mode: import
+		source = SELECTCOLUMNS ( { 5, 10, 15, 20, 25, 30, 50 }, "Top N", [Value] )
+
+	annotation PBI_Id = 5ede690e7bae517083e0

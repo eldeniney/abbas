@@ -1,0 +1,52 @@
+table 'Metric Selector'
+	lineageTag: a56173ca-8642-51e0-bca1-67fba7e2b55b
+
+	column 'Metric Selector'
+		dataType: string
+		lineageTag: 7a6ee931-8728-50f5-82ff-9d6c74818bbd
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Metric Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Metric Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Metric Fields'
+		dataType: string
+		isHidden
+		lineageTag: 5cc65703-4776-51b6-9c5b-c09de26d11a0
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Metric Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Metric Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f065ca8c-9125-5e5e-806e-4cb4f38423ae
+		summarizeBy: none
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Metric Selector' = calculated
+		mode: import
+		source =
+				{
+				    ( "Points", NAMEOF ( '_Measures'[Total Points] ), 0 ),
+				    ( "VOA", NAMEOF ( '_Measures'[Total VOA] ), 1 ),
+				    ( "MNP VOA", NAMEOF ( '_Measures'[MNP VOA] ), 2 ),
+				    ( "Achievement %", NAMEOF ( '_Measures'[Achievement % (To Date)] ), 3 )
+				}
+
+	annotation PBI_Id = 0ef9ab0568b85f22be16

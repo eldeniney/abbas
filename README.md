@@ -23,3 +23,13 @@ python3 -m http.server 8000
 ## Tech
 
 Single HTML file with vanilla JavaScript and CSS. No frameworks, no build step, no dependencies.
+
+---
+
+# Prime Sales Performance – Power BI
+
+The `powerbi/` folder contains a Power BI project (PBIP: TMDL semantic model + PBIR report) that
+replicates the Prime Sales Performance dashboard and adds analyst pages (target and forecast,
+KAM ranking, product and portability, data quality). See [`powerbi/README.md`](powerbi/README.md)
+for how to open it in Power BI Desktop, the model, the measure list and the assumptions to confirm.
+All bundled data is dummy.
