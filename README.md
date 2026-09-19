@@ -12,6 +12,7 @@ Interactive, Arabic-first (RTL) design prototype of the Twaa hyperlocal quick-co
 - `twaa/assets/logo.svg`, `logo-cream.svg`, `logo-mark.svg` — vector logo traced from the official artwork (full and mark-only)
 - `twaa/design-system.html` — tokens and components
 - `twaa/DESIGN.md` — screen-by-screen design guideline mapped to the BRD
+- `twaa/docs/Twaa-Project-and-Plan.pptx` — 20-slide project overview and delivery plan deck
 
 Open `twaa/index.html` in a browser, or serve the folder:
 
