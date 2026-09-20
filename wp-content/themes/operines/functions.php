@@ -21,6 +21,7 @@ require OPERINES_DIR . '/inc/template-tags.php';
 require OPERINES_DIR . '/inc/emails.php';
 require OPERINES_DIR . '/inc/accounts.php';
 require OPERINES_DIR . '/inc/admin-leads.php';
+require OPERINES_DIR . '/inc/survey.php';
 require OPERINES_DIR . '/inc/seed-functions.php';
 
 /**

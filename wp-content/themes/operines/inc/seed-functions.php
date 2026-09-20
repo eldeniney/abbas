@@ -78,6 +78,14 @@ function operines_seed_site(): void {
 	operines_seed_page( 'login', 'Sign in' );
 	operines_seed_page( 'my-account', 'My account' );
 
+	// Standalone unbranded survey landing (Arabic, temporary, unlisted —
+	// not linked from any menu; noindex is printed by its own template).
+	operines_seed_page(
+		'survey',
+		'استبيان احتياجات التسوق والتوصيل',
+		array( 'template' => 'page-templates/survey.php' )
+	);
+
 	// Solution child pages, driven by the data layer.
 	foreach ( operines_solutions() as $slug => $s ) {
 		operines_seed_page(

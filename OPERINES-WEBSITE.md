@@ -40,6 +40,25 @@ email to the client); client accounts appear under **Users** with the role
 No other plugins are required. The theme was developed and tested against
 WordPress 7.1 / PHP 8.4.
 
+## Standalone survey landing (temporary)
+
+`/survey/` hosts an **unbranded, Arabic-only** survey landing page (Beheira
+shopping & delivery needs, 75 EGP promo-code incentive). It intentionally
+uses its own standalone template (`page-templates/survey.php`) with no site
+header/footer, no brand name, and a `noindex` meta tag; it is excluded from
+the sitemap and site search and linked from no menu — share the URL
+directly.
+
+- **Data**: every submission is stored in wp-admin under **Survey Data**
+  (one row per respondent; city filter; full answers on each row's detail
+  screen). The same mobile number is never stored twice — a repeat
+  submission returns the respondent's existing code.
+- **Extract**: Survey Data → **Export CSV (Excel)** downloads all responses
+  as UTF-8 CSV with BOM, so Arabic opens correctly in Excel — one column
+  per question.
+- **Close it**: when data collection ends, unpublish the `survey` page
+  (Pages → استبيان → Draft). The collected data stays in Survey Data.
+
 ## Architecture
 
 | Piece | Where |
