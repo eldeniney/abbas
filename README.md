@@ -1,3 +1,11 @@
+# abbas
+
+## Mr. Abb — AI Voice Command Center (WordPress theme)
+
+The production WordPress theme for eldeniney.me lives in [`mr-abb/`](mr-abb/) and ships as the installable [`mr-abb.zip`](mr-abb.zip) (Appearance → Themes → Add New → Upload Theme). See [`mr-abb/README.md`](mr-abb/README.md) for installation, configuration, the backend API contract, ElevenLabs integration and security notes.
+
+---
+
 # Expense Calculator
 
 A simple, dependency-free expense calculator that runs entirely in the browser.

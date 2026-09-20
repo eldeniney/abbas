@@ -1,0 +1,125 @@
+/* ==========================================================================
+   Mr. Abb — responsive layouts
+   Desktop-first for the shell; each breakpoint is a distinct layout,
+   not a shrunken desktop.
+   ========================================================================== */
+
+/* Large desktop: a little more air. */
+@media (min-width: 1600px) {
+	:root { --mrabb-sidebar-w: 256px; --mrabb-context-w: 336px; --mrabb-orb-size: 196px; }
+	.mrabb-main--home { max-width: 1120px; }
+}
+
+/* Small desktop / large tablet landscape: context panel becomes a drawer-like overlay toggle. */
+@media (max-width: 1279px) {
+	:root { --mrabb-context-w: 280px; }
+	.mrabb-workspace { grid-template-columns: minmax(0, 1fr); }
+	.mrabb-context {
+		position: fixed; top: var(--mrabb-topbar-h); bottom: 0; inset-inline-end: 0;
+		width: min(100%, 320px);
+		background: var(--mrabb-surface);
+		box-shadow: var(--mrabb-shadow-lg);
+		z-index: 45;
+		transform: translateX(0);
+	}
+	.mrabb-app.is-context-collapsed .mrabb-context { display: flex; }
+	.mrabb-app:not(.is-context-open) .mrabb-context { opacity: 0; pointer-events: none; transform: translateX(16px); }
+	html[dir="rtl"] .mrabb-app:not(.is-context-open) .mrabb-context { transform: translateX(-16px); }
+	.mrabb-main--home { padding-inline: var(--mrabb-s8); }
+}
+
+/* Tablet: sidebar collapses to icon rail. */
+@media (max-width: 1023px) {
+	.mrabb-app { grid-template-columns: var(--mrabb-sidebar-w-collapsed) minmax(0, 1fr); }
+	.mrabb-sidebar__label, .mrabb-brand__name { opacity: 0; width: 0; overflow: hidden; }
+	.mrabb-sidebar__top { justify-content: center; }
+	.mrabb-sidebar__toggle { display: none; }
+	.mrabb-nav__item, .mrabb-sidebar__new { justify-content: center; padding-inline: 0; }
+	.mrabb-session { grid-template-columns: minmax(0, 1fr); grid-template-areas: "conversation" "actions" "results"; gap: var(--mrabb-s8); }
+}
+
+/* Phone: no sidebar, bottom tab bar, orb-first stage. */
+@media (max-width: 767px) {
+	:root { --mrabb-orb-size: 164px; --mrabb-topbar-h: 56px; }
+	.mrabb-app { grid-template-columns: minmax(0, 1fr); }
+	.mrabb-sidebar {
+		position: fixed; top: 0; bottom: 0; inset-inline-start: 0;
+		width: min(84vw, 300px); height: 100dvh;
+		transform: translateX(-104%);
+		transition: transform var(--mrabb-med) var(--mrabb-ease);
+		box-shadow: none; z-index: 45;
+	}
+	html[dir="rtl"] .mrabb-sidebar { transform: translateX(104%); }
+	.mrabb-app.is-sidebar-open .mrabb-sidebar { transform: translateX(0); box-shadow: var(--mrabb-shadow-lg); }
+	.mrabb-app.is-sidebar-open .mrabb-sidebar__label, .mrabb-app.is-sidebar-open .mrabb-brand__name { opacity: 1; width: auto; }
+	.mrabb-app.is-sidebar-open .mrabb-nav__item, .mrabb-app.is-sidebar-open .mrabb-sidebar__new { justify-content: flex-start; padding-inline: 12px; }
+	.mrabb-app.is-sidebar-open .mrabb-sidebar__top { justify-content: space-between; }
+	.mrabb-app.is-sidebar-open .mrabb-sidebar__toggle { display: inline-flex; }
+	.mrabb-app.is-sidebar-open .mrabb-sidebar__toggle .mrabb-icon { transform: none; }
+	.mrabb-topbar { padding-inline: var(--mrabb-s4); gap: var(--mrabb-s2); }
+	.mrabb-topbar__menu { display: inline-flex; }
+	.mrabb-topbar__owner { font-size: var(--mrabb-text-sm); }
+	.mrabb-frame { padding-bottom: calc(var(--mrabb-tabbar-h) + env(safe-area-inset-bottom)); }
+	.mrabb-main--home { padding: var(--mrabb-s4) var(--mrabb-s4) var(--mrabb-s8); }
+	.mrabb-main--page, .mrabb-main--content { padding: var(--mrabb-s5) var(--mrabb-s4) var(--mrabb-s8); }
+	.mrabb-stage { min-height: calc(100dvh - var(--mrabb-topbar-h) - var(--mrabb-tabbar-h) - 120px); justify-content: center; padding-block: var(--mrabb-s2); }
+	.mrabb-stage.is-session { min-height: 0; }
+	.mrabb-stage__title { font-size: var(--mrabb-text-lg); }
+	.mrabb-stage__subtitle { font-size: var(--mrabb-text-sm); margin-top: 2px; }
+	.mrabb-orb-wrap { margin: var(--mrabb-s6) 0 var(--mrabb-s3); }
+	.mrabb-stage__prompt { font-size: var(--mrabb-text-md); }
+	.mrabb-composer { margin-top: var(--mrabb-s4); }
+	.mrabb-session { margin-top: var(--mrabb-s6); padding-top: var(--mrabb-s5); gap: var(--mrabb-s6); }
+	.mrabb-msg { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+	.mrabb-msg__body { font-size: var(--mrabb-text-base); }
+	.mrabb-results { grid-template-columns: minmax(0, 1fr); }
+	.mrabb-page-head { flex-direction: column; align-items: flex-start; margin-bottom: var(--mrabb-s5); }
+	.mrabb-page-title { font-size: var(--mrabb-text-lg); }
+	.mrabb-row { grid-template-columns: minmax(0, 1fr) auto; padding: 12px var(--mrabb-s4); }
+	.mrabb-row__time { grid-column: 1 / -1; order: -1; font-size: var(--mrabb-text-xs); min-width: 0; }
+	.mrabb-row--task { grid-template-columns: auto minmax(0, 1fr) auto; }
+	.mrabb-row--task .mrabb-row__time { display: none; }
+	.mrabb-grid { grid-template-columns: minmax(0, 1fr); }
+	.mrabb-context { top: 0; width: 100%; padding-top: calc(var(--mrabb-s6) + env(safe-area-inset-top)); }
+	.mrabb-modal { align-items: end; padding: 0; }
+	.mrabb-modal__card { width: 100%; border-radius: var(--mrabb-radius-xl) var(--mrabb-radius-xl) 0 0; padding-bottom: calc(var(--mrabb-s6) + env(safe-area-inset-bottom)); max-height: 88dvh; }
+	.mrabb-drawer { width: 100%; }
+	.mrabb-toasts { inset-inline: var(--mrabb-s4); bottom: calc(var(--mrabb-tabbar-h) + var(--mrabb-s3) + env(safe-area-inset-bottom)); align-items: center; }
+	.mrabb-toast { max-width: 100%; }
+	.mrabb-mockpill { bottom: calc(var(--mrabb-tabbar-h) + 8px + env(safe-area-inset-bottom)); }
+	.mrabb-welcome__title { font-size: var(--mrabb-text-xl); }
+
+	.mrabb-tabbar {
+		display: grid; grid-template-columns: repeat(4, 1fr);
+		position: fixed; bottom: 0; inset-inline: 0;
+		height: calc(var(--mrabb-tabbar-h) + env(safe-area-inset-bottom));
+		padding-bottom: env(safe-area-inset-bottom);
+		background: color-mix(in srgb, var(--mrabb-surface) 92%, transparent);
+		backdrop-filter: saturate(160%) blur(12px);
+		-webkit-backdrop-filter: saturate(160%) blur(12px);
+		border-top: 1px solid var(--mrabb-border);
+		z-index: 35;
+	}
+	.mrabb-tabbar__item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11px; font-weight: 500; color: var(--mrabb-text-subtle); transition: color var(--mrabb-fast); }
+	.mrabb-tabbar__item.is-active { color: var(--mrabb-primary); }
+	.mrabb-tabbar__item:active { color: var(--mrabb-text); }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+	:root { --mrabb-orb-size: 140px; }
+	.mrabb-approval__details { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Short landscape phones: keep the orb reachable without huge whitespace */
+@media (max-height: 520px) and (max-width: 1023px) {
+	:root { --mrabb-orb-size: 110px; }
+	.mrabb-stage { min-height: 0; }
+	.mrabb-orb-wrap { margin-block: var(--mrabb-s3); }
+}
+
+/* Print: hide chrome */
+@media print {
+	.mrabb-sidebar, .mrabb-topbar, .mrabb-tabbar, .mrabb-composer, .mrabb-orb-wrap, .mrabb-context, .mrabb-mockpill { display: none !important; }
+	.mrabb-app { display: block; }
+}

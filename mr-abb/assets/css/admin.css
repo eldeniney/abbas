@@ -1,0 +1,18 @@
+.mrabb-admin { max-width: 1040px; }
+.mrabb-admin__title { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+.mrabb-admin__brand { color: #4F1964; font-weight: 700; }
+.mrabb-admin__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 20px 0 28px; }
+.mrabb-admin__card { background: #fff; border: 1px solid #e5e2e8; border-radius: 12px; padding: 18px 20px; }
+.mrabb-admin__card h2 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #7a7580; }
+.mrabb-admin__big { font-size: 22px; font-weight: 600; margin: 0 0 4px; color: #1f1d22; }
+.mrabb-admin__status--connected { color: #2E8B5B; }
+.mrabb-admin__status--error { color: #BF4A47; }
+.mrabb-admin__status--unconfigured { color: #B97A12; }
+.mrabb-admin__table { margin-top: 10px; }
+.mrabb-admin__form .form-table th { width: 220px; }
+.mrabb-admin__note { background: #fff; border: 1px solid #e5e2e8; border-radius: 12px; padding: 16px 20px; margin-top: 24px; max-width: 760px; }
+.mrabb-admin__note pre { background: #f4f3f1; padding: 10px 12px; border-radius: 8px; overflow: auto; }
+.mrabb-admin__level { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; background: #f0eef2; }
+.mrabb-admin__level--warn { background: #FBF2DF; color: #B97A12; }
+.mrabb-admin__level--error { background: #FBEAE9; color: #BF4A47; }
+#mrabb-test-result { margin-inline-start: 8px; font-size: 13px; }

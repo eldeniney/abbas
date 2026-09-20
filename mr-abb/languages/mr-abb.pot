@@ -1,0 +1,489 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Mr. Abb 1.0.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Domain: mr-abb\n"
+
+msgid "AI Command Center"
+msgstr ""
+
+msgid "API"
+msgstr ""
+
+msgid "About"
+msgstr ""
+
+msgid "Accent Colour"
+msgstr ""
+
+msgid "Access"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Add this line to wp-config.php instead of using the Backend Secret field:"
+msgstr ""
+
+msgid "Administrators always have access."
+msgstr ""
+
+msgid "Administrators only."
+msgstr ""
+
+msgid "Agent ID configured."
+msgstr ""
+
+msgid "Agent Name"
+msgstr ""
+
+msgid "Allowed User Roles"
+msgstr ""
+
+msgid "Appearance"
+msgstr ""
+
+msgid "Architecture: Browser → WordPress (this theme) → Secure Tool Gateway → Connected systems. WordPress is the interface; business logic and credentials live in the backend."
+msgstr ""
+
+msgid "Automations"
+msgstr ""
+
+msgid "Back to Mr. Abb"
+msgstr ""
+
+msgid "Backend"
+msgstr ""
+
+msgid "Backend Base URL"
+msgstr ""
+
+msgid "Backend Secret"
+msgstr ""
+
+msgid "Backend Session Endpoint"
+msgstr ""
+
+msgid "Backend reachable."
+msgstr ""
+
+msgid "Clear logs"
+msgstr ""
+
+msgid "Clear stored secret"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Collapse sidebar"
+msgstr ""
+
+msgid "Connect your tools and Mr. Abb becomes more capable."
+msgstr ""
+
+msgid "Connections"
+msgstr ""
+
+msgid "Context"
+msgstr ""
+
+msgid "Conversation"
+msgstr ""
+
+msgid "Create pages"
+msgstr ""
+
+msgid "Dashboard"
+msgstr ""
+
+msgid "Debug Logging"
+msgstr ""
+
+msgid "Debug logging is off. Only errors are recorded."
+msgstr ""
+
+msgid "Default Language"
+msgstr ""
+
+msgid "Defined in wp-config.php (MRABB_BACKEND_SECRET)."
+msgstr ""
+
+msgid "Demo"
+msgstr ""
+
+msgid "Demo / Mock"
+msgstr ""
+
+msgid "Demo / Mock Mode"
+msgstr ""
+
+msgid "Demo mode: the Connections page on the site shows sample services. Once a backend is configured, this screen lists the real connection status from GET /connections."
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Disabled"
+msgstr ""
+
+msgid "Documentation lives in the theme folder under /docs: backend API contract, ElevenLabs integration, event schemas and security notes."
+msgstr ""
+
+msgid "ES module URL of @elevenlabs/client. Loaded only when a live voice session starts."
+msgstr ""
+
+msgid "ElevenLabs Agent ID"
+msgstr ""
+
+msgid "ElevenLabs SDK URL"
+msgstr ""
+
+msgid "ElevenLabs voice session configuration. Secrets stay on the server."
+msgstr ""
+
+msgid "Enabled"
+msgstr ""
+
+msgid "Environment"
+msgstr ""
+
+msgid "Every session, what was said, what was done."
+msgstr ""
+
+msgid "Forgot your password?"
+msgstr ""
+
+msgid "From you, from your tools, from Mr. Abb."
+msgstr ""
+
+msgid "General"
+msgstr ""
+
+msgid "Go back to the command center and just ask."
+msgstr ""
+
+msgid "Good afternoon, %s."
+msgstr ""
+
+msgid "Good evening, %s."
+msgstr ""
+
+msgid "Good morning, %s."
+msgstr ""
+
+msgid "History"
+msgstr ""
+
+msgid "Home"
+msgstr ""
+
+msgid "How the assistant introduces itself."
+msgstr ""
+
+msgid "Identity and language of the assistant."
+msgstr ""
+
+msgid "Interface Density"
+msgstr ""
+
+msgid "Keep me signed in"
+msgstr ""
+
+msgid "Keeping secrets out of the browser"
+msgstr ""
+
+msgid "Last sync"
+msgstr ""
+
+msgid "Level"
+msgstr ""
+
+msgid "Live"
+msgstr ""
+
+msgid "Logs"
+msgstr ""
+
+msgid "Message"
+msgstr ""
+
+msgid "Mobile navigation"
+msgstr ""
+
+msgid "Mode"
+msgstr ""
+
+msgid "Mr. Abb could not reach the backend."
+msgstr ""
+
+msgid "New Session"
+msgstr ""
+
+msgid "New automation"
+msgstr ""
+
+msgid "No ElevenLabs Agent ID yet."
+msgstr ""
+
+msgid "No backend URL configured. Demo mode is active."
+msgstr ""
+
+msgid "No log entries."
+msgstr ""
+
+msgid "Not allowed."
+msgstr ""
+
+msgid "Not set"
+msgstr ""
+
+msgid "Nothing here yet."
+msgstr ""
+
+msgid "One person. One AI. All tools."
+msgstr ""
+
+msgid "Only signed-in, allowed users can open the interface."
+msgstr ""
+
+msgid "Open Connections page"
+msgstr ""
+
+msgid "Open Mr. Abb"
+msgstr ""
+
+msgid "Open Settings"
+msgstr ""
+
+msgid "Open menu"
+msgstr ""
+
+msgid "Owner Name"
+msgstr ""
+
+msgid "Pages"
+msgstr ""
+
+msgid "Pages created."
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Path on the backend that returns a signed ElevenLabs session. Default: /voice/session"
+msgstr ""
+
+msgid "Please enter both your username and password."
+msgstr ""
+
+msgid "Please sign in to talk to Mr. Abb."
+msgstr ""
+
+msgid "Primary"
+msgstr ""
+
+msgid "Priority tasks"
+msgstr ""
+
+msgid "Private"
+msgstr ""
+
+msgid "Production backends must use HTTPS. The backend URL was not saved."
+msgstr ""
+
+msgid "Profile"
+msgstr ""
+
+msgid "Public"
+msgstr ""
+
+msgid "Public agent identifier. The API key never goes here."
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "Recent actions"
+msgstr ""
+
+msgid "Requests are forwarded to your backend gateway."
+msgstr ""
+
+msgid "Require Authentication"
+msgstr ""
+
+msgid "Results"
+msgstr ""
+
+msgid "Secondary links (footer of sidebar)"
+msgstr ""
+
+msgid "Sections"
+msgstr ""
+
+msgid "Secure tool gateway, e.g. https://api.eldeniney.me. Leave empty to stay in demo mode."
+msgstr ""
+
+msgid "Security"
+msgstr ""
+
+msgid "Send"
+msgstr ""
+
+msgid "Sent as a Bearer token from the server only. Prefer defining MRABB_BACKEND_SECRET in wp-config.php."
+msgstr ""
+
+msgid "Service"
+msgstr ""
+
+msgid "Session"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Show technical error details and keep a short log. Turn off in production."
+msgstr ""
+
+msgid "Shown in the top bar and greetings."
+msgstr ""
+
+msgid "Shown once, on the first session."
+msgstr ""
+
+msgid "Sign in"
+msgstr ""
+
+msgid "Sign in to talk to Mr. Abb."
+msgstr ""
+
+msgid "Sign out"
+msgstr ""
+
+msgid "Simulate the whole experience without a backend. Forced on while no backend URL is set."
+msgstr ""
+
+msgid "Skip to content"
+msgstr ""
+
+msgid "Small visual adjustments. Purple is used sparingly by design."
+msgstr ""
+
+msgid "Some Mr. Abb pages are missing (History, Tasks, Connections, Automations)."
+msgstr ""
+
+msgid "Start Talking"
+msgstr ""
+
+msgid "Start listening"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Switch language"
+msgstr ""
+
+msgid "Tap to talk"
+msgstr ""
+
+msgid "Tasks"
+msgstr ""
+
+msgid "Test connection"
+msgstr ""
+
+msgid "That did not match. Try again."
+msgstr ""
+
+msgid "That page does not exist."
+msgstr ""
+
+msgid "That request is not permitted."
+msgstr ""
+
+msgid "The ElevenLabs API key belongs in the backend, never in WordPress."
+msgstr ""
+
+msgid "The backend is not configured yet. Mr. Abb is running in demo mode."
+msgstr ""
+
+msgid "The backend returned an error."
+msgstr ""
+
+msgid "The backend sent a response Mr. Abb could not read."
+msgstr ""
+
+msgid "The interface simulates every step. Configure a backend to go live."
+msgstr ""
+
+msgid "Things Mr. Abb does without being asked."
+msgstr ""
+
+msgid "This space is private."
+msgstr ""
+
+msgid "Time"
+msgstr ""
+
+msgid "Toggle context panel"
+msgstr ""
+
+msgid "Tools"
+msgstr ""
+
+msgid "Try asking Mr. Abb instead."
+msgstr ""
+
+msgid "Type a command"
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+msgid "Username or email"
+msgstr ""
+
+msgid "View"
+msgstr ""
+
+msgid "Voice"
+msgstr ""
+
+msgid "Voice Enabled"
+msgstr ""
+
+msgid "Voice is turned off in settings."
+msgstr ""
+
+msgid "Welcome Message"
+msgstr ""
+
+msgid "Welcome back."
+msgstr ""
+
+msgid "What should we do?"
+msgstr ""
+
+msgid "When off, the interface works with typed commands only."
+msgstr ""
+
+msgid "Where Mr. Abb sends tool requests. The browser only ever talks to this WordPress site."
+msgstr ""
+
+msgid "Who can use the command center."
+msgstr ""
+
+msgid "Your AI Command Center"
+msgstr ""
+
+msgid "Your account is not allowed to use this interface."
+msgstr ""
+
+msgid "a personal AI Voice Command Center for Abbas ElDeniney."
+msgstr ""
+
+msgid "or type a command…"
+msgstr ""
