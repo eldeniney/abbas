@@ -31,7 +31,7 @@ No page builders, no frameworks, no build step. Vanilla PHP/CSS/JS.
 
 1. Upload `mr-abb.zip` via **Appearance → Themes → Add New → Upload Theme** and activate it.
 2. On activation the theme creates the pages **Command Center** (set as the static front page), **History**, **Tasks**, **Connections**, **Automations**, enables pretty permalinks if needed, and adds the **Mr. Abb** admin menu.
-3. Visit the site. You are in **Demo mode** until a backend is configured: everything you see is simulated so you can validate the experience end-to-end.
+3. Visit the site. You are in **Demo mode** until you connect ElevenLabs or Claude under Mr. Abb → Connections; then it goes live automatically.
 
 If pages are ever deleted, the admin shows a one-click "Create pages" notice.
 
@@ -62,7 +62,7 @@ The theme includes its own secure gateway, so there is nothing else to deploy. F
 2. Paste the **ElevenLabs API key + Agent ID**, click **Sync tools to agent**, paste the suggested system prompt into the agent.
 3. Enter Google OAuth client ID/secret, click **Connect Google** (Calendar, Gmail, Tasks, Drive).
 4. Point n8n (and WhatsApp/CRM/Odoo/Power BI/UiPath/Operines/Power Platform) webhooks at workflows that do the work.
-5. Settings → API → turn **Demo mode** off.
+5. Live mode switches on automatically once step 1 or 2 is done (Settings → API → Demo / Live can force it).
 
 ## Real vs. mocked (v1)
 

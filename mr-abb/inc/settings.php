@@ -45,7 +45,7 @@ function mrabb_default_settings() {
 		'gateway_mode'     => 'builtin',
 		'backend_url'      => '',
 		'environment'      => 'production',
-		'mock_mode'        => 1,
+		'mock_mode'        => 'auto',
 		// Brain.
 		'claude_model'     => 'claude-opus-5',
 		'claude_effort'    => 'medium',
@@ -125,7 +125,9 @@ function mrabb_sanitize_settings( $input ) {
 	$backend_url        = esc_url_raw( trim( (string) ( $input['backend_url'] ?? '' ) ), array( 'https', 'http' ) );
 	$out['backend_url'] = $backend_url ? untrailingslashit( $backend_url ) : '';
 	$out['environment'] = in_array( $input['environment'] ?? 'production', array( 'development', 'staging', 'production' ), true ) ? $input['environment'] : 'production';
-	$out['mock_mode']   = empty( $input['mock_mode'] ) ? 0 : 1;
+	$mock = $input['mock_mode'] ?? 'auto';
+	if ( '1' === (string) $mock ) { $mock = 'on'; } elseif ( '0' === (string) $mock || '' === $mock ) { $mock = 'auto'; }
+	$out['mock_mode'] = in_array( $mock, array( 'auto', 'on', 'off' ), true ) ? $mock : 'auto';
 	$out['gateway_mode'] = in_array( $input['gateway_mode'] ?? 'builtin', array( 'builtin', 'external' ), true ) ? $input['gateway_mode'] : 'builtin';
 	$out['claude_model'] = preg_replace( '/[^a-z0-9\-]/', '', (string) ( $input['claude_model'] ?? $defaults['claude_model'] ) ) ?: $defaults['claude_model'];
 	$out['claude_effort'] = in_array( $input['claude_effort'] ?? 'medium', array( 'low', 'medium', 'high', 'xhigh', 'max' ), true ) ? $input['claude_effort'] : 'medium';
@@ -218,5 +220,17 @@ function mrabb_is_mock_mode() {
 	if ( ! mrabb_backend_configured() ) {
 		return true;
 	}
-	return (bool) mrabb_get_setting( 'mock_mode', 1 );
+	$mode = mrabb_get_setting( 'mock_mode', 'auto' );
+	if ( 'on' === $mode || 1 === $mode || '1' === $mode ) {
+		return true;
+	}
+	if ( 'off' === $mode || 0 === $mode || '0' === $mode ) {
+		return false;
+	}
+	// auto: demo only until an engine is connected.
+	if ( ! mrabb_is_builtin_gateway() ) {
+		return false;
+	}
+	$engine_ready = ( class_exists( 'MrAbb_Brain' ) && MrAbb_Brain::configured() ) || ( class_exists( 'MrAbb_ElevenLabs' ) && MrAbb_ElevenLabs::configured() );
+	return ! $engine_ready;
 }

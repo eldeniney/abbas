@@ -21,7 +21,7 @@ function mrabb_admin_connections_page() {
 		echo '<div class="notice notice-info is-dismissible"><p>' . esc_html( $notice ) . '</p></div>';
 	}
 	if ( mrabb_is_mock_mode() ) {
-		echo '<div class="notice notice-warning"><p>' . esc_html__( 'Demo mode is ON. Connect at least Claude or ElevenLabs below, then turn Demo mode off in Settings → API.', 'mr-abb' ) . '</p></div>';
+		echo '<div class="notice notice-warning"><p>' . esc_html__( 'Demo mode is active. Connect ElevenLabs (API key + Agent ID) or Claude below and save: the site switches to live automatically.', 'mr-abb' ) . '</p></div>';
 	}
 	?>
 	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="mrabb-admin__form mrabb-conn">
@@ -234,7 +234,7 @@ function mrabb_setup_checklist() {
 		array( (bool) get_option( 'mrabb_elevenlabs_synced' ), __( 'Tools synced to the ElevenLabs agent (so the voice agent can act)', 'mr-abb' ), $conn . '#elevenlabs' ),
 		array( MrAbb_Google::is_connected(), __( 'Google connected (Calendar, Gmail, Tasks, Drive)', 'mr-abb' ), $conn . '#google' ),
 		array( '' !== MrAbb_Connectors::webhook_config( 'n8n' )['url'], __( 'n8n webhook (workflows and the bridge to WhatsApp, CRM, Odoo, Power BI, UiPath, Operines)', 'mr-abb' ), $conn . '#n8n' ),
-		array( ! mrabb_is_mock_mode(), __( 'Demo mode turned off', 'mr-abb' ), $sett ),
+		array( ! mrabb_is_mock_mode(), __( 'Live mode active (automatic once an engine is connected)', 'mr-abb' ), $sett ),
 		array( is_ssl(), __( 'Site served over HTTPS (required for the microphone)', 'mr-abb' ), '' ),
 	);
 	$done = count( array_filter( $items, function ( $i ) { return $i[0]; } ) );

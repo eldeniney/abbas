@@ -42,8 +42,8 @@ Each of these is a **webhook connector**: a URL you control plus a secret. The e
 
 Actions Mr. Abb sends per service are listed on the Connections page. `ping` must reply `{"summary":"ok"}`. Check the `Authorization: Bearer <secret>` header in the workflow to reject strangers.
 
-## 5. Turn demo mode off
-WordPress → Mr. Abb → Settings → API → untick **Demo / Mock Mode** → Save. The topbar status changes from "Demo" to "Ready".
+## 5. Live mode
+Live mode switches on automatically the moment ElevenLabs (key + Agent ID) or Claude is connected. The topbar status changes from "Demo" to "Ready". Settings → API → Demo / Live lets you force either mode.
 
 ## 6. Automations
 Mr. Abb → Automations (on the site) → New automation. Name it, give a schedule in plain words (`weekdays 07:45`, `daily 18:00`, `weekly sunday 08:00`, `hourly`) and a prompt (what Mr. Abb should do). Runs use WordPress cron; on shared hosting add a real cron hitting `https://eldeniney.me/wp-cron.php` every 15 minutes for punctual runs. Results appear in History.

@@ -59,7 +59,7 @@ function mrabb_hook_permission( WP_REST_Request $request ) {
 		return new WP_Error( 'mrabb_hook_forbidden', 'Invalid webhook secret.', array( 'status' => 403 ) );
 	}
 	if ( mrabb_is_mock_mode() ) {
-		return new WP_Error( 'mrabb_mock', 'Mr. Abb is in demo mode. Turn demo mode off in Settings.', array( 'status' => 409 ) );
+		return new WP_Error( 'mrabb_mock', 'Mr. Abb is in demo mode. Connect an engine or set Demo / Live to Always live in Settings.', array( 'status' => 409 ) );
 	}
 	return true;
 }

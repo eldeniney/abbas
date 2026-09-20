@@ -82,7 +82,7 @@ function mrabb_register_settings() {
 		array( 'session_endpoint', __( 'Backend Session Endpoint', 'mr-abb' ), 'voice', 'text', __( 'Path on the backend that returns a signed ElevenLabs session. Default: /voice/session', 'mr-abb' ) ),
 		array( 'sdk_url', __( 'ElevenLabs SDK URL', 'mr-abb' ), 'voice', 'text', __( 'ES module URL of @elevenlabs/client. Loaded only when a live voice session starts.', 'mr-abb' ) ),
 		// API.
-		array( 'mock_mode', __( 'Demo / Mock Mode', 'mr-abb' ), 'api', 'checkbox', __( 'Simulate the whole experience. Turn OFF to go live once Claude or ElevenLabs is connected.', 'mr-abb' ) ),
+		array( 'mock_mode', __( 'Demo / Live', 'mr-abb' ), 'api', 'select', __( 'Automatic goes live the moment ElevenLabs or Claude is connected (recommended).', 'mr-abb' ), array( 'auto' => 'Automatic (live once an engine is connected)', 'off' => 'Always live', 'on' => 'Always demo' ) ),
 		array( 'gateway_mode', __( 'Gateway', 'mr-abb' ), 'api', 'select', __( 'Built-in: WordPress itself runs the tools (default, nothing else to deploy). External: forward to your own backend.', 'mr-abb' ), array( 'builtin' => 'Built-in (this WordPress site)', 'external' => 'External backend' ) ),
 		array( 'backend_url', __( 'External Backend URL', 'mr-abb' ), 'api', 'url', __( 'Only for the External gateway, e.g. https://api.eldeniney.me.', 'mr-abb' ) ),
 		array( 'backend_secret', __( 'External Backend Secret', 'mr-abb' ), 'api', 'secret', __( 'Only for the External gateway. Prefer MRABB_BACKEND_SECRET in wp-config.php.', 'mr-abb' ) ),
