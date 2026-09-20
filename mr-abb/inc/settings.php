@@ -60,6 +60,8 @@ function mrabb_default_settings() {
 		// Appearance.
 		'accent_color'     => '#4F1964',
 		'density'          => 'comfortable',
+		'theme_style'      => 'nova',
+		'weather_city'     => 'Dubai',
 	);
 }
 
@@ -141,6 +143,8 @@ function mrabb_sanitize_settings( $input ) {
 	$color               = sanitize_hex_color( $input['accent_color'] ?? $defaults['accent_color'] );
 	$out['accent_color'] = $color ? $color : $defaults['accent_color'];
 	$out['density']      = in_array( $input['density'] ?? 'comfortable', array( 'comfortable', 'compact' ), true ) ? $input['density'] : 'comfortable';
+	$out['theme_style']  = in_array( $input['theme_style'] ?? 'nova', array( 'nova', 'classic' ), true ) ? $input['theme_style'] : 'nova';
+	$out['weather_city'] = sanitize_text_field( $input['weather_city'] ?? 'Dubai' ) ?: 'Dubai';
 
 	// The secret is stored separately so it never travels with the public settings array.
 	if ( isset( $input['backend_secret'] ) && ! defined( 'MRABB_BACKEND_SECRET' ) ) {

@@ -9,4 +9,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require MRABB_DIR . 'templates/dashboard.php';
+require MRABB_DIR . ( mrabb_is_nova() ? 'templates/dashboard-nova.php' : 'templates/dashboard.php' );

@@ -226,3 +226,12 @@ function mrabb_owner_first_name() {
 	$parts = preg_split( '/\s+/', trim( $owner ) );
 	return $parts ? $parts[0] : $owner;
 }
+
+/**
+ * Is the Nova (dark, animated) style active?
+ *
+ * @return bool
+ */
+function mrabb_is_nova() {
+	return 'nova' === mrabb_get_setting( 'theme_style', 'nova' );
+}

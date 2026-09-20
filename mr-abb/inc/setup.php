@@ -84,6 +84,7 @@ function mrabb_body_class( $classes ) {
 	$classes[] = 'mrabb-view-' . mrabb_current_view();
 	$classes[] = 'mrabb-density-' . mrabb_get_setting( 'density', 'comfortable' );
 	$classes[] = 'mrabb-lang-' . mrabb_current_language();
+	$classes[] = 'mrabb-style-' . ( mrabb_is_nova() ? 'nova' : 'classic' );
 	if ( mrabb_is_mock_mode() ) {
 		$classes[] = 'mrabb-mock';
 	}
@@ -156,7 +157,11 @@ function mrabb_enqueue_assets() {
 	wp_enqueue_style( 'mrabb-components', MRABB_URI . 'assets/css/components.css', array( 'mrabb-app' ), $v );
 	wp_enqueue_style( 'mrabb-animations', MRABB_URI . 'assets/css/animations.css', array( 'mrabb-components' ), $v );
 	wp_enqueue_style( 'mrabb-responsive', MRABB_URI . 'assets/css/responsive.css', array( 'mrabb-animations' ), $v );
-	wp_add_inline_style( 'mrabb-app', mrabb_accent_css() );
+	if ( mrabb_is_nova() ) {
+		wp_enqueue_style( 'mrabb-nova', MRABB_URI . 'assets/css/nova.css', array( 'mrabb-responsive' ), $v );
+	} else {
+		wp_add_inline_style( 'mrabb-app', mrabb_accent_css() );
+	}
 
 	if ( ! mrabb_user_can_access() ) {
 		return; // The login screen needs no application JavaScript.
@@ -174,6 +179,9 @@ function mrabb_enqueue_assets() {
 		'pages'       => array( 'mrabb-ui', 'mrabb-api', 'mrabb-mock-data' ),
 		'app'         => array( 'mrabb-ui', 'mrabb-cards', 'mrabb-voice-agent', 'mrabb-mock-agent', 'mrabb-pages' ),
 	);
+	if ( mrabb_is_nova() ) {
+		$scripts['nova'] = array( 'mrabb-app' );
+	}
 	foreach ( $scripts as $name => $deps ) {
 		wp_enqueue_script( 'mrabb-' . $name, MRABB_URI . 'assets/js/' . $name . '.js', $deps, $v, array( 'strategy' => 'defer', 'in_footer' => true ) );
 	}
@@ -233,10 +241,10 @@ function mrabb_hex_to_rgb( $hex ) {
  * Head extras: theme-color, manifest, viewport for PWA.
  */
 function mrabb_head_meta() {
-	$accent = mrabb_get_setting( 'accent_color', '#4F1964' );
+	$accent = mrabb_is_nova() ? '#060A1F' : mrabb_get_setting( 'accent_color', '#4F1964' );
 	echo '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">' . "\n";
 	echo '<meta name="theme-color" content="' . esc_attr( $accent ) . '">' . "\n";
-	echo '<meta name="color-scheme" content="light">' . "\n";
+	echo '<meta name="color-scheme" content="' . ( mrabb_is_nova() ? 'dark' : 'light' ) . '">' . "\n";
 	echo '<meta name="apple-mobile-web-app-capable" content="yes">' . "\n";
 	echo '<meta name="apple-mobile-web-app-status-bar-style" content="default">' . "\n";
 	echo '<meta name="apple-mobile-web-app-title" content="' . esc_attr( mrabb_get_setting( 'agent_name', 'Mr. Abb' ) ) . '">' . "\n";

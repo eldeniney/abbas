@@ -23,6 +23,10 @@ USER → WORDPRESS VOICE UI → ELEVENLABS VOICE SESSION → MR ABB AI → SECUR
 
 No page builders, no frameworks, no build step. Vanilla PHP/CSS/JS.
 
+## Styles
+
+**Nova** (default): dark glass bento dashboard with an animated starfield, holographic assistant orb, glowing mic, weather (Open-Meteo, no key), AI insights, schedule, recent sessions and a floating AI dock. **Classic**: the light, minimal layout. Switch under Mr. Abb → Settings → Appearance → Style; the weather city is set there too. Both styles share the same live gateway, voice, approvals and pages.
+
 ## Installation
 
 1. Upload `mr-abb.zip` via **Appearance → Themes → Add New → Upload Theme** and activate it.

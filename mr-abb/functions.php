@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'MRABB_VERSION', '1.1.0' );
+define( 'MRABB_VERSION', '1.2.0' );
 define( 'MRABB_DIR', trailingslashit( get_template_directory() ) );
 define( 'MRABB_URI', trailingslashit( get_template_directory_uri() ) );
 define( 'MRABB_REST_NAMESPACE', 'mrabb/v1' );

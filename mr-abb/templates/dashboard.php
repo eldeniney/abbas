@@ -12,6 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 global $mrabb_current_view;
 $mrabb_current_view = 'home';
+if ( mrabb_is_nova() && ! defined( 'MRABB_NOVA_RENDERING' ) ) {
+	define( 'MRABB_NOVA_RENDERING', true );
+	require MRABB_DIR . 'templates/dashboard-nova.php';
+	return;
+}
 get_header();
 ?>
 <div class="mrabb-workspace">

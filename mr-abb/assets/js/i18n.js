@@ -126,6 +126,7 @@
 			sent: 'Sent',
 			draft: 'Draft',
 			open: 'Open',
+			wx_clear: 'Clear', wx_cloudy: 'Partly cloudy', wx_rain: 'Rain', wx_storm: 'Storms', wx_fog: 'Foggy', wx_unavailable: 'Weather unavailable',
 			hint_examples: [
 				'“What do I have today?”',
 				'“Show my priorities.”',
@@ -257,6 +258,7 @@
 			sent: 'تم الإرسال',
 			draft: 'مسودة',
 			open: 'فتح',
+			wx_clear: 'صافي', wx_cloudy: 'غائم جزئياً', wx_rain: 'مطر', wx_storm: 'عواصف', wx_fog: 'ضباب', wx_unavailable: 'الطقس غير متاح',
 			hint_examples: [
 				'"عندي إيه النهارده؟"',
 				'"إيه أهم الحاجات اللي محتاج أخلصها؟"',

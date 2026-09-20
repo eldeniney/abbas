@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 	</div><!-- .mrabb-frame -->
-	<?php get_template_part( 'template-parts/mobile-nav' ); ?>
+	<?php get_template_part( 'template-parts/' . ( mrabb_is_nova() ? 'dock' : 'mobile-nav' ) ); ?>
 	<?php get_template_part( 'template-parts/overlays' ); ?>
 </div><!-- #mrabb-app -->
 <?php wp_footer(); ?>

@@ -360,8 +360,8 @@ function mrabb_rest_manifest() {
 		'start_url'        => home_url( '/' ),
 		'scope'            => home_url( '/' ),
 		'display'          => 'standalone',
-		'background_color' => '#FAF9F7',
-		'theme_color'      => $accent,
+		'background_color' => mrabb_is_nova() ? '#060A1F' : '#FAF9F7',
+		'theme_color'      => mrabb_is_nova() ? '#060A1F' : $accent,
 		'lang'             => mrabb_get_setting( 'default_language', 'en' ),
 		'dir'              => 'ar' === mrabb_get_setting( 'default_language', 'en' ) ? 'rtl' : 'ltr',
 		'icons'            => array(

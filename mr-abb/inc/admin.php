@@ -97,7 +97,9 @@ function mrabb_register_settings() {
 		array( 'allowed_roles', __( 'Allowed User Roles', 'mr-abb' ), 'security', 'roles', __( 'Administrators always have access.', 'mr-abb' ) ),
 		array( 'debug_logging', __( 'Debug Logging', 'mr-abb' ), 'security', 'checkbox', __( 'Show technical error details and keep a short log. Turn off in production.', 'mr-abb' ) ),
 		// Appearance.
-		array( 'accent_color', __( 'Accent Colour', 'mr-abb' ), 'appearance', 'color', '' ),
+		array( 'theme_style', __( 'Style', 'mr-abb' ), 'appearance', 'select', __( 'Nova: dark glass, neon, animated. Classic: light and minimal.', 'mr-abb' ), array( 'nova' => 'Nova (dark, animated)', 'classic' => 'Classic (light, minimal)' ) ),
+		array( 'weather_city', __( 'Weather city', 'mr-abb' ), 'appearance', 'text', __( 'Shown on the Nova home (Open-Meteo, no key needed).', 'mr-abb' ) ),
+		array( 'accent_color', __( 'Accent Colour (Classic)', 'mr-abb' ), 'appearance', 'color', '' ),
 		array( 'density', __( 'Interface Density', 'mr-abb' ), 'appearance', 'select', '', array( 'comfortable' => 'Comfortable', 'compact' => 'Compact' ) ),
 	);
 
