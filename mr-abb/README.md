@@ -15,7 +15,8 @@ USER → WORDPRESS VOICE UI → ELEVENLABS VOICE SESSION → MR ABB AI → SECUR
 | Theme foundation | `style.css`, `functions.php`, `header.php`, `footer.php`, `index.php`, `page.php`, `404.php`, `front-page.php` |
 | App views | `templates/dashboard.php` (home), `history.php`, `tasks.php`, `connections.php`, `automations.php`, `login.php` |
 | Shell parts | `template-parts/sidebar.php`, `topbar.php`, `context-panel.php`, `mobile-nav.php`, `orb.php`, `overlays.php` |
-| PHP modules | `inc/setup.php` (assets, config, routing), `settings.php`, `security.php`, `api.php` (backend gateway client), `rest-routes.php`, `admin.php`, `pages.php`, `logs.php`, `i18n.php`, `helpers.php` |
+| PHP modules | `inc/setup.php` (assets, config, routing), `settings.php`, `security.php`, `api.php` (gateway dispatcher), `rest-routes.php`, `admin.php`, `admin-connections.php`, `pages.php`, `logs.php`, `i18n.php`, `helpers.php` |
+| Built-in gateway | `inc/gateway/class-secrets.php` (encrypted keys), `class-store.php` (sessions, events, approvals, tasks), `class-tools.php` (registry + approval gate), `tools-builtin.php`, `class-google.php`, `class-elevenlabs.php`, `class-brain.php` (Claude), `class-connectors.php` (webhooks), `class-local-gateway.php`, `hooks.php` (inbound webhooks, OAuth callback), `class-cron.php` (automations) |
 | Design system | `assets/css/app.css` (tokens + layout), `components.css`, `animations.css`, `responsive.css`, `admin.css` |
 | JavaScript | `assets/js/core.js` (bus, store, models, event ingestion), `i18n.js`, `api.js`, `ui.js`, `cards.js`, `voice-agent.js` (ElevenLabs adapter), `mock-agent.js`, `mock-data.js`, `pages.js`, `app.js`, `admin.js` |
 | Docs | `docs/backend-api-contract.md`, `docs/events.md`, `docs/elevenlabs-integration.md`, `docs/security.md` |
@@ -49,19 +50,29 @@ The **Dashboard** screen shows mode, backend health (with a "Test connection" bu
 ## Per-user language
 The top-bar toggle (`ع` / `EN`) switches the whole interface between English (LTR) and Arabic (RTL). The preference is saved per WordPress user. Arabic strings ship inside the theme (no .mo file needed); a `languages/ar.mo` would take precedence if you add one.
 
+## Going live (built-in gateway)
+
+The theme includes its own secure gateway, so there is nothing else to deploy. Follow **docs/go-live.md** (also shown as a checklist in Mr. Abb → Dashboard):
+
+1. Mr. Abb → Connections → paste the **Anthropic API key** (typed commands, automations, web research).
+2. Paste the **ElevenLabs API key + Agent ID**, click **Sync tools to agent**, paste the suggested system prompt into the agent.
+3. Enter Google OAuth client ID/secret, click **Connect Google** (Calendar, Gmail, Tasks, Drive).
+4. Point n8n (and WhatsApp/CRM/Odoo/Power BI/UiPath/Operines/Power Platform) webhooks at workflows that do the work.
+5. Settings → API → turn **Demo mode** off.
+
 ## Real vs. mocked (v1)
 
-| Real today | Mocked / prepared |
+| Real (live mode) | Demo only / not yet |
 | --- | --- |
-| Theme, layout, RTL, responsive layouts, accessibility basics | Conversation scenarios, tool runs, results, approvals, error flow (`mock-agent.js`, `mock-data.js`) |
-| WordPress authentication, role gating, in-theme login screen | History, Tasks, Connections, Automations data (served from mock data until a backend answers) |
-| REST proxy with nonce + permission checks + path allowlist | Backend itself (`api.eldeniney.me`) |
-| Settings, admin screens, debug log, health check | Connect/Manage OAuth flows (backend-owned) |
-| ElevenLabs adapter (signed-URL handshake, SDK loading, callbacks, client tools, amplitude) | A working ElevenLabs agent needs the backend session endpoint and an Agent ID |
-| Event schema, card registry, state manager, PWA manifest + icons | Service worker / offline (deliberately not yet) |
+| Voice via ElevenLabs (server-minted signed URL, tools synced as webhook tools) | The scripted scenarios in `mock-agent.js` (demo mode only) |
+| Typed commands via Claude with tool use, approvals follow-up, automations, web research | MCP servers, direct database tools (add as webhook connectors or new tools) |
+| Google Calendar, Gmail, Tasks, Drive through OAuth inside WordPress | Native OAuth for CRM/Odoo/Microsoft (use webhook connectors, typically n8n) |
+| Approvals, history, activity feed, context panel, tasks (WordPress tables) | Service worker / offline PWA |
+| Webhook connectors: n8n, WhatsApp, CRM, Odoo, Power BI, Power Platform, UiPath, Operines | |
+| Optional external backend mode (same contract) | |
 
 ## Recommended next step
-Build the backend's `POST /voice/session` (ElevenLabs signed URL) and `GET /profile/context`, point the theme at it, and turn Demo mode off. From there add tools one by one; the interface needs no redesign as tools are added because every tool speaks the same event format (`docs/events.md`).
+Do the five steps above, then build one n8n workflow per business system (start with CRM). New tools are added in `inc/gateway/tools-builtin.php` or as webhook connectors; the interface needs no redesign because every tool speaks the same event format (`docs/events.md`).
 
 ## Testing performed
 PHP lint on every file; the templates rendered through a stub-WordPress harness and exercised in headless Chromium (desktop 1440/1920, tablet 900, phone 390; EN/AR; idle, listening, thinking, executing, speaking, approval, error states; history drawer, tasks, connections, automations, login, profile modal, collapsed panels) with zero JavaScript errors and no horizontal overflow. Final verification on a real WordPress install (theme activation, REST permissions, admin settings) should be repeated on the Tasjeel host after upload.

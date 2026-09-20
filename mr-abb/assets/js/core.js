@@ -315,6 +315,7 @@
 				break;
 			case 'approval_resolved':
 				store.resolveApproval(evt.id, evt.status || (evt.approved ? 'approved' : 'rejected'));
+				if (store.get('agentState') === 'approval_required') { store.setAgentState('executing'); }
 				break;
 			case 'error':
 				bus.emit('agent:error', evt);

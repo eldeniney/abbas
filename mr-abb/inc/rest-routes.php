@@ -71,6 +71,42 @@ function mrabb_register_rest_routes() {
 
 	register_rest_route(
 		$ns,
+		'/admin/test/(?P<id>[a-z0-9\-]+)',
+		array(
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => function ( WP_REST_Request $r ) {
+				$res = MrAbb_Connectors::test( sanitize_key( $r->get_param( 'id' ) ) );
+				if ( is_wp_error( $res ) ) {
+					return rest_ensure_response( array( 'ok' => false, 'message' => $res->get_error_message() ) );
+				}
+				return rest_ensure_response( array( 'ok' => true, 'message' => isset( $res['summary'] ) ? $res['summary'] : 'OK' ) );
+			},
+			'permission_callback' => 'mrabb_rest_admin_permission',
+		)
+	);
+
+	register_rest_route(
+		$ns,
+		'/admin/elevenlabs/sync',
+		array(
+			'methods'             => WP_REST_Server::CREATABLE,
+			'callback'            => function () {
+				$res = MrAbb_ElevenLabs::sync_tools();
+				if ( is_wp_error( $res ) ) {
+					return rest_ensure_response( array( 'ok' => false, 'message' => $res->get_error_message() ) );
+				}
+				$msg = sprintf( 'Created %d, updated %d, attached %d.', $res['created'], $res['updated'], $res['attached'] );
+				if ( $res['errors'] ) {
+					$msg .= ' Errors: ' . implode( ' | ', $res['errors'] );
+				}
+				return rest_ensure_response( array( 'ok' => empty( $res['errors'] ), 'message' => $msg ) );
+			},
+			'permission_callback' => 'mrabb_rest_admin_permission',
+		)
+	);
+
+	register_rest_route(
+		$ns,
 		'/logs',
 		array(
 			array(
@@ -117,6 +153,7 @@ function mrabb_register_rest_routes() {
 		array( 'POST', '/tasks', '/tasks' ),
 		array( 'POST', '/tasks/(?P<id>[A-Za-z0-9_\-]+)/complete', '/tasks/{id}/complete' ),
 		array( 'GET', '/automations', '/automations' ),
+		array( 'POST', '/automations', '/automations' ),
 		array( 'POST', '/automations/(?P<id>[A-Za-z0-9_\-]+)/toggle', '/automations/{id}/toggle' ),
 		array( 'POST', '/automations/(?P<id>[A-Za-z0-9_\-]+)/run', '/automations/{id}/run' ),
 	);
@@ -253,7 +290,7 @@ function mrabb_rest_voice_session( WP_REST_Request $request ) {
 		),
 		'timezone' => wp_timezone_string(),
 	);
-	$result = MrAbb_Gateway::request( 'POST', mrabb_get_setting( 'session_endpoint', '/voice/session' ), $body );
+	$result = MrAbb_Gateway::request( 'POST', mrabb_is_builtin_gateway() ? '/voice/session' : mrabb_get_setting( 'session_endpoint', '/voice/session' ), $body );
 	if ( is_wp_error( $result ) ) {
 		return mrabb_rest_error( $result );
 	}

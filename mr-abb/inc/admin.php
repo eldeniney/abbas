@@ -62,6 +62,7 @@ function mrabb_register_settings() {
 		'general'    => __( 'General', 'mr-abb' ),
 		'voice'      => __( 'Voice', 'mr-abb' ),
 		'api'        => __( 'API', 'mr-abb' ),
+		'brain'      => __( 'Brain', 'mr-abb' ),
 		'security'   => __( 'Security', 'mr-abb' ),
 		'appearance' => __( 'Appearance', 'mr-abb' ),
 	);
@@ -81,10 +82,16 @@ function mrabb_register_settings() {
 		array( 'session_endpoint', __( 'Backend Session Endpoint', 'mr-abb' ), 'voice', 'text', __( 'Path on the backend that returns a signed ElevenLabs session. Default: /voice/session', 'mr-abb' ) ),
 		array( 'sdk_url', __( 'ElevenLabs SDK URL', 'mr-abb' ), 'voice', 'text', __( 'ES module URL of @elevenlabs/client. Loaded only when a live voice session starts.', 'mr-abb' ) ),
 		// API.
-		array( 'backend_url', __( 'Backend Base URL', 'mr-abb' ), 'api', 'url', __( 'Secure tool gateway, e.g. https://api.eldeniney.me. Leave empty to stay in demo mode.', 'mr-abb' ) ),
-		array( 'backend_secret', __( 'Backend Secret', 'mr-abb' ), 'api', 'secret', __( 'Sent as a Bearer token from the server only. Prefer defining MRABB_BACKEND_SECRET in wp-config.php.', 'mr-abb' ) ),
+		array( 'mock_mode', __( 'Demo / Mock Mode', 'mr-abb' ), 'api', 'checkbox', __( 'Simulate the whole experience. Turn OFF to go live once Claude or ElevenLabs is connected.', 'mr-abb' ) ),
+		array( 'gateway_mode', __( 'Gateway', 'mr-abb' ), 'api', 'select', __( 'Built-in: WordPress itself runs the tools (default, nothing else to deploy). External: forward to your own backend.', 'mr-abb' ), array( 'builtin' => 'Built-in (this WordPress site)', 'external' => 'External backend' ) ),
+		array( 'backend_url', __( 'External Backend URL', 'mr-abb' ), 'api', 'url', __( 'Only for the External gateway, e.g. https://api.eldeniney.me.', 'mr-abb' ) ),
+		array( 'backend_secret', __( 'External Backend Secret', 'mr-abb' ), 'api', 'secret', __( 'Only for the External gateway. Prefer MRABB_BACKEND_SECRET in wp-config.php.', 'mr-abb' ) ),
 		array( 'environment', __( 'Environment', 'mr-abb' ), 'api', 'select', '', array( 'development' => 'Development', 'staging' => 'Staging', 'production' => 'Production' ) ),
-		array( 'mock_mode', __( 'Demo / Mock Mode', 'mr-abb' ), 'api', 'checkbox', __( 'Simulate the whole experience without a backend. Forced on while no backend URL is set.', 'mr-abb' ) ),
+		// Brain.
+		array( 'claude_model', __( 'Claude model', 'mr-abb' ), 'brain', 'select', __( 'Opus 5 is the default. Sonnet 5 is cheaper and faster for simple days.', 'mr-abb' ), array( 'claude-opus-5' => 'Claude Opus 5 (default)', 'claude-sonnet-5' => 'Claude Sonnet 5', 'claude-haiku-4-5' => 'Claude Haiku 4.5' ) ),
+		array( 'claude_effort', __( 'Effort', 'mr-abb' ), 'brain', 'select', __( 'How hard Claude thinks per command. Medium suits a daily assistant.', 'mr-abb' ), array( 'low' => 'Low', 'medium' => 'Medium', 'high' => 'High', 'xhigh' => 'Extra high' ) ),
+		array( 'assistant_instructions', __( 'Owner instructions', 'mr-abb' ), 'brain', 'textarea', __( 'Standing instructions for Mr. Abb: priorities, people, preferences, tone.', 'mr-abb' ) ),
+		array( 'owner_user_id', __( 'Owner user', 'mr-abb' ), 'brain', 'users', __( 'The WordPress user the voice agent and automations act for.', 'mr-abb' ) ),
 		// Security.
 		array( 'require_auth', __( 'Require Authentication', 'mr-abb' ), 'security', 'checkbox', __( 'Only signed-in, allowed users can open the interface.', 'mr-abb' ) ),
 		array( 'allowed_roles', __( 'Allowed User Roles', 'mr-abb' ), 'security', 'roles', __( 'Administrators always have access.', 'mr-abb' ) ),
@@ -122,7 +129,8 @@ function mrabb_section_intro( $args ) {
 	$intros = array(
 		'mrabb_general'    => __( 'Identity and language of the assistant.', 'mr-abb' ),
 		'mrabb_voice'      => __( 'ElevenLabs voice session configuration. Secrets stay on the server.', 'mr-abb' ),
-		'mrabb_api'        => __( 'Where Mr. Abb sends tool requests. The browser only ever talks to this WordPress site.', 'mr-abb' ),
+		'mrabb_api'        => __( 'Where Mr. Abb runs tools. The browser only ever talks to this WordPress site. API keys and connections live under Mr. Abb → Connections.', 'mr-abb' ),
+		'mrabb_brain'      => __( 'Claude settings for typed commands and automations.', 'mr-abb' ),
 		'mrabb_security'   => __( 'Who can use the command center.', 'mr-abb' ),
 		'mrabb_appearance' => __( 'Small visual adjustments. Purple is used sparingly by design.', 'mr-abb' ),
 	);
@@ -175,6 +183,15 @@ function mrabb_render_field( $args ) {
 		case 'color':
 			printf( '<input type="color" id="%1$s" name="%2$s" value="%3$s" />', esc_attr( $id ), esc_attr( $name ), esc_attr( $value ) );
 			break;
+		case 'users':
+			$users = get_users( array( 'role__in' => array( 'administrator', 'editor' ), 'fields' => array( 'ID', 'display_name' ) ) );
+			printf( '<select id="%1$s" name="%2$s">', esc_attr( $id ), esc_attr( $name ) );
+			printf( '<option value="0" %1$s>%2$s</option>', selected( (int) $value, 0, false ), esc_html__( 'First administrator (automatic)', 'mr-abb' ) );
+			foreach ( $users as $u ) {
+				printf( '<option value="%1$d" %2$s>%3$s</option>', (int) $u->ID, selected( (int) $value, (int) $u->ID, false ), esc_html( $u->display_name ) );
+			}
+			echo '</select>';
+			break;
 		case 'roles':
 			$roles = wp_roles()->roles;
 			$value = (array) $value;
@@ -221,7 +238,7 @@ function mrabb_admin_dashboard_page() {
 		<div class="mrabb-admin__card">
 			<h2><?php esc_html_e( 'Mode', 'mr-abb' ); ?></h2>
 			<p class="mrabb-admin__big"><?php echo $mock ? esc_html__( 'Demo / Mock', 'mr-abb' ) : esc_html__( 'Live', 'mr-abb' ); ?></p>
-			<p class="description"><?php echo $mock ? esc_html__( 'The interface simulates every step. Configure a backend to go live.', 'mr-abb' ) : esc_html__( 'Requests are forwarded to your backend gateway.', 'mr-abb' ); ?></p>
+			<p class="description"><?php echo $mock ? esc_html__( 'The interface simulates every step. Connect Claude or ElevenLabs below, then turn Demo mode off.', 'mr-abb' ) : esc_html__( 'Requests are forwarded to your backend gateway.', 'mr-abb' ); ?></p>
 		</div>
 		<div class="mrabb-admin__card">
 			<h2><?php esc_html_e( 'Backend', 'mr-abb' ); ?></h2>
@@ -240,6 +257,7 @@ function mrabb_admin_dashboard_page() {
 			<p class="description"><?php echo esc_html( implode( ', ', (array) mrabb_get_setting( 'allowed_roles' ) ) ); ?></p>
 		</div>
 	</div>
+	<?php mrabb_setup_checklist(); ?>
 	<h2><?php esc_html_e( 'Pages', 'mr-abb' ); ?></h2>
 	<table class="widefat striped mrabb-admin__table">
 		<thead><tr><th><?php esc_html_e( 'View', 'mr-abb' ); ?></th><th><?php esc_html_e( 'URL', 'mr-abb' ); ?></th></tr></thead>
@@ -276,30 +294,6 @@ function mrabb_admin_settings_page() {
 	</div>
 	</div>
 	<?php
-}
-
-/**
- * Connections screen (server-side view of backend connections).
- */
-function mrabb_admin_connections_page() {
-	mrabb_admin_header( __( 'Connections', 'mr-abb' ) );
-	$result = mrabb_is_mock_mode() ? null : MrAbb_Gateway::request( 'GET', '/connections' );
-	if ( null === $result ) {
-		echo '<p>' . esc_html__( 'Demo mode: the Connections page on the site shows sample services. Once a backend is configured, this screen lists the real connection status from GET /connections.', 'mr-abb' ) . '</p>';
-	} elseif ( is_wp_error( $result ) ) {
-		echo '<div class="notice notice-error"><p>' . esc_html( $result->get_error_message() ) . '</p></div>';
-	} else {
-		$items = isset( $result['data'] ) && is_array( $result['data'] ) ? $result['data'] : $result;
-		echo '<table class="widefat striped mrabb-admin__table"><thead><tr><th>' . esc_html__( 'Service', 'mr-abb' ) . '</th><th>' . esc_html__( 'Status', 'mr-abb' ) . '</th><th>' . esc_html__( 'Last sync', 'mr-abb' ) . '</th></tr></thead><tbody>';
-		foreach ( (array) $items as $item ) {
-			if ( ! is_array( $item ) ) {
-				continue;
-			}
-			printf( '<tr><td>%1$s</td><td>%2$s</td><td>%3$s</td></tr>', esc_html( $item['name'] ?? '' ), esc_html( $item['status'] ?? '' ), esc_html( $item['lastSync'] ?? '—' ) );
-		}
-		echo '</tbody></table>';
-	}
-	echo '<p><a class="button" href="' . esc_url( mrabb_page_url( 'connections' ) ) . '">' . esc_html__( 'Open Connections page', 'mr-abb' ) . '</a></p></div>';
 }
 
 /**

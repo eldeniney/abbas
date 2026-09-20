@@ -1,6 +1,8 @@
 # Mr. Abb — Backend API Contract (v1)
 
-The WordPress theme never talks to third-party services. It talks to **one secure tool gateway** (for example `https://api.eldeniney.me`) through the theme's own REST proxy:
+**Default: built-in gateway.** Since v1.1 the theme implements this contract inside WordPress (`inc/gateway/`), so no external backend is required. Set *Settings → API → Gateway* to *External* to forward the same routes to your own service instead. The contract below is identical in both modes.
+
+The WordPress theme never talks to third-party services from the browser. It talks to **one secure tool gateway** (for example `https://api.eldeniney.me`) through the theme's own REST proxy:
 
 ```
 Browser ──(cookie + X-WP-Nonce)──▶ WordPress /wp-json/mrabb/v1/* ──(Bearer MRABB_BACKEND_SECRET)──▶ Backend
@@ -107,3 +109,13 @@ Detail adds `messages` (`{ role: "user"|"agent", text, time }`), `tools` (`{ too
 ## Adding a tool
 
 Nothing in WordPress needs to change. Emit `tool` events with your new tool name (e.g. `hubspot.searchDeals`) and, optionally, `result` events with a `cardType`. Unknown card types render as a clean generic card. Permission levels are inferred from the tool name (`*.send`, `*.delete`, `*.pay` → approval; `*.create`, `*.draft`, `*.execute` → action; otherwise read) unless the event specifies `level`.
+
+## Inbound endpoints (built-in gateway)
+
+| Endpoint | Caller | Auth |
+| --- | --- | --- |
+| `POST /wp-json/mrabb/v1/hooks/tool/{tool_name}` | ElevenLabs server tools (`calendar_search`, `email_send`, …) | header `X-MrAbb-Hook-Secret` |
+| `POST /wp-json/mrabb/v1/hooks/elevenlabs` | ElevenLabs post-call webhook | `ElevenLabs-Signature` HMAC |
+| `GET /wp-json/mrabb/v1/oauth/google` | Google OAuth redirect | signed `state` |
+
+Tool hook request body: the tool's parameters plus `session_id` (the `mrabb_session_id` dynamic variable). Response: `{ status: "completed|failed|requires_approval", summary, data?, approvalId? }`.

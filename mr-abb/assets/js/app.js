@@ -47,6 +47,7 @@
 
 	function onComposer(p) {
 		agent.sendText(p.text).catch(function (err) { ui.toast(err.message || t('error_generic'), 'danger'); });
+		if (agent.name !== 'mock' && !config.mockMode && !agent.isActive()) { MrAbb.pages.loadContext(); }
 	}
 
 	function onApprovalDecision(p) {

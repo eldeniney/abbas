@@ -16,3 +16,15 @@
 .mrabb-admin__level--warn { background: #FBF2DF; color: #B97A12; }
 .mrabb-admin__level--error { background: #FBEAE9; color: #BF4A47; }
 #mrabb-test-result { margin-inline-start: 8px; font-size: 13px; }
+
+.mrabb-conn__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; margin-top: 16px; }
+.mrabb-conn__card h2 { display: flex; align-items: center; gap: 8px; font-size: 15px; text-transform: none; letter-spacing: 0; color: #1f1d22; }
+.mrabb-conn__card .regular-text { width: 100%; max-width: 420px; }
+.mrabb-conn__card details { margin-top: 8px; }
+.mrabb-copy.is-copied { outline: 2px solid #2E8B5B; }
+.mrabb-test-out { margin-inline-start: 6px; font-size: 13px; }
+.mrabb-checklist ol { margin: 8px 0 0; padding: 0; list-style: none; }
+.mrabb-checklist li { padding: 6px 0; border-bottom: 1px solid #f0eef2; }
+.mrabb-checklist li.is-done { color: #7a7580; }
+.mrabb-checklist__mark { display: inline-block; width: 20px; color: #2E8B5B; font-weight: 700; }
+.mrabb-checklist li:not(.is-done) .mrabb-checklist__mark { color: #B97A12; }

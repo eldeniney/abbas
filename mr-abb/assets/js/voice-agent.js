@@ -69,6 +69,7 @@
 				var e = new Error('mock_session'); e.code = 'mock_session'; throw e;
 			}
 			self.session = session;
+			if (session.sessionId) { MrAbb.events.handle({ type: 'session', id: session.sessionId }); }
 			return loadSdk().catch(function (err) { var e2 = new Error(t('error_sdk')); e2.code = 'sdk'; e2.details = err && err.message; throw e2; });
 		}).then(function (Conversation) {
 			return self.startConversation(Conversation);
@@ -138,7 +139,8 @@
 			if (res && res.reply && res.reply.text) { MrAbb.events.handle({ type: 'transcript', role: 'agent', text: res.reply.text }); }
 			if (store.get('agentState') !== 'approval_required' && store.get('agentState') !== 'error') { store.setAgentState('idle'); }
 		}).catch(function (err) {
-			self.onError(err.message, err);
+			MrAbb.events.handle({ type: 'error', message: err.message || t('error_generic'), details: err.details, retryable: false });
+			store.setAgentState('idle');
 		});
 	};
 
@@ -149,6 +151,9 @@
 		return call.then(function (res) {
 			MrAbb.events.handle({ type: 'approval_resolved', id: id, approved: approved });
 			if (res && Array.isArray(res.events)) { MrAbb.events.handleMany(res.events); }
+			if (res && res.contextualUpdate && self.conversation && typeof self.conversation.sendContextualUpdate === 'function') {
+				try { self.conversation.sendContextualUpdate('Owner decision: ' + (approved ? 'approved' : 'cancelled') + '. ' + res.contextualUpdate); } catch (e) { /* ignore */ }
+			}
 			if (pending) { pending.resolve(approved ? 'approved' : 'rejected'); delete self.pendingApprovals[id]; }
 			if (store.get('agentState') === 'approval_required') { store.setAgentState(self.conversation ? 'listening' : 'idle'); }
 		}).catch(function (err) { self.onError(err.message, err); });
@@ -236,11 +241,13 @@
 		var self = this;
 		if (!config.backendConfigured || this.poller) { return; }
 		this.lastActivityAt = new Date().toISOString();
+		this.activityCursor = 0;
 		var poll = function () {
 			if (!self.active) { return; }
 			var session = store.get('session');
-			api.activity({ since: self.lastActivityAt, sessionId: session ? (session.remoteId || session.id) : undefined }).then(function (res) {
+			api.activity({ since: self.activityCursor ? undefined : self.lastActivityAt, cursor: self.activityCursor || undefined, sessionId: session ? (session.remoteId || session.id) : undefined }).then(function (res) {
 				var events = res && Array.isArray(res.events) ? res.events : (Array.isArray(res) ? res : []);
+				if (res && res.cursor) { self.activityCursor = res.cursor; }
 				if (events.length) { self.lastActivityAt = res.now || new Date().toISOString(); MrAbb.events.handleMany(events); }
 			}).catch(function () { /* transient */ });
 		};

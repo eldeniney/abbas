@@ -43,6 +43,7 @@ class MrAbb_Gateway {
 		'POST /tasks',
 		'POST /tasks/*/complete',
 		'GET /automations',
+		'POST /automations',
 		'POST /automations/*/toggle',
 		'POST /automations/*/run',
 	);
@@ -83,6 +84,12 @@ class MrAbb_Gateway {
 	 * @return array|WP_Error Decoded JSON on success.
 	 */
 	public static function request( $method, $path, $body = null, $query = array() ) {
+		if ( mrabb_is_builtin_gateway() ) {
+			if ( ! self::is_allowed( $method, $path ) ) {
+				return new WP_Error( 'mrabb_path_not_allowed', __( 'That request is not permitted.', 'mr-abb' ), array( 'status' => 400 ) );
+			}
+			return MrAbb_Local_Gateway::handle( $method, $path, $body, $query, get_current_user_id() );
+		}
 		if ( ! mrabb_backend_configured() ) {
 			return new WP_Error( 'mrabb_no_backend', __( 'The backend is not configured yet. Mr. Abb is running in demo mode.', 'mr-abb' ), array( 'status' => 503 ) );
 		}
@@ -155,6 +162,14 @@ class MrAbb_Gateway {
 	 * @return array
 	 */
 	public static function health() {
+		if ( mrabb_is_builtin_gateway() ) {
+			$parts = array();
+			$parts[] = MrAbb_Brain::configured() ? __( 'Claude key set', 'mr-abb' ) : __( 'Claude key missing', 'mr-abb' );
+			$parts[] = MrAbb_ElevenLabs::configured() ? __( 'ElevenLabs ready', 'mr-abb' ) : __( 'ElevenLabs not set up', 'mr-abb' );
+			$parts[] = MrAbb_Google::is_connected() ? __( 'Google connected', 'mr-abb' ) : __( 'Google not connected', 'mr-abb' );
+			$ok = MrAbb_Brain::configured() || MrAbb_ElevenLabs::configured();
+			return array( 'ok' => $ok, 'state' => $ok ? 'connected' : 'unconfigured', 'message' => __( 'Built-in gateway.', 'mr-abb' ) . ' ' . implode( ' · ', $parts ) );
+		}
 		if ( ! mrabb_backend_configured() ) {
 			return array(
 				'ok'      => false,

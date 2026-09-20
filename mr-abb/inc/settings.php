@@ -41,10 +41,18 @@ function mrabb_default_settings() {
 		'agent_id'         => '',
 		'session_endpoint' => '/voice/session',
 		'sdk_url'          => 'https://cdn.jsdelivr.net/npm/@elevenlabs/client@0.4.5/+esm',
-		// API.
+		// API / gateway.
+		'gateway_mode'     => 'builtin',
 		'backend_url'      => '',
-		'environment'      => 'development',
+		'environment'      => 'production',
 		'mock_mode'        => 1,
+		// Brain.
+		'claude_model'     => 'claude-opus-5',
+		'claude_effort'    => 'medium',
+		'assistant_instructions' => '',
+		'owner_user_id'    => 0,
+		// Google OAuth (client id is public; the secret is stored encrypted).
+		'google_client_id' => '',
 		// Security.
 		'require_auth'     => 1,
 		'allowed_roles'    => array( 'administrator' ),
@@ -114,8 +122,14 @@ function mrabb_sanitize_settings( $input ) {
 
 	$backend_url        = esc_url_raw( trim( (string) ( $input['backend_url'] ?? '' ) ), array( 'https', 'http' ) );
 	$out['backend_url'] = $backend_url ? untrailingslashit( $backend_url ) : '';
-	$out['environment'] = in_array( $input['environment'] ?? 'development', array( 'development', 'staging', 'production' ), true ) ? $input['environment'] : 'development';
+	$out['environment'] = in_array( $input['environment'] ?? 'production', array( 'development', 'staging', 'production' ), true ) ? $input['environment'] : 'production';
 	$out['mock_mode']   = empty( $input['mock_mode'] ) ? 0 : 1;
+	$out['gateway_mode'] = in_array( $input['gateway_mode'] ?? 'builtin', array( 'builtin', 'external' ), true ) ? $input['gateway_mode'] : 'builtin';
+	$out['claude_model'] = preg_replace( '/[^a-z0-9\-]/', '', (string) ( $input['claude_model'] ?? $defaults['claude_model'] ) ) ?: $defaults['claude_model'];
+	$out['claude_effort'] = in_array( $input['claude_effort'] ?? 'medium', array( 'low', 'medium', 'high', 'xhigh', 'max' ), true ) ? $input['claude_effort'] : 'medium';
+	$out['assistant_instructions'] = sanitize_textarea_field( $input['assistant_instructions'] ?? '' );
+	$out['owner_user_id'] = (int) ( $input['owner_user_id'] ?? 0 );
+	$out['google_client_id'] = sanitize_text_field( $input['google_client_id'] ?? $current['google_client_id'] ?? '' );
 
 	$out['require_auth']  = empty( $input['require_auth'] ) ? 0 : 1;
 	$roles                = isset( $input['allowed_roles'] ) && is_array( $input['allowed_roles'] ) ? $input['allowed_roles'] : array( 'administrator' );
@@ -135,6 +149,16 @@ function mrabb_sanitize_settings( $input ) {
 			update_option( MRABB_SECRET_OPTION, $secret, false );
 		} elseif ( '' === $secret && ! empty( $input['clear_backend_secret'] ) ) {
 			delete_option( MRABB_SECRET_OPTION );
+		}
+	}
+
+	// Secrets handled by the Connections screen may also arrive here (Settings → API).
+	foreach ( array( 'anthropic_api_key', 'elevenlabs_api_key', 'elevenlabs_webhook_secret', 'google_client_secret' ) as $secret_key ) {
+		if ( isset( $input[ $secret_key ] ) && class_exists( 'MrAbb_Secrets' ) && ! MrAbb_Secrets::is_constant( $secret_key ) ) {
+			$val = trim( (string) $input[ $secret_key ] );
+			if ( '' !== $val && '••••••••' !== $val ) {
+				MrAbb_Secrets::set( $secret_key, $val );
+			}
 		}
 	}
 
@@ -165,7 +189,19 @@ function mrabb_get_backend_secret() {
  * @return bool
  */
 function mrabb_backend_configured() {
+	if ( 'builtin' === mrabb_get_setting( 'gateway_mode', 'builtin' ) ) {
+		return true;
+	}
 	return '' !== mrabb_get_setting( 'backend_url', '' );
+}
+
+/**
+ * Is the built-in gateway (WordPress itself) the backend?
+ *
+ * @return bool
+ */
+function mrabb_is_builtin_gateway() {
+	return 'builtin' === mrabb_get_setting( 'gateway_mode', 'builtin' );
 }
 
 /**

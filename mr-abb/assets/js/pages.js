@@ -55,7 +55,7 @@
 
 	/* ------------------------------------------------------------ History */
 	function renderHistory(container, data) {
-		var sessions = (data && data.sessions) || [];
+		var sessions = Array.isArray(data) ? data : ((data && data.sessions) || []);
 		container.innerHTML = '';
 		if (!sessions.length) { container.appendChild(ui.emptyState(t('empty_history_title'), t('empty_history_text'), { label: t('new_session').replace('.', ''), onClick: function () { window.location.href = config.pages.home; } })); return; }
 		sessions.sort(function (a, b) { return new Date(b.startedAt) - new Date(a.startedAt); });
@@ -86,7 +86,7 @@
 
 	/* -------------------------------------------------------------- Tasks */
 	function renderTasks(container, data) {
-		var tasks = (data && data.tasks) || [];
+		var tasks = Array.isArray(data) ? data : ((data && data.tasks) || []);
 		container.innerHTML = '';
 		var today = new Date(); today.setHours(0, 0, 0, 0);
 		var sections = [
@@ -113,7 +113,7 @@
 
 	/* -------------------------------------------------------- Connections */
 	function renderConnections(container, data) {
-		var items = (data && data.connections) || [];
+		var items = Array.isArray(data) ? data : ((data && data.connections) || []);
 		container.innerHTML = '';
 		if (!items.length) { container.appendChild(ui.emptyState(t('empty_connections_title'), t('empty_connections_text'))); return; }
 		container.appendChild(el('div', { class: 'mrabb-grid' }, items.map(function (c) {
@@ -140,7 +140,7 @@
 
 	/* -------------------------------------------------------- Automations */
 	function renderAutomations(container, data) {
-		var items = (data && data.automations) || [];
+		var items = Array.isArray(data) ? data : ((data && data.automations) || []);
 		container.innerHTML = '';
 		if (!items.length) { container.appendChild(ui.emptyState(t('empty_automations_title'), t('empty_automations_text'), { label: t('new_automation'), onClick: newAutomation })); return; }
 		container.appendChild(el('div', { class: 'mrabb-rows' }, items.map(function (a) {

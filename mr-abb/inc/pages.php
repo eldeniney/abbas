@@ -60,6 +60,9 @@ function mrabb_ensure_pages() {
  */
 function mrabb_on_activation() {
 	mrabb_ensure_pages();
+	MrAbb_Store::install();
+	MrAbb_Cron::seed_defaults();
+	MrAbb_Secrets::hook_secret();
 	if ( ! get_option( 'permalink_structure' ) ) {
 		update_option( 'permalink_structure', '/%postname%/' );
 	}
