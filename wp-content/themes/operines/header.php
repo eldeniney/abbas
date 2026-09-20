@@ -23,10 +23,12 @@ $nav = operines_nav();
 	<div class="container announce-inner">
 		<p>AI &amp; automation for UAE business — Arabic &amp; English, WhatsApp-first.</p>
 		<a href="<?php echo esc_url( home_url( '/book-audit/' ) ); ?>">Book an AI Automation Audit<?php echo operines_icon( 'arrow-right', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></a>
-		<?php if ( is_user_logged_in() ) : ?>
-			<a href="<?php echo esc_url( home_url( '/my-account/' ) ); ?>">My account</a>
-		<?php else : ?>
-			<a href="<?php echo esc_url( home_url( '/login/' ) ); ?>">Sign in</a>
+		<?php if ( operines_portal_enabled() ) : ?>
+			<?php if ( is_user_logged_in() ) : ?>
+				<a href="<?php echo esc_url( home_url( '/my-account/' ) ); ?>">My account</a>
+			<?php else : ?>
+				<a href="<?php echo esc_url( home_url( '/login/' ) ); ?>">Sign in</a>
+			<?php endif; ?>
 		<?php endif; ?>
 	</div>
 </div>

@@ -167,9 +167,13 @@ add_action(
 					'Status'  => $labels[ $new_status ],
 					'closed' === $new_status
 						? 'This request is now closed. If anything else should run better in your business, we are one message away.'
-						: 'We will keep you posted as it moves. You can also track it from your account.',
+						: ( operines_portal_enabled()
+							? 'We will keep you posted as it moves. You can also track it from your account.'
+							: 'We will keep you posted as it moves.' ),
 				),
-				array( 'View my account', home_url( '/my-account/' ) )
+				operines_portal_enabled()
+					? array( 'View my account', home_url( '/my-account/' ) )
+					: array( 'Visit the website', home_url( '/' ) )
 			);
 		}
 	}

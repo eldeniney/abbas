@@ -97,13 +97,17 @@ function operines_store_lead( string $type, array $fields ): void {
 				$is_audit
 					? 'A consultant is reviewing your answers and will come back within one business day with your automation opportunity map and the recommended first step.'
 					: 'A consultant will reply within one business day. If it is urgent, just reply to this email.',
-				$user_id
-					? 'You can follow the status of this request from your account at any time.'
-					: 'Tip: create a free account to follow the status of your requests and keep your details in one place.',
+				operines_portal_enabled()
+					? ( $user_id
+						? 'You can follow the status of this request from your account at any time.'
+						: 'Tip: create a free account to follow the status of your requests and keep your details in one place.' )
+					: 'We will keep you updated by email at every step.',
 			),
-			$user_id
-				? array( 'Track my request', home_url( '/my-account/' ) )
-				: array( 'Create my account', home_url( '/register/' ) )
+			operines_portal_enabled()
+				? ( $user_id
+					? array( 'Track my request', home_url( '/my-account/' ) )
+					: array( 'Create my account', home_url( '/register/' ) ) )
+				: array( 'Visit the website', home_url( '/' ) )
 		);
 	}
 

@@ -13,8 +13,7 @@ vanilla-JS file.
 1. Copy `wp-content/themes/operines/` into the site's `wp-content/themes/`
    (or upload the theme zip via Appearance → Themes → Add New).
 2. Activate the **Operines** theme. **Activation provisions everything
-   automatically**: all 20 pages (including the client portal at
-   `/register/`, `/login/`, `/my-account/`), front/posts page assignment,
+   automatically**: all pages, front/posts page assignment,
    `/%postname%/` permalinks, timezone, tagline, legal placeholders and the
    five starter Insights articles. Idempotent — re-activating never
    duplicates content.
@@ -34,8 +33,16 @@ vanilla-JS file.
 
 The inquiry inbox lives in wp-admin under **Leads** (statuses New → In
 review → Contacted → Closed, internal notes, optional automated status
-email to the client); client accounts appear under **Users** with the role
-*Operines Client* and never see wp-admin.
+email to the client).
+
+**Client portal — currently switched OFF.** The full portal (registration,
+sign-in, `/my-account/`, wp-admin lockout for client accounts) is built but
+disabled so nothing interferes with the standard WordPress login
+(`wp-login.php` / hosting auto-login links). To re-enable it, set
+`OPERINES_PORTAL` to `true` in `functions.php` and re-run the seeder (or
+re-activate the theme) so its pages are created. While off, `/login/`,
+`/register/` and `/my-account/` redirect to the homepage and their links
+are hidden site-wide.
 
 No other plugins are required. The theme was developed and tested against
 WordPress 7.1 / PHP 8.4.

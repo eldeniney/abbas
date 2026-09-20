@@ -74,9 +74,13 @@ function operines_seed_site(): void {
 	operines_seed_page( 'about', 'About' );
 	operines_seed_page( 'contact', 'Contact' );
 	operines_seed_page( 'book-audit', 'Book an AI Automation Audit' );
-	operines_seed_page( 'register', 'Create your account' );
-	operines_seed_page( 'login', 'Sign in' );
-	operines_seed_page( 'my-account', 'My account' );
+	// Client portal pages only exist while the portal is switched on
+	// (OPERINES_PORTAL in functions.php); while off they also redirect home.
+	if ( operines_portal_enabled() ) {
+		operines_seed_page( 'register', 'Create your account' );
+		operines_seed_page( 'login', 'Sign in' );
+		operines_seed_page( 'my-account', 'My account' );
+	}
 
 	// Standalone unbranded survey landing (Arabic, temporary, unlisted —
 	// not linked from any menu; noindex is printed by its own template).

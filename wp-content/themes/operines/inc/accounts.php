@@ -13,6 +13,14 @@ defined( 'ABSPATH' ) || exit;
 
 const OPERINES_CLIENT_ROLE = 'operines_client';
 
+/**
+ * Whether the client portal (register/login/my-account + access rules)
+ * is active. Controlled by the OPERINES_PORTAL constant in functions.php.
+ */
+function operines_portal_enabled(): bool {
+	return defined( 'OPERINES_PORTAL' ) && OPERINES_PORTAL;
+}
+
 /** Profile meta fields editable by the client. */
 function operines_profile_fields(): array {
 	return array(
@@ -40,6 +48,10 @@ add_action( 'admin_post_nopriv_operines_register', 'operines_handle_register' );
  * Create the client account, log them in, send onboarding emails.
  */
 function operines_handle_register(): void {
+	if ( ! operines_portal_enabled() ) {
+		wp_safe_redirect( home_url( '/' ) );
+		exit;
+	}
 	if ( ! operines_form_guard( 'operines_register' ) ) {
 		operines_form_redirect( '/register/', 'error' );
 	}
@@ -171,6 +183,10 @@ add_action( 'admin_post_operines_login', 'operines_handle_login' );
  * Front-end sign-in.
  */
 function operines_handle_login(): void {
+	if ( ! operines_portal_enabled() ) {
+		wp_safe_redirect( home_url( '/' ) );
+		exit;
+	}
 	if ( ! isset( $_POST['_opnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_opnonce'] ) ), 'operines_login' ) ) {
 		operines_form_redirect( '/login/', 'error' );
 	}
@@ -198,6 +214,10 @@ add_action( 'admin_post_operines_profile', 'operines_handle_profile' );
  * Client updates their own details from /my-account/.
  */
 function operines_handle_profile(): void {
+	if ( ! operines_portal_enabled() ) {
+		wp_safe_redirect( home_url( '/' ) );
+		exit;
+	}
 	if ( ! is_user_logged_in()
 		|| ! isset( $_POST['_opnonce'] )
 		|| ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_opnonce'] ) ), 'operines_profile' ) ) {
@@ -231,6 +251,14 @@ function operines_handle_profile(): void {
 add_action(
 	'template_redirect',
 	function () {
+		// Portal off: the auth/account pages are unreachable — straight home.
+		if ( ! operines_portal_enabled() ) {
+			if ( is_page( 'my-account' ) || is_page( 'login' ) || is_page( 'register' ) ) {
+				wp_safe_redirect( home_url( '/' ) );
+				exit;
+			}
+			return;
+		}
 		// The account area requires sign-in.
 		if ( is_page( 'my-account' ) && ! is_user_logged_in() ) {
 			wp_safe_redirect( home_url( '/login/' ) );
@@ -245,13 +273,18 @@ add_action(
 );
 
 // Clients live on the front-end: no admin bar, no wp-admin.
+// Both rules apply only while the portal is active — with it off, nothing
+// interferes with the standard WordPress login and wp-admin.
 add_filter(
 	'show_admin_bar',
-	fn( $show ) => current_user_can( 'edit_posts' ) ? $show : false
+	fn( $show ) => ( ! operines_portal_enabled() || current_user_can( 'edit_posts' ) ) ? $show : false
 );
 add_action(
 	'admin_init',
 	function () {
+		if ( ! operines_portal_enabled() ) {
+			return;
+		}
 		global $pagenow;
 		// admin-post.php and admin-ajax.php are form/API endpoints used by
 		// the front-end for everyone — only admin SCREENS are locked down.
