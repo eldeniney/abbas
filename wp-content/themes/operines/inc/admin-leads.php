@@ -12,6 +12,16 @@
 
 defined( 'ABSPATH' ) || exit;
 
+/** Lead status vocabulary. */
+function operines_lead_statuses(): array {
+	return array(
+		'new'       => 'New',
+		'review'    => 'In review',
+		'contacted' => 'Contacted',
+		'closed'    => 'Closed',
+	);
+}
+
 /* -------------------------------------------------- List table columns */
 
 add_filter(
@@ -167,13 +177,9 @@ add_action(
 					'Status'  => $labels[ $new_status ],
 					'closed' === $new_status
 						? 'This request is now closed. If anything else should run better in your business, we are one message away.'
-						: ( operines_portal_enabled()
-							? 'We will keep you posted as it moves. You can also track it from your account.'
-							: 'We will keep you posted as it moves.' ),
+						: 'We will keep you posted as it moves.',
 				),
-				operines_portal_enabled()
-					? array( 'View my account', home_url( '/my-account/' ) )
-					: array( 'Visit the website', home_url( '/' ) )
+				array( 'Visit the website', home_url( '/' ) )
 			);
 		}
 	}

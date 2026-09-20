@@ -74,12 +74,14 @@ function operines_seed_site(): void {
 	operines_seed_page( 'about', 'About' );
 	operines_seed_page( 'contact', 'Contact' );
 	operines_seed_page( 'book-audit', 'Book an AI Automation Audit' );
-	// Client portal pages only exist while the portal is switched on
-	// (OPERINES_PORTAL in functions.php); while off they also redirect home.
-	if ( operines_portal_enabled() ) {
-		operines_seed_page( 'register', 'Create your account' );
-		operines_seed_page( 'login', 'Sign in' );
-		operines_seed_page( 'my-account', 'My account' );
+	// The client-portal pages were removed from the theme — clean up any
+	// copies an earlier version created, so only the normal WordPress
+	// login (wp-login.php / wp-admin) exists.
+	foreach ( array( 'register', 'login', 'my-account' ) as $portal_slug ) {
+		$portal_page = get_page_by_path( $portal_slug, OBJECT, 'page' );
+		if ( $portal_page ) {
+			wp_delete_post( $portal_page->ID, true );
+		}
 	}
 
 	// Standalone unbranded survey landing (Arabic, temporary, unlisted —

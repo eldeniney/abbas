@@ -35,14 +35,11 @@ The inquiry inbox lives in wp-admin under **Leads** (statuses New → In
 review → Contacted → Closed, internal notes, optional automated status
 email to the client).
 
-**Client portal — currently switched OFF.** The full portal (registration,
-sign-in, `/my-account/`, wp-admin lockout for client accounts) is built but
-disabled so nothing interferes with the standard WordPress login
-(`wp-login.php` / hosting auto-login links). To re-enable it, set
-`OPERINES_PORTAL` to `true` in `functions.php` and re-run the seeder (or
-re-activate the theme) so its pages are created. While off, `/login/`,
-`/register/` and `/my-account/` redirect to the homepage and their links
-are hidden site-wide.
+Administration uses the **normal WordPress login** (`wp-login.php` /
+`wp-admin`) — the theme adds no custom login, registration or account
+pages, and does not interfere with hosting auto-login links. If an earlier
+theme version created `/login/`, `/register/` or `/my-account/` pages,
+re-activating the theme (or re-running the seeder) deletes them.
 
 No other plugins are required. The theme was developed and tested against
 WordPress 7.1 / PHP 8.4.

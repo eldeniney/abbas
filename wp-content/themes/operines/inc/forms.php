@@ -62,13 +62,6 @@ function operines_store_lead( string $type, array $fields ): void {
 
 	$email = strtolower( trim( $fields['Email'] ?? '' ) );
 
-	// Attach to a client account: the signed-in user, or a match by email.
-	$user_id = get_current_user_id();
-	if ( ! $user_id && $email ) {
-		$user    = get_user_by( 'email', $email );
-		$user_id = $user ? (int) $user->ID : 0;
-	}
-
 	$lead_id = wp_insert_post(
 		array(
 			'post_type'    => 'operines_lead',
@@ -81,7 +74,6 @@ function operines_store_lead( string $type, array $fields ): void {
 				'_operines_lead_email'   => $email,
 				'_operines_lead_phone'   => $fields['Phone'] ?? '',
 				'_operines_lead_company' => $fields['Company'] ?? '',
-				'_operines_lead_user'    => $user_id ? $user_id : '',
 			),
 		)
 	);
@@ -97,17 +89,9 @@ function operines_store_lead( string $type, array $fields ): void {
 				$is_audit
 					? 'A consultant is reviewing your answers and will come back within one business day with your automation opportunity map and the recommended first step.'
 					: 'A consultant will reply within one business day. If it is urgent, just reply to this email.',
-				operines_portal_enabled()
-					? ( $user_id
-						? 'You can follow the status of this request from your account at any time.'
-						: 'Tip: create a free account to follow the status of your requests and keep your details in one place.' )
-					: 'We will keep you updated by email at every step.',
+				'We will keep you updated by email at every step.',
 			),
-			operines_portal_enabled()
-				? ( $user_id
-					? array( 'Track my request', home_url( '/my-account/' ) )
-					: array( 'Create my account', home_url( '/register/' ) ) )
-				: array( 'Visit the website', home_url( '/' ) )
+			array( 'Visit the website', home_url( '/' ) )
 		);
 	}
 

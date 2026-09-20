@@ -8,14 +8,6 @@
 defined( 'ABSPATH' ) || exit;
 
 define( 'OPERINES_VERSION', '1.0.0' );
-
-/**
- * Client portal switch. Set to true to bring back /register/, /login/ and
- * /my-account/ (plus their header/footer links and wp-admin lockout for
- * client accounts). While false, those pages redirect home and nothing
- * intercepts the standard WordPress login (wp-login.php / wp-admin).
- */
-define( 'OPERINES_PORTAL', false );
 define( 'OPERINES_DIR', get_template_directory() );
 define( 'OPERINES_URI', get_template_directory_uri() );
 
@@ -27,7 +19,6 @@ require OPERINES_DIR . '/inc/seo.php';
 require OPERINES_DIR . '/inc/forms.php';
 require OPERINES_DIR . '/inc/template-tags.php';
 require OPERINES_DIR . '/inc/emails.php';
-require OPERINES_DIR . '/inc/accounts.php';
 require OPERINES_DIR . '/inc/admin-leads.php';
 require OPERINES_DIR . '/inc/survey.php';
 require OPERINES_DIR . '/inc/seed-functions.php';
