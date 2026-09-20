@@ -83,6 +83,40 @@ add_action( 'admin_post_nopriv_op_survey_submit', 'op_survey_handle_submit' );
 add_action( 'admin_post_op_survey_submit', 'op_survey_handle_submit' );
 
 /**
+ * Client IP. Behind a CDN/proxy (e.g. Cloudflare) hook the filter and
+ * return the connecting-IP header instead.
+ */
+function op_survey_client_ip(): string {
+	$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+	return (string) apply_filters( 'op_survey_client_ip', $ip );
+}
+
+/**
+ * Submissions from this IP in the last 24 hours.
+ */
+function op_survey_ip_count_24h( string $ip ): int {
+	if ( '' === $ip ) {
+		return 0;
+	}
+	$posts = get_posts(
+		array(
+			'post_type'   => OP_SURVEY_CPT,
+			'post_status' => 'private',
+			'numberposts' => 10,
+			'fields'      => 'ids',
+			'date_query'  => array( array( 'after' => '24 hours ago' ) ),
+			'meta_query'  => array( // phpcs:ignore WordPress.DB.SlowDBQuery
+				array(
+					'key'   => '_op_survey_ip',
+					'value' => $ip,
+				),
+			),
+		)
+	);
+	return count( $posts );
+}
+
+/**
  * Validate, store, and return the promo code as JSON.
  */
 function op_survey_handle_submit(): void {
@@ -106,8 +140,52 @@ function op_survey_handle_submit(): void {
 	if ( '' === $name || 'yes' !== $consent || '' === $city || '' === $area ) {
 		wp_send_json_error( array( 'message' => 'في بيانات مطلوبة ناقصة — ارجع خطوة وكمّلها.' ), 400 );
 	}
-	if ( ! preg_match( '/^01[0-9]{9}$/', $mobile ) ) {
-		wp_send_json_error( array( 'message' => 'رقم الموبايل مش صحيح — لازم يبدأ بـ 01 ويكون 11 رقم.' ), 400 );
+	// Real Egyptian mobile only: 010 / 011 / 012 / 015 + 8 digits.
+	if ( ! preg_match( '/^01[0125][0-9]{8}$/', $mobile ) ) {
+		wp_send_json_error( array( 'message' => 'رقم الموبايل مش صحيح — لازم يبدأ بـ 010 أو 011 أو 012 أو 015 ويكون 11 رقم.' ), 400 );
+	}
+
+	/* ---------- fraud guards ---------- */
+
+	// Answering 12 screens honestly can't take under 10 seconds.
+	$ts = isset( $_POST['_opts'] ) ? absint( $_POST['_opts'] ) : 0;
+	if ( ! $ts || ( time() - $ts ) < 10 ) {
+		wp_send_json_error( array( 'message' => 'خد وقتك في الإجابات وجرّب تاني.' ), 400 );
+	}
+
+	// Cap submissions per connection: 3 per IP per 24h (a household can
+	// share a router, so the cap is generous; beyond it is farming).
+	$ip       = op_survey_client_ip();
+	$ip_count = op_survey_ip_count_24h( $ip );
+	if ( $ip_count >= 3 ) {
+		wp_send_json_error( array( 'message' => 'استقبلنا أكتر من مشاركة من نفس الاتصال بالإنترنت النهارده — جرّب تاني بكرة.' ), 429 );
+	}
+
+	// One entry per email as well (when an email is given).
+	$email_in = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
+	if ( $email_in && is_email( $email_in ) ) {
+		$by_email = get_posts(
+			array(
+				'post_type'   => OP_SURVEY_CPT,
+				'post_status' => 'private',
+				'numberposts' => 1,
+				'fields'      => 'ids',
+				'meta_query'  => array( // phpcs:ignore WordPress.DB.SlowDBQuery
+					array(
+						'key'   => '_op_survey_email',
+						'value' => $email_in,
+					),
+				),
+			)
+		);
+		if ( $by_email ) {
+			wp_send_json_success(
+				array(
+					'code'      => (string) get_post_meta( $by_email[0], '_op_survey_code', true ),
+					'duplicate' => true,
+				)
+			);
+		}
 	}
 
 	$code = 'BHR75-' . substr( $mobile, -4 );
@@ -136,10 +214,18 @@ function op_survey_handle_submit(): void {
 		);
 	}
 
-	$meta    = array(
+	$ua   = isset( $_SERVER['HTTP_USER_AGENT'] ) ? substr( sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ), 0, 200 ) : '';
+	$meta = array(
 		'_op_survey_code'   => $code,
 		'_op_survey_mobile' => $mobile,
+		'_op_survey_ip'     => $ip,
+		'_op_survey_ua'     => $ua,
 	);
+	// Repeat submissions from one connection are allowed (shared routers)
+	// but flagged, so they are easy to review before honoring codes.
+	if ( $ip_count > 0 ) {
+		$meta['_op_survey_flag'] = sprintf( 'same-network #%d', $ip_count + 1 );
+	}
 	$summary = '';
 	foreach ( op_survey_fields() as $key => $def ) {
 		list( , $label, $multi ) = $def;
@@ -198,6 +284,7 @@ add_filter(
 			'sv_area'     => 'Area',
 			'sv_delivery' => 'Deliveries/30d',
 			'sv_code'     => 'Promo code',
+			'sv_flag'     => 'Flag',
 			'date'        => 'Received',
 		);
 	}
@@ -216,6 +303,13 @@ add_action(
 			echo esc_html( (string) get_post_meta( $post_id, $map[ $column ], true ) );
 		} elseif ( 'sv_code' === $column ) {
 			echo '<code>' . esc_html( (string) get_post_meta( $post_id, '_op_survey_code', true ) ) . '</code>';
+		} elseif ( 'sv_flag' === $column ) {
+			$flag = (string) get_post_meta( $post_id, '_op_survey_flag', true );
+			if ( $flag ) {
+				echo '<span style="color:#b45309;font-weight:600">⚑ ' . esc_html( $flag ) . '</span>';
+			} else {
+				echo '—';
+			}
 		}
 	},
 	10,
@@ -300,6 +394,18 @@ add_action(
 						esc_html( '' !== $value ? $value : '—' )
 					);
 				}
+				foreach ( array(
+					'_op_survey_ip'   => 'IP address',
+					'_op_survey_ua'   => 'Browser (user agent)',
+					'_op_survey_flag' => 'Fraud flag',
+				) as $meta_key => $label ) {
+					$value = (string) get_post_meta( $post->ID, $meta_key, true );
+					printf(
+						'<tr><td><strong>%s</strong></td><td>%s</td></tr>',
+						esc_html( $label ),
+						esc_html( '' !== $value ? $value : '—' )
+					);
+				}
 				echo '</table>';
 			},
 			OP_SURVEY_CPT,
@@ -346,6 +452,8 @@ function op_survey_export_csv(): void {
 		$header[] = $def[0] . ' / ' . $def[1];
 	}
 	$header[] = 'Promo code';
+	$header[] = 'IP';
+	$header[] = 'Fraud flag';
 	fputcsv( $out, $header );
 
 	foreach ( $posts as $post ) {
@@ -354,6 +462,8 @@ function op_survey_export_csv(): void {
 			$row[] = (string) get_post_meta( $post->ID, '_op_survey_' . $key, true );
 		}
 		$row[] = (string) get_post_meta( $post->ID, '_op_survey_code', true );
+		$row[] = (string) get_post_meta( $post->ID, '_op_survey_ip', true );
+		$row[] = (string) get_post_meta( $post->ID, '_op_survey_flag', true );
 		fputcsv( $out, $row );
 	}
 	fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions

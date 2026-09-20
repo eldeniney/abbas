@@ -97,7 +97,7 @@
 	}
 
 	/* ------------------------------------------------ validation */
-	var EG_MOBILE = /^01[0-9]{9}$/;
+	var EG_MOBILE = /^01[0125][0-9]{8}$/;
 
 	function normalizeMobile( raw ) {
 		var d = String( raw ).replace( /\D/g, '' );

@@ -129,14 +129,20 @@ if ( ! function_exists( 'op_sv_step_head' ) ) {
 			<span class="sv-spark sv-spark--1"><?php echo op_sv_icon( 'sparkle', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			<span class="sv-spark sv-spark--2"><?php echo op_sv_icon( 'sparkle', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			<span class="sv-spark sv-spark--3"><?php echo op_sv_icon( 'sparkle', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
-			<span class="sv-gift-art" aria-hidden="true"><?php echo op_sv_icon( 'gift', 54 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
-			<span class="sv-pill">هدية خاصة ليك</span>
-			<div class="sv-gift"><span class="sv-gift-num">75</span><span class="sv-gift-unit">جنيه</span></div>
-			<h1>جاوب على كام سؤال بسيط<br>وخد 75 جنيه هدية</h1>
-			<p class="sv-hero-lede">دقايق معدودة، سؤال في كل شاشة، من موبايلك على طول. رأيك بيساعدنا نفهم احتياجات منطقتك أحسن.</p>
-			<div class="sv-promise">بعد ما تخلّص هتاخد كود خصم بقيمة <b>75 جنيه</b> تستخدمه في أول طلب عند الإطلاق — وهتكون من أوائل الناس اللي تجرب الخدمة.</div>
+			<span class="sv-gift-art" aria-hidden="true"><?php echo op_sv_icon( 'gift', 44 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+			<span class="sv-pill">هدية حقيقية — مش نقاط ولا سحب</span>
+			<div class="sv-voucher" role="img" aria-label="كود خصم بقيمة 75 جنيه">
+				<div class="sv-voucher-main">
+					<span class="sv-voucher-label">كود خصم بقيمة</span>
+					<div class="sv-voucher-value"><b>75</b><span>جنيه</span></div>
+				</div>
+				<div class="sv-voucher-strip"><?php echo op_sv_icon( 'sparkle', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput ?> على أول طلب عند الإطلاق — محجوز باسمك</div>
+			</div>
+			<h1>جاوب على كام سؤال بسيط<br>والكود ده يبقى بتاعك</h1>
+			<p class="sv-hero-lede">3 دقايق من وقتك مقابل 75 جنيه خصم حقيقي — سؤال في كل شاشة، من موبايلك على طول.</p>
+			<div class="sv-promise">الكود بيتربط برقم موبايلك ومحفوظ عندنا لحد الإطلاق — وهتكون كمان من أوائل الناس اللي تجرب الخدمة.</div>
 			<button type="button" class="sv-btn sv-btn--orange sv-next">
-				ابدأ وخد هديتك
+				ابدأ وفعّل هديتك
 				<?php echo op_sv_icon( 'back', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 			</button>
 			<p class="sv-hero-note">من غير ما نسألك عنوان بيتك — بيانات بسيطة وبس.</p>
@@ -156,7 +162,7 @@ if ( ! function_exists( 'op_sv_step_head' ) ) {
 				<span class="sv-label">رقم الموبايل <b class="sv-req">مطلوب</b></span>
 				<input required name="mobile" type="tel" inputmode="tel" dir="ltr" placeholder="01xxxxxxxxx" autocomplete="tel">
 				<span class="sv-hint-s">الكود هيتربط بآخر ٤ أرقام من رقمك</span>
-				<span class="sv-error" data-error>اكتب رقم موبايل صحيح يبدأ بـ 01 (11 رقم)</span>
+				<span class="sv-error" data-error>اكتب رقم موبايل صحيح — يبدأ بـ 010 أو 011 أو 012 أو 015 (11 رقم)</span>
 			</label>
 			<label class="sv-field">
 				<span class="sv-label">البريد الإلكتروني <span class="sv-opt-tag">اختياري</span></span>
@@ -406,19 +412,24 @@ if ( ! function_exists( 'op_sv_step_head' ) ) {
 		</span>
 		<h1>شكرًا يا <span id="personName"></span> 🎉</h1>
 		<p>إجابتك هتساعدنا نبني الخدمة بناءً على احتياجات الناس الفعلية في منطقتك.</p>
-		<div class="sv-reward"><span class="sv-reward-ic" aria-hidden="true"><?php echo op_sv_icon( 'gift', 26 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>أنت من أوائل الناس اللي هيجربوا الخدمة عند الإطلاق.<br><b>احتفظ بالكود ده لأول طلب:</b></div>
-		<div class="sv-promo" dir="ltr"><span id="promo">BHR75</span></div>
+		<div class="sv-reward"><span class="sv-reward-ic" aria-hidden="true"><?php echo op_sv_icon( 'gift', 26 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>أنت من أوائل الناس اللي هيجربوا الخدمة عند الإطلاق.<br><b>هديتك اتحجزت باسمك:</b></div>
+		<div class="sv-voucher sv-voucher--code" >
+			<div class="sv-voucher-main">
+				<span class="sv-voucher-label">كود خصم بقيمة <b>75 جنيه</b></span>
+				<div class="sv-voucher-num" dir="ltr"><span id="promo">BHR75</span></div>
+			</div>
+			<div class="sv-voucher-strip">يُستخدم مرة واحدة على أول طلب — مربوط برقم موبايلك</div>
+		</div>
 		<button type="button" class="sv-btn sv-btn--ghost" id="copyCode">
 			<?php echo op_sv_icon( 'copy', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 			<span data-copy-label>انسخ الكود</span>
 		</button>
-		<p class="sv-promo-value"><b>قيمة الكود: 75 جنيه</b></p>
-		<p class="sv-small">يُستخدم مرة واحدة على أول طلب بعد الإطلاق. شروط الاستخدام وتاريخ الصلاحية سيتم تأكيدهما عند الإطلاق.</p>
+		<p class="sv-small">احتفظ بالكود ده — شروط الاستخدام وتاريخ الصلاحية سيتم تأكيدهما عند الإطلاق.</p>
 	</div>
 </section>
 
 <footer class="sv-footer">
-	<p>استبيان مستقل لأغراض دراسة السوق. بياناتك تُستخدم فقط للتواصل معك بخصوص تجربة الإطلاق والعرض المذكور.</p>
+	<p>استبيان مستقل لأغراض دراسة السوق. بياناتك تُستخدم فقط للتواصل معك بخصوص تجربة الإطلاق والعرض المذكور، وقد نسجّل بيانات تقنية عن الاتصال لحماية العرض من إساءة الاستخدام.</p>
 </footer>
 </main>
 
