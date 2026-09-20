@@ -14,6 +14,66 @@ $survey_css = get_theme_file_uri( 'assets/css/survey.css' );
 $survey_js  = get_theme_file_uri( 'assets/js/survey.js' );
 $survey_ver = (string) filemtime( get_theme_file_path( 'assets/css/survey.css' ) );
 $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
+$img_dir    = get_theme_file_uri( 'assets/img' );
+
+if ( ! function_exists( 'op_sv_icon' ) ) {
+	/**
+	 * Inline rounded line icons (24x24, stroke 1.8, round caps) — the brand
+	 * calls for simple rounded icons with a consistent stroke weight.
+	 */
+	function op_sv_icon( string $name, int $size = 22 ): string {
+		$paths = array(
+			'gift'    => '<rect x="4" y="11.5" width="16" height="8.5" rx="2"/><rect x="3" y="7.5" width="18" height="4" rx="1.6"/><path d="M12 7.5V20"/><path d="M12 7.3C10 7.3 8.2 6.4 8.2 4.9c0-1.4 1.9-2.1 3.8 1 1.9-3.1 3.8-2.4 3.8-1 0 1.5-1.8 2.4-3.8 2.4z"/>',
+			'user'    => '<circle cx="12" cy="8" r="3.4"/><path d="M5.5 19.5c.8-3.4 3.4-5 6.5-5s5.7 1.6 6.5 5"/>',
+			'pin'     => '<path d="M12 21s-6.5-5.3-6.5-10a6.5 6.5 0 0 1 13 0c0 4.7-6.5 10-6.5 10z"/><circle cx="12" cy="10.5" r="2.3"/>',
+			'basket'  => '<path d="M4 9.5h16l-1.4 8.6a2 2 0 0 1-2 1.7H7.4a2 2 0 0 1-2-1.7L4 9.5z"/><path d="M8.5 9.5 12 3.5l3.5 6"/><path d="M9.7 13v3.5M14.3 13v3.5"/>',
+			'store'   => '<path d="M4.5 9 5.8 4h12.4l1.3 5"/><path d="M4 9a2.65 2.65 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0A2.65 2.65 0 0 0 20 9"/><path d="M5.8 12.5V20h12.4v-7.5"/><path d="M10 20v-4.8h4V20"/>',
+			'clock'   => '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.2V12l3.2 2"/>',
+			'box'     => '<path d="M3.5 8 12 3.5 20.5 8v8L12 20.5 3.5 16z"/><path d="M3.5 8 12 12.5 20.5 8"/><path d="M12 12.5v8"/>',
+			'scooter' => '<circle cx="5.6" cy="17.3" r="2.4"/><circle cx="18.4" cy="17.3" r="2.4"/><path d="M8 17.3h5l1.9-7.3h3.4"/><path d="M16.4 6.5h2l.9 3.5"/><rect x="3.8" y="7.6" width="6.4" height="5.4" rx="1.4"/>',
+			'search'  => '<circle cx="11" cy="11" r="6.5"/><path d="m15.9 15.9 4.6 4.6"/>',
+			'flash'   => '<path d="M13 3 5.7 13.4h4.8L10.8 21l7.5-11.3h-5L13 3z"/>',
+			'star'    => '<path d="m12 3.6 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 17l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.6z"/>',
+			'coins'   => '<ellipse cx="12" cy="6.3" rx="7" ry="2.9"/><path d="M5 6.3v5.5c0 1.6 3.1 2.9 7 2.9s7-1.3 7-2.9V6.3"/><path d="M5 11.8v5.4c0 1.6 3.1 2.9 7 2.9s7-1.3 7-2.9v-5.4"/>',
+			'card'    => '<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 9.5h18"/><path d="M6.5 14.5H11"/>',
+			'apple'   => '<path d="M12 7.6c-1.1-1.5-3-2-4.5-1-2.8 1.7-2.9 5.5-1 8.9 1.9 3.5 4.5 5 5.5 5s3.6-1.5 5.5-5 1.8-7.2-1-8.9c-1.5-1-3.4-.5-4.5 1z"/><path d="M12 7.6c0-2 1-3.6 3-4.1"/>',
+			'bread'   => '<path d="M4 12.7a8 8 0 0 1 16 0v5.8H4z"/><path d="M9 9.7v3.8M12 9.2v4.3M15 9.7v3.8"/>',
+			'fish'    => '<path d="M7 12s3-5 8-5c3.2 0 5.3 2.6 6 5-.7 2.4-2.8 5-6 5-5 0-8-5-8-5z"/><path d="M7 12 3.5 8.8v6.4L7 12z"/><circle cx="16.6" cy="10.9" r="0.4" fill="currentColor" stroke="none"/>',
+			'egg'     => '<path d="M12 3.6c3 0 6 5 6 9.4a6 6 0 0 1-12 0c0-4.4 3-9.4 6-9.4z"/>',
+			'pill'    => '<rect x="4" y="4" width="16" height="16" rx="4.5"/><path d="M12 8.5v7M8.5 12h7"/>',
+			'plate'   => '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.4"/>',
+			'home'    => '<path d="m4 11 8-7 8 7"/><path d="M6 9.4V20h12V9.4"/><path d="M10 20v-5.4h4V20"/>',
+			'bottle'  => '<path d="M10.4 5.4c0-1 .7-1.9 1.6-1.9s1.6.9 1.6 1.9"/><path d="M10 7.4h4"/><rect x="9" y="7.4" width="6" height="12.6" rx="2.6"/><path d="M9 12.2h6"/>',
+			'wheat'   => '<path d="M12 21V7.6"/><path d="M12 7.6c-2.4 0-3.9-1.4-3.9-3.9 2.4 0 3.9 1.4 3.9 3.9zM12 7.6c2.4 0 3.9-1.4 3.9-3.9-2.4 0-3.9 1.4-3.9 3.9z"/><path d="M12 12.6c-2.4 0-3.9-1.4-3.9-3.9 2.4 0 3.9 1.4 3.9 3.9zM12 12.6c2.4 0 3.9-1.4 3.9-3.9-2.4 0-3.9 1.4-3.9 3.9z"/><path d="M12 17.6c-2.4 0-3.9-1.4-3.9-3.9 2.4 0 3.9 1.4 3.9 3.9zM12 17.6c2.4 0 3.9-1.4 3.9-3.9-2.4 0-3.9 1.4-3.9 3.9z"/>',
+			'dots'    => '<circle cx="5.5" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.5" fill="currentColor" stroke="none"/>',
+			'sparkle' => '<path d="m12 3.5 1.7 5.1 5.1 1.7-5.1 1.7-1.7 5.1-1.7-5.1-5.1-1.7 5.1-1.7L12 3.5z"/>',
+			'copy'    => '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+			'check'   => '<path d="M5 13l4 4L19 7"/>',
+			'back'    => '<path d="M9 6l6 6-6 6"/>',
+		);
+		if ( ! isset( $paths[ $name ] ) ) {
+			return '';
+		}
+		return sprintf(
+			'<svg viewBox="0 0 24 24" width="%1$d" height="%1$d" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">%2$s</svg>',
+			$size,
+			$paths[ $name ]
+		);
+	}
+}
+
+/**
+ * Step heading with its icon chip.
+ */
+if ( ! function_exists( 'op_sv_step_head' ) ) {
+	function op_sv_step_head( string $icon, string $title, string $hint = '' ): void {
+		printf( '<span class="sv-step-icon">%s</span>', op_sv_icon( $icon, 24 ) ); // phpcs:ignore WordPress.Security.EscapeOutput
+		printf( '<h2 class="sv-q-title">%s</h2>', esc_html( $title ) );
+		if ( $hint ) {
+			printf( '<p class="sv-q-hint">%s</p>', wp_kses( $hint, array( 'span' => array( 'class' => true, 'id' => true ) ) ) );
+		}
+	}
+}
 ?>
 <!doctype html>
 <html lang="ar" dir="rtl">
@@ -21,7 +81,17 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#3A1F3D">
 <title>استبيان احتياجات التسوق والتوصيل — البحيرة</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="جاوب على كام سؤال بسيط وخد 75 جنيه هدية 🎁">
+<meta property="og:description" content="استبيان سريع عن التسوق والتوصيل في البحيرة — دقايق معدودة، وهديتك كود بقيمة 75 جنيه لأول طلب عند الإطلاق.">
+<meta property="og:url" content="<?php echo esc_url( get_permalink() ); ?>">
+<meta property="og:image" content="<?php echo esc_url( $img_dir . '/survey-og.png' ); ?>">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<link rel="icon" type="image/svg+xml" href="<?php echo esc_url( $img_dir . '/survey-favicon.svg' ); ?>">
+<link rel="apple-touch-icon" href="<?php echo esc_url( $img_dir . '/survey-touch.png' ); ?>">
 <link rel="preload" href="<?php echo esc_url( $fonts_dir ); ?>/baloo2-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="<?php echo esc_url( $survey_css . '?v=' . $survey_ver ); ?>">
 </head>
@@ -30,10 +100,10 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 <div class="sv-top" id="svTop" hidden>
 	<div class="sv-top-inner">
 		<button type="button" class="sv-back" id="svBack" aria-label="رجوع">
-			<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+			<?php echo op_sv_icon( 'back', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 		</button>
 		<span class="sv-step-label" id="svStepLabel" aria-live="polite"></span>
-		<span class="sv-gift-chip">هديتك 75 جنيه</span>
+		<span class="sv-gift-chip"><?php echo op_sv_icon( 'gift', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput ?> هديتك 75 جنيه</span>
 	</div>
 	<div class="sv-progress" role="progressbar" aria-label="تقدم الاستبيان" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="svProgressBar">
 		<span class="sv-progress-fill" id="svProgressFill"></span>
@@ -56,6 +126,10 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 				<circle cx="168" cy="28" r="5" fill="currentColor" opacity=".55"/>
 				<circle cx="302" cy="60" r="7" fill="#F9732F"/>
 			</svg>
+			<span class="sv-spark sv-spark--1"><?php echo op_sv_icon( 'sparkle', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+			<span class="sv-spark sv-spark--2"><?php echo op_sv_icon( 'sparkle', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+			<span class="sv-spark sv-spark--3"><?php echo op_sv_icon( 'sparkle', 15 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+			<span class="sv-gift-art" aria-hidden="true"><?php echo op_sv_icon( 'gift', 54 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			<span class="sv-pill">هدية خاصة ليك</span>
 			<div class="sv-gift"><span class="sv-gift-num">75</span><span class="sv-gift-unit">جنيه</span></div>
 			<h1>جاوب على كام سؤال بسيط<br>وخد 75 جنيه هدية</h1>
@@ -63,7 +137,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 			<div class="sv-promise">بعد ما تخلّص هتاخد كود خصم بقيمة <b>75 جنيه</b> تستخدمه في أول طلب عند الإطلاق — وهتكون من أوائل الناس اللي تجرب الخدمة.</div>
 			<button type="button" class="sv-btn sv-btn--orange sv-next">
 				ابدأ وخد هديتك
-				<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+				<?php echo op_sv_icon( 'back', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 			</button>
 			<p class="sv-hero-note">من غير ما نسألك عنوان بيتك — بيانات بسيطة وبس.</p>
 		</div>
@@ -71,8 +145,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ١ — بياناتك -->
 	<section class="sv-screen" data-step data-title="خلّينا نعرفك">
-		<h2 class="sv-q-title">خلّينا نعرفك</h2>
-		<p class="sv-q-hint">علشان نربط هديتك بمشاركتك ونبعتلك تفاصيل الإطلاق.</p>
+		<?php op_sv_step_head( 'user', 'خلّينا نعرفك', 'علشان نربط هديتك بمشاركتك ونبعتلك تفاصيل الإطلاق.' ); ?>
 		<div class="sv-card">
 			<label class="sv-field">
 				<span class="sv-label">الاسم</span>
@@ -93,7 +166,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 		</div>
 		<label class="sv-consent">
 			<input required type="checkbox" name="consent" value="yes">
-			<span class="sv-consent-box" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>
+			<span class="sv-consent-box" aria-hidden="true"><?php echo op_sv_icon( 'check', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			<span>أوافق على استخدام إجاباتي لأغراض دراسة السوق والتواصل معي بخصوص تجربة الإطلاق والعرض المذكور.</span>
 		</label>
 		<span class="sv-error" data-error-consent>من فضلك وافق قبل ما تكمل</span>
@@ -102,8 +175,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ٢ — مكانك -->
 	<section class="sv-screen" data-step data-title="إنت منين؟">
-		<h2 class="sv-q-title">إنت منين في البحيرة؟</h2>
-		<p class="sv-q-hint">من غير عنوان البيت — المنطقة وبس.</p>
+		<?php op_sv_step_head( 'pin', 'إنت منين في البحيرة؟', 'من غير عنوان البيت — المنطقة وبس.' ); ?>
 		<div class="sv-card">
 			<label class="sv-field">
 				<span class="sv-label">المركز / المدينة</span>
@@ -144,14 +216,25 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ٣ — مشتريات آخر ٧ أيام -->
 	<section class="sv-screen" data-step data-title="مشترياتك">
-		<h2 class="sv-q-title">خلال آخر 7 أيام، اشتريت إيه فعلًا؟</h2>
-		<p class="sv-q-hint">اختار كل اللي ينطبق.</p>
+		<?php op_sv_step_head( 'basket', 'خلال آخر 7 أيام، اشتريت إيه فعلًا؟', 'اختار كل اللي ينطبق.' ); ?>
 		<div class="sv-opts sv-opts--grid">
 			<?php
-			$last7 = array( 'بقالة وسوبر ماركت', 'خضار وفاكهة', 'خبز ومخبوزات', 'لحوم/دواجن/أسماك', 'ألبان وبيض', 'أدوية/صيدلية', 'مطاعم وأكل', 'مستلزمات منزلية', 'مستلزمات أطفال', 'منتجات زراعية/أعلاف', 'أخرى' );
-			foreach ( $last7 as $v ) :
+			$last7 = array(
+				'بقالة وسوبر ماركت'    => 'basket',
+				'خضار وفاكهة'          => 'apple',
+				'خبز ومخبوزات'         => 'bread',
+				'لحوم/دواجن/أسماك'     => 'fish',
+				'ألبان وبيض'           => 'egg',
+				'أدوية/صيدلية'         => 'pill',
+				'مطاعم وأكل'           => 'plate',
+				'مستلزمات منزلية'      => 'home',
+				'مستلزمات أطفال'       => 'bottle',
+				'منتجات زراعية/أعلاف'  => 'wheat',
+				'أخرى'                 => 'dots',
+			);
+			foreach ( $last7 as $v => $ic ) :
 				?>
-				<label class="sv-opt"><input type="checkbox" name="last7[]" value="<?php echo esc_attr( $v ); ?>"><span class="sv-opt-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span><span class="sv-opt-text"><?php echo esc_html( $v ); ?></span></label>
+				<label class="sv-opt sv-opt--icon"><input type="checkbox" name="last7[]" value="<?php echo esc_attr( $v ); ?>"><span class="sv-opt-ic" aria-hidden="true"><?php echo op_sv_icon( $ic, 21 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span class="sv-opt-text"><?php echo esc_html( $v ); ?></span><span class="sv-opt-tick" aria-hidden="true"><?php echo op_sv_icon( 'check', 12 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span></label>
 			<?php endforeach; ?>
 		</div>
 		<div class="sv-actions"><button type="button" class="sv-btn sv-btn--primary sv-next">التالي</button></div>
@@ -159,7 +242,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ٤ — آخر مصدر شراء -->
 	<section class="sv-screen" data-step data-title="آخر مرة" data-auto>
-		<h2 class="sv-q-title">آخر مرة اشتريت احتياجات، جبتها إزاي؟</h2>
+		<?php op_sv_step_head( 'store', 'آخر مرة اشتريت احتياجات، جبتها إزاي؟' ); ?>
 		<div class="sv-opts">
 			<?php
 			$sources = array( 'روحت محل قريب', 'روحت سوق محلي', 'روحت منطقة/مدينة تانية', 'طلبت من محل بالتليفون أو WhatsApp', 'طلبت من تطبيق أو موقع' );
@@ -174,7 +257,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ٥ — وقت الرحلة (يتخطى لو طلب أونلاين) -->
 	<section class="sv-screen" data-step data-title="الرحلة" data-auto id="travelBlock">
-		<h2 class="sv-q-title">الرحلة للمحل/السوق أخدت منك قد إيه تقريبًا؟</h2>
+		<?php op_sv_step_head( 'clock', 'الرحلة للمحل/السوق أخدت منك قد إيه تقريبًا؟' ); ?>
 		<div class="sv-opts">
 			<?php foreach ( array( 'أقل من 10 دقائق', '10–20 دقيقة', '21–40 دقيقة', 'أكثر من 40 دقيقة' ) as $v ) : ?>
 				<label class="sv-opt"><input type="radio" name="travel_time" value="<?php echo esc_attr( $v ); ?>"><span class="sv-opt-check sv-opt-check--radio" aria-hidden="true"></span><span class="sv-opt-text"><?php echo esc_html( $v ); ?></span></label>
@@ -185,7 +268,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ٦ — مرات التوصيل آخر ٣٠ يوم -->
 	<section class="sv-screen" data-step data-title="التوصيل" data-auto>
-		<h2 class="sv-q-title">خلال آخر 30 يوم، طلبت توصيل للبيت كام مرة؟</h2>
+		<?php op_sv_step_head( 'box', 'خلال آخر 30 يوم، طلبت توصيل للبيت كام مرة؟' ); ?>
 		<div class="sv-opts">
 			<?php foreach ( array( 'ولا مرة', 'مرة', '2–3 مرات', '4–7 مرات', '8 مرات أو أكثر' ) as $v ) : ?>
 				<label class="sv-opt"><input required type="radio" name="delivery30" value="<?php echo esc_attr( $v ); ?>"><span class="sv-opt-check sv-opt-check--radio" aria-hidden="true"></span><span class="sv-opt-text"><?php echo esc_html( $v ); ?></span></label>
@@ -197,7 +280,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ٧ — تفاصيل آخر توصيل (يتخطى لو "ولا مرة") -->
 	<section class="sv-screen" data-step data-title="آخر توصيل" id="deliveryDetails">
-		<h2 class="sv-q-title">آخر مرة طلبت توصيل…</h2>
+		<?php op_sv_step_head( 'scooter', 'آخر مرة طلبت توصيل…' ); ?>
 		<div class="sv-card">
 			<fieldset class="sv-sub">
 				<legend class="sv-label">طلبت إزاي؟</legend>
@@ -225,7 +308,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ٨ — منتج مش لاقيه -->
 	<section class="sv-screen" data-step data-title="منتج ناقص">
-		<h2 class="sv-q-title">خلال آخر 30 يوم، احتجت منتج ومكنتش عارف تلاقيه فين؟</h2>
+		<?php op_sv_step_head( 'search', 'خلال آخر 30 يوم، احتجت منتج ومكنتش عارف تلاقيه فين؟' ); ?>
 		<div class="sv-opts">
 			<label class="sv-opt"><input required type="radio" name="couldnt_find" value="yes_many"><span class="sv-opt-check sv-opt-check--radio" aria-hidden="true"></span><span class="sv-opt-text">نعم، أكثر من مرة</span></label>
 			<label class="sv-opt"><input type="radio" name="couldnt_find" value="yes_once"><span class="sv-opt-check sv-opt-check--radio" aria-hidden="true"></span><span class="sv-opt-text">نعم، مرة</span></label>
@@ -253,14 +336,13 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ٩ — أكبر ٣ مشاكل -->
 	<section class="sv-screen" data-step data-title="المشاكل">
-		<h2 class="sv-q-title">إيه أكتر 3 مشاكل بتقابلك في شراء احتياجاتك؟</h2>
-		<p class="sv-q-hint">بحد أقصى 3 اختيارات — <span class="sv-count" id="painCount">0/3</span></p>
+		<?php op_sv_step_head( 'flash', 'إيه أكتر 3 مشاكل بتقابلك في شراء احتياجاتك؟', 'بحد أقصى 3 اختيارات — <span class="sv-count" id="painCount">0/3</span>' ); ?>
 		<div class="sv-opts sv-opts--grid" id="painOpts">
 			<?php
 			$pains = array( 'المنتج مش متوفر', 'مش عارف المنتج موجود فين', 'المسافة بعيدة', 'مفيش توصيل', 'التوصيل بطيء', 'التوصيل غالي', 'الأسعار مش واضحة', 'الجودة مش مضمونة', 'اختيارات قليلة', 'صعوبة التواصل مع المحلات', 'مفيش مشكلة واضحة' );
 			foreach ( $pains as $v ) :
 				?>
-				<label class="sv-opt"><input class="max3" type="checkbox" name="pain[]" value="<?php echo esc_attr( $v ); ?>"><span class="sv-opt-check" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span><span class="sv-opt-text"><?php echo esc_html( $v ); ?></span></label>
+				<label class="sv-opt"><input class="max3" type="checkbox" name="pain[]" value="<?php echo esc_attr( $v ); ?>"><span class="sv-opt-check" aria-hidden="true"><?php echo op_sv_icon( 'check', 13 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span><span class="sv-opt-text"><?php echo esc_html( $v ); ?></span></label>
 			<?php endforeach; ?>
 		</div>
 		<div class="sv-actions"><button type="button" class="sv-btn sv-btn--primary sv-next">التالي</button></div>
@@ -268,7 +350,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ١٠ — أهم قيمة -->
 	<section class="sv-screen" data-step data-title="الأهم ليك" data-auto>
-		<h2 class="sv-q-title">لو تقدر تعرف المنتجات المتاحة في المحلات القريبة وتطلبها للبيت — إيه أهم حاجة بالنسبة لك؟</h2>
+		<?php op_sv_step_head( 'star', 'لو تقدر تعرف المنتجات المتاحة في المحلات القريبة وتطلبها للبيت — إيه أهم حاجة بالنسبة لك؟' ); ?>
 		<div class="sv-opts">
 			<?php foreach ( array( 'أعرف المنتج موجود فين', 'السعر يكون واضح', 'توصيل أسرع', 'تكلفة توصيل أقل', 'محلات موثوقة', 'منتجات أكتر', 'أطلب من أكتر من محل', 'سهولة الطلب' ) as $v ) : ?>
 				<label class="sv-opt"><input type="radio" name="main_value" value="<?php echo esc_attr( $v ); ?>"><span class="sv-opt-check sv-opt-check--radio" aria-hidden="true"></span><span class="sv-opt-text"><?php echo esc_html( $v ); ?></span></label>
@@ -279,7 +361,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ١١ — أقصى رسوم توصيل -->
 	<section class="sv-screen" data-step data-title="رسوم التوصيل" data-auto>
-		<h2 class="sv-q-title">بالنسبة لطلب عادي من محل قريب، أقصى مبلغ توصيل غالبًا تقبل تدفعه؟</h2>
+		<?php op_sv_step_head( 'coins', 'بالنسبة لطلب عادي من محل قريب، أقصى مبلغ توصيل غالبًا تقبل تدفعه؟' ); ?>
 		<div class="sv-opts">
 			<?php foreach ( array( 'لن أدفع للتوصيل', 'حتى 10 جنيه', '11–20 جنيه', '21–30 جنيه', 'أكثر من 30 جنيه حسب الطلب' ) as $v ) : ?>
 				<label class="sv-opt"><input type="radio" name="max_fee" value="<?php echo esc_attr( $v ); ?>"><span class="sv-opt-check sv-opt-check--radio" aria-hidden="true"></span><span class="sv-opt-text"><?php echo esc_html( $v ); ?></span></label>
@@ -290,7 +372,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 
 	<!-- ١٢ — الدفع + كلمة أخيرة -->
 	<section class="sv-screen" data-step data-title="آخر خطوة">
-		<h2 class="sv-q-title">آخر خطوة وهديتك جاهزة 🎁</h2>
+		<?php op_sv_step_head( 'card', 'آخر خطوة وهديتك جاهزة' ); ?>
 		<div class="sv-card">
 			<fieldset class="sv-sub">
 				<legend class="sv-label">إيه طرق الدفع اللي بتستخدمها حاليًا؟</legend>
@@ -311,7 +393,7 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 		</div>
 		<span class="sv-error" data-error-submit></span>
 		<div class="sv-actions">
-			<button type="submit" class="sv-btn sv-btn--orange" id="svSubmit">إنهاء واستلام الكود</button>
+			<button type="submit" class="sv-btn sv-btn--orange" id="svSubmit"><?php echo op_sv_icon( 'gift', 20 ); // phpcs:ignore WordPress.Security.EscapeOutput ?> إنهاء واستلام الكود</button>
 		</div>
 	</section>
 </form>
@@ -324,10 +406,10 @@ $fonts_dir  = get_theme_file_uri( 'assets/fonts' );
 		</span>
 		<h1>شكرًا يا <span id="personName"></span> 🎉</h1>
 		<p>إجابتك هتساعدنا نبني الخدمة بناءً على احتياجات الناس الفعلية في منطقتك.</p>
-		<div class="sv-reward">أنت من أوائل الناس اللي هيجربوا الخدمة عند الإطلاق.<br><b>احتفظ بالكود ده لأول طلب:</b></div>
+		<div class="sv-reward"><span class="sv-reward-ic" aria-hidden="true"><?php echo op_sv_icon( 'gift', 26 ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>أنت من أوائل الناس اللي هيجربوا الخدمة عند الإطلاق.<br><b>احتفظ بالكود ده لأول طلب:</b></div>
 		<div class="sv-promo" dir="ltr"><span id="promo">BHR75</span></div>
 		<button type="button" class="sv-btn sv-btn--ghost" id="copyCode">
-			<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+			<?php echo op_sv_icon( 'copy', 18 ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 			<span data-copy-label>انسخ الكود</span>
 		</button>
 		<p class="sv-promo-value"><b>قيمة الكود: 75 جنيه</b></p>

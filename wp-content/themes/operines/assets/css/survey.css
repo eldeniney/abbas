@@ -44,6 +44,8 @@ html { scroll-behavior: smooth; }
 body.survey-body {
 	margin: 0;
 	background: var(--cream);
+	background-image: radial-gradient(rgba(58, 31, 61, 0.05) 1.5px, transparent 1.5px);
+	background-size: 26px 26px;
 	color: var(--ink);
 	font-family: 'Baloo 2 AR', Tahoma, Arial, sans-serif;
 	font-size: 17px;
@@ -97,6 +99,9 @@ body.survey-body {
 	flex: 1;
 }
 .sv-gift-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
 	font-size: 13px;
 	font-weight: 700;
 	color: var(--orange-deep);
@@ -153,6 +158,40 @@ body.survey-body {
 	inline-size: 100%;
 	color: rgba(255, 255, 255, 0.5);
 	pointer-events: none;
+}
+.sv-gift-art {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 88px;
+	block-size: 88px;
+	margin: 0 auto 14px;
+	border-radius: 28px;
+	background: rgba(255, 255, 255, 0.1);
+	border: 1.5px solid rgba(255, 255, 255, 0.22);
+	color: var(--orange);
+	box-shadow: 0 16px 34px -18px rgba(0, 0, 0, 0.55);
+	animation: sv-float 3.4s ease-in-out infinite;
+}
+.sv-gift-art svg { stroke-width: 1.6; }
+@keyframes sv-float {
+	0%, 100% { transform: translateY(0) rotate(-2deg); }
+	50% { transform: translateY(-8px) rotate(2deg); }
+}
+.sv-spark {
+	position: absolute;
+	color: #f6c9a8;
+	opacity: 0;
+	animation: sv-twinkle 2.8s ease-in-out infinite;
+	pointer-events: none;
+}
+.sv-spark--1 { top: 15%; inset-inline-start: 16%; animation-delay: 0.2s; }
+.sv-spark--2 { top: 10%; inset-inline-end: 18%; animation-delay: 1.1s; color: var(--orange); }
+.sv-spark--3 { top: 34%; inset-inline-end: 9%; animation-delay: 1.9s; }
+@keyframes sv-twinkle {
+	0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+	50% { opacity: 0.9; transform: scale(1) rotate(30deg); }
 }
 .sv-pill {
 	position: relative;
@@ -213,6 +252,20 @@ body.survey-body {
 }
 
 /* -------------------------------------------------- Typography */
+.sv-step-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 48px;
+	block-size: 48px;
+	margin-top: 8px;
+	border-radius: 15px;
+	background: var(--plum-tint);
+	border: 1px solid #e6d8e4;
+	color: var(--plum);
+	box-shadow: 0 6px 16px -12px rgba(58, 31, 61, 0.5);
+}
+.sv-step-icon svg { stroke-width: 1.7; }
 .sv-q-title {
 	font-size: 23px;
 	font-weight: 800;
@@ -408,6 +461,50 @@ select { appearance: none; }
 }
 .sv-opt.is-capped { opacity: 0.45; }
 
+/* Icon options (category grid): the icon chip IS the state indicator. */
+.sv-opt--icon { padding: 11px 12px; }
+.sv-opt-ic {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 40px;
+	block-size: 40px;
+	border-radius: 13px;
+	background: var(--plum-tint);
+	color: var(--plum);
+	transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+.sv-opt--icon input:checked ~ .sv-opt-ic {
+	background: var(--orange);
+	color: #fff;
+	transform: scale(1.04);
+}
+.sv-opt--icon input:focus-visible ~ .sv-opt-ic {
+	box-shadow: 0 0 0 3px rgba(249, 115, 47, 0.3);
+}
+.sv-opt-tick {
+	position: absolute;
+	top: -7px;
+	inset-inline-end: -7px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: 22px;
+	block-size: 22px;
+	border-radius: 50%;
+	background: var(--orange);
+	color: #fff;
+	border: 2px solid #fff;
+	opacity: 0;
+	transform: scale(0.4);
+	transition: 0.16s ease;
+}
+.sv-opt--icon input:checked ~ .sv-opt-tick {
+	opacity: 1;
+	transform: scale(1);
+}
+
 /* Compact chips (sub-questions) */
 .sv-sub { border: 0; padding: 0; margin: 0 0 16px; }
 .sv-sub:last-child { margin-bottom: 0; }
@@ -513,7 +610,7 @@ select { appearance: none; }
 	padding: 11px 20px;
 }
 .sv-btn--ghost:hover { border-color: var(--plum); }
-.sv-btn svg { transform: scaleX(-1); } /* RTL forward arrow */
+.sv-next svg { transform: scaleX(-1); } /* RTL: forward arrow points left */
 
 /* Conditional reveal */
 .sv-reveal { animation: sv-in 0.3s ease both; }
@@ -552,6 +649,12 @@ select { appearance: none; }
 	color: #6d3d1f;
 	font-size: 15px;
 	line-height: 1.8;
+}
+.sv-reward-ic {
+	display: block;
+	inline-size: 26px;
+	margin: 0 auto 6px;
+	color: var(--orange-deep);
 }
 .sv-promo {
 	font-size: 32px;
