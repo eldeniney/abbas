@@ -129,6 +129,45 @@ ws_set.column_dimensions["A"].width = 44; ws_set.column_dimensions["B"].width = 
 ws_set.column_dimensions["F"].width = 28; ws_set.column_dimensions["G"].width = 22
 OVR = "Settings!$F$10:$G$39"
 
+# Shift policy table (editable) - source: e& SMB shift policy provided by the business
+ws_set["N8"] = "Shift policy (editable - drives Day Result, Late / No Show / Absent rules)"; ws_set["N8"].font = font(10, True)
+pol_hdr = ["Shift Name (exactly as in the data)", "Rule", "Punch out required (1/0)", "Late after (blank = no late rule)", "Absent after (blank = none)", "Weekly minimum hours"]
+for i, h in enumerate(pol_hdr):
+    c = ws_set.cell(row=9, column=14 + i, value=h); c.font = font(9, True, WHITE); c.fill = fill(CHAR); c.alignment = Alignment(wrap_text=True, vertical="center")
+ws_set.row_dimensions[9].height = 30
+POLICY = [
+    ("SMB-GENERAL SHIFT", "Open punch-in 07:00-10:00; after 10:00 = Absent; punch out not mandatory", 0, "", "10:00", 40),
+    ("SMB-PRIME&BD-KAM-1", "Punch in by 08:30, later = Late; no punch in = No Show; punch out not mandatory", 0, "08:30", "", 40),
+    ("SMB-Elite Business", "Punch in is enough (any time); no punch in = No Show", 0, "", "", 40),
+    ("SMB DIGITAL BACK OFFICE", "Punch in AND out required; hours = out - in; in 07:00-10:00, out 15:00-18:00", 1, "", "", 40),
+    ("General Shift", "Punch in AND out required; hours = out - in", 1, "", "", 40),
+    ("SMB-CCC & SOHO", "Punch in is enough; punch out not mandatory", 0, "", "", 40),
+    ("SMB-Preferred Business", "Punch in is enough; punch out not mandatory", 0, "", "", 40),
+    ("SMB-SVP-SHIF-1", "Not specified - treated as punch in is enough (edit if different)", 0, "", "", 40),
+    ("(Default)", "Any shift not listed above: punch in is enough", 0, "", "", 40),
+]
+POL_ROWS = 25
+for i in range(POL_ROWS):
+    r = 10 + i
+    vals = POLICY[i] if i < len(POLICY) else ("", "", "", "", "", "")
+    for j, v in enumerate(vals):
+        c = ws_set.cell(row=r, column=14 + j, value=(v if v != "" else None))
+        c.font = font(9, color="0000FF"); c.fill = fill("FFFFCC"); c.border = BORDER
+        if j in (3, 4) and v:
+            hh, mm = v.split(":"); c.value = (int(hh) * 60 + int(mm)) / 1440; c.number_format = "hh:mm"
+for col, w in zip("NOPQRS", (30, 60, 12, 14, 14, 12)):
+    ws_set.column_dimensions[col].width = w
+ws_set["N36"] = "Rules: Leave / Holiday / Rest-day statuses are never judged. No punch in -> 'No Show'. Punch in after 'Absent after' -> 'Absent (after cut-off)'. Punch in after 'Late after' -> 'Late'. Punch out missing where required -> 'Missing Punch Out'. Otherwise 'OK'."
+ws_set["N36"].font = font(8, italic=True, color=GREY)
+ws_set["N37"] = "The default policy row '(Default)' must stay last. Teams sharing a shift name (e.g. Sales Planning and SIS on SMB-GENERAL SHIFT) share its rule."
+ws_set["N37"].font = font(8, italic=True, color=GREY)
+POL_SHIFT = f"Settings!$N$10:$N${9 + POL_ROWS}"
+POL_OUT = f"Settings!$P$10:$P${9 + POL_ROWS}"
+POL_LATE = f"Settings!$Q$10:$Q${9 + POL_ROWS}"
+POL_ABS = f"Settings!$R$10:$R${9 + POL_ROWS}"
+POL_WEEK = f"Settings!$S$10:$S${9 + POL_ROWS}"
+DEFAULT_ROW = len(POLICY)   # 1-based index of "(Default)" inside the policy range
+
 # ----------------------------------------------------------------------------------------------
 # Calc (one formula row per Raw Data row)
 # ----------------------------------------------------------------------------------------------
@@ -169,6 +208,13 @@ CALC_COLS = [
     ("AI", "Client run", '=IF(Z{r}="",AI{p},AI{p}+Z{r})'),
     ("AJ", "Shift run", '=IF(AB{r}="",AJ{p},AJ{p}+AB{r})'),
     ("AK", "Emp run", '=IF(AD{r}="",AK{p},AK{p}+AD{r})'),
+    ("AL", "Policy #", '=IF(C{r}="","",IFERROR(MATCH(W{r},' + POL_SHIFT + ',0),' + str(DEFAULT_ROW) + '))'),
+    ("AM", "Out Req", '=IF(AL{r}="","",IF(INDEX(' + POL_OUT + ',AL{r})=1,1,0))'),
+    ("AN", "Late After", '=IF(AL{r}="","",IF(INDEX(' + POL_LATE + ',AL{r})="","",INDEX(' + POL_LATE + ',AL{r})))'),
+    ("AO", "Absent After", '=IF(AL{r}="","",IF(INDEX(' + POL_ABS + ',AL{r})="","",INDEX(' + POL_ABS + ',AL{r})))'),
+    ("AP", "Day Result", '=IF(C{r}="","",IF(OR(F{r}="Leave",F{r}="Holiday",F{r}="Weekend / Rest Day"),F{r},IF(F{r}="Absent","Absent",IF(P{r}="","No Show",IF(AND(AO{r}<>"",P{r}>AO{r}),"Absent (after cut-off)",IF(AND(AN{r}<>"",P{r}>AN{r}),"Late",IF(AND(AM{r}=1,Q{r}=""),"Missing Punch Out","OK")))))))'),
+    ("AQ", "Week Start", '=IF(B{r}="","",B{r}-WEEKDAY(B{r},2)+1)'),
+    ("AR", "Week Key", '=IF(AQ{r}="","",A{r}&"|"&AQ{r})'),
     ("AG", "DQ", '=IF(C{r}="",IF(OR(TRIM(\'Raw Data\'!A{r})<>"",TRIM(\'Raw Data\'!J{r})<>""),1,""),IF(OR(TRIM(\'Raw Data\'!C{r})="",AND(TRIM(\'Raw Data\'!N{r})<>"",G{r}=""),AND(F{r}="Present",TRIM(\'Raw Data\'!N{r})=""),AND(TRIM(\'Raw Data\'!L{r})<>"",P{r}=""),AND(TRIM(\'Raw Data\'!M{r})<>"",Q{r}=""),O{r}=0,F{r}="Other",F{r}="Unknown",U{r}="(Blank)",V{r}="(Blank)",W{r}="(Blank)"),1,0))'),
 ]
 for col, name, _ in CALC_COLS:
@@ -183,9 +229,10 @@ for col in ("AH", "AI", "AJ", "AK"):
     ws_calc[f"{col}1"] = 0
     ws_calc[f"B{r}"].number_format = "dd-mmm-yyyy"
     ws_calc[f"P{r}"].number_format = "hh:mm"; ws_calc[f"Q{r}"].number_format = "hh:mm"
+    ws_calc[f"AN{r}"].number_format = "hh:mm"; ws_calc[f"AO{r}"].number_format = "hh:mm"; ws_calc[f"AQ{r}"].number_format = "dd-mmm"
 ws_calc.freeze_panes = "A2"
-ws_calc["AM1"] = "Formulas are filled to row %d. To add capacity, select the last filled row and fill down." % (N_FILL + 1)
-ws_calc["AM1"].font = font(9, italic=True, color=GREY)
+ws_calc["AT1"] = "Formulas are filled to row %d. To add capacity, select the last filled row and fill down." % (N_FILL + 1)
+ws_calc["AT1"].font = font(9, italic=True, color=GREY)
 
 def C(col):  # full calc range
     return f"Calc!${col}$2:${col}$30001"
@@ -195,7 +242,8 @@ def C(col):  # full calc range
 # ----------------------------------------------------------------------------------------------
 EMP_N = globals().get("EMP_OVERRIDE", 2000)
 SEL = "Dashboard!$C$4"
-emp_hdr = ["#", "Employee Code", "Employee Name", "Business Unit", "Client", "Employee Days", "Present Days", "Exception Days", "Missing Punch Days", "Avg Hours", "Rank Key"]
+emp_hdr = ["#", "Employee Code", "Employee Name", "Business Unit", "Client", "Employee Days", "Present Days", "Exception Days", "Missing Punch Days", "Avg Hours", "Rank Key",
+           "Late Days", "No Show Days", "Absent (cut-off) Days", "Missing Punch Out Days", "Shift", "Weeks below minimum", "Policy Rank Key"]
 for i, h in enumerate(emp_hdr, 1):
     c = ws_emp.cell(row=1, column=i, value=h); c.font = font(9, True, WHITE); c.fill = fill(CHAR)
 for r in range(2, EMP_N + 2):
@@ -212,9 +260,56 @@ for r in range(2, EMP_N + 2):
     ws_emp[f"J{r}"] = f'=IF(B{r}="","",IFERROR(SUMIFS({C("G")},{C("A")},B{r},{C("C")},{SEL},{C("O")},1)/COUNTIFS({C("A")},B{r},{C("C")},{SEL},{C("L")},1,{C("G")},">0"),""))'
     ws_emp[f"K{r}"] = f'=IF(B{r}="","",H{r}+I{r}/1000+{k}/100000000)'
     ws_emp[f"J{r}"].number_format = "0.0"
+    ws_emp[f"L{r}"] = f'=IF(B{r}="","",COUNTIFS({C("A")},B{r},{C("C")},{SEL},{C("L")},1,{C("AP")},"Late"))'
+    ws_emp[f"M{r}"] = f'=IF(B{r}="","",COUNTIFS({C("A")},B{r},{C("C")},{SEL},{C("L")},1,{C("AP")},"No Show"))'
+    ws_emp[f"N{r}"] = f'=IF(B{r}="","",COUNTIFS({C("A")},B{r},{C("C")},{SEL},{C("L")},1,{C("AP")},"Absent (after cut-off)"))'
+    ws_emp[f"O{r}"] = f'=IF(B{r}="","",COUNTIFS({C("A")},B{r},{C("C")},{SEL},{C("L")},1,{C("AP")},"Missing Punch Out"))'
+    ws_emp[f"P{r}"] = f'=IF(B{r}="","",IFERROR(INDEX({C("W")},MATCH(B{r}&"|"&{SEL},{C("E")},0)),""))'
+    ws_emp[f"Q{r}"] = f'=IF(B{r}="","",COUNTIF(Weekly!$J{r + 3}:$O{r + 3},"Below"))'
+    ws_emp[f"R{r}"] = f'=IF(B{r}="","",L{r}+M{r}+N{r}+O{r}+(L{r}+M{r}+N{r}+O{r})/1000+{k}/100000000)'
 ws_emp.freeze_panes = "A2"
-for col, w in zip("ABCDEFGHIJK", (5, 14, 30, 18, 18, 12, 12, 12, 14, 10, 12)):
+for col, w in zip("ABCDEFGHIJKLMNOPQR", (5, 14, 30, 18, 18, 12, 12, 12, 14, 10, 12, 10, 12, 14, 14, 24, 12, 12)):
     ws_emp.column_dimensions[col].width = w
+for i, h in enumerate(emp_hdr[11:], 12):
+    c = ws_emp.cell(row=1, column=i, value=h); c.font = font(9, True, WHITE); c.fill = fill(CHAR)
+
+# ----------------------------------------------------------------------------------------------
+# Weekly hours sheet (employee x week of the selected month)
+# ----------------------------------------------------------------------------------------------
+ws_wk = wb.create_sheet("Weekly")
+ws_wk["A1"] = "Weekly worked hours vs minimum (weeks touching the selected month)"; ws_wk["A1"].font = font(12, True)
+ws_wk["A2"] = "Minimum hours per week"; ws_wk["B2"] = 40; ws_wk["B2"].font = font(10, color="0000FF"); ws_wk["B2"].fill = fill("FFFF00")
+ws_wk["C2"] = "Weeks run Monday-Sunday. A week is judged only when it lies completely inside the loaded data and the employee has hours in it (partial weeks at the edges show hours but no verdict)."
+ws_wk["C2"].font = font(8, italic=True, color=GREY)
+ws_wk["A3"] = "Week starting ->"; ws_wk["A3"].font = font(9, True)
+for i in range(6):
+    col = L(4 + i)   # D..I hours
+    ws_wk[f"{col}3"] = f'=IF(Dashboard!$C$4="","",DATEVALUE(Dashboard!$C$4&"-01")-WEEKDAY(DATEVALUE(Dashboard!$C$4&"-01"),2)+1+{7 * i})'
+    ws_wk[f"{col}3"].number_format = "dd-mmm"; ws_wk[f"{col}3"].font = font(9, True, WHITE); ws_wk[f"{col}3"].fill = fill(CHAR)
+    col2 = L(10 + i)  # J..O flags
+    ws_wk[f"{col2}3"] = f'=IF({col}3="","","Wk "&{i + 1})'; ws_wk[f"{col2}3"].font = font(9, True, WHITE); ws_wk[f"{col2}3"].fill = fill(GREY)
+ws_wk["A4"] = "Employee Code"; ws_wk["B4"] = "Employee Name"; ws_wk["C4"] = "Shift"
+for c in "ABC":
+    ws_wk[f"{c}4"].font = font(9, True, WHITE); ws_wk[f"{c}4"].fill = fill(CHAR)
+ws_wk["D4"] = "Hours per week (Mon-Sun)"; ws_wk["D4"].font = font(9, True); ws_wk["J4"] = "Below minimum?"; ws_wk["J4"].font = font(9, True)
+ws_wk["P4"] = "Weeks below"; ws_wk["P4"].font = font(9, True, WHITE); ws_wk["P4"].fill = fill(CHAR)
+for r in range(2, EMP_N + 2):
+    wr = r + 3   # weekly row offset (data starts row 5)
+    ws_wk[f"A{r}"] = None
+for r in range(5, EMP_N + 5):
+    er = r - 3   # matching Employees row
+    ws_wk[f"A{r}"] = f'=Employees!B{er}'
+    ws_wk[f"B{r}"] = f'=IF(A{r}="","",Employees!C{er})'
+    ws_wk[f"C{r}"] = f'=IF(A{r}="","",Employees!P{er})'
+    for i in range(6):
+        col = L(4 + i); col2 = L(10 + i)
+        ws_wk[f"{col}{r}"] = f'=IF(OR($A{r}="",{col}$3=""),"",SUMIFS({C("G")},{C("A")},$A{r},{C("AQ")},{col}$3,{C("O")},1))'
+        ws_wk[f"{col}{r}"].number_format = "0.0"
+        ws_wk[f"{col2}{r}"] = f'=IF(OR($A{r}="",{col}$3=""),"",IF(OR({col}{r}=0,{col}$3<MIN(Calc!$B$2:$B$30001),{col}$3+6>MAX(Calc!$B$2:$B$30001)),"",IF({col}{r}<$B$2,"Below","OK")))'
+    ws_wk[f"P{r}"] = f'=IF(A{r}="","",COUNTIF(J{r}:O{r},"Below"))'
+ws_wk.freeze_panes = "D5"
+ws_wk.column_dimensions["A"].width = 14; ws_wk.column_dimensions["B"].width = 30; ws_wk.column_dimensions["C"].width = 24
+ws_wk.conditional_formatting.add(f"J5:O{EMP_N + 4}", CellIsRule(operator="equal", formula=['"Below"'], font=Font(color=RED, bold=True)))
 EMP = lambda col: f"Employees!${col}$2:${col}${EMP_N + 1}"
 
 # ----------------------------------------------------------------------------------------------
@@ -269,7 +364,7 @@ for i, (label, fx, fmt, kind) in enumerate(kpis):
     else:
         d[f"E{r}"] = f'=IF(OR(C{r}="",D{r}="",D{r}=0),"",C{r}/D{r}-1)'; d[f"E{r}"].number_format = "+0.0%;-0.0%;0.0%"
     d[f"E{r}"].font = font(10)
-    d[f"F{r}"] = notes.get(label, ""); d[f"F{r}"].font = font(8, italic=True, color=GREY)
+    d[f"F{r}"] = notes.get(label, ""); d[f"F{r}"].font = font(8, italic=True, color=GREY); d[f"F{r}"].alignment = Alignment(wrap_text=True, vertical="top")
     for c in "BCDE":
         d[f"{c}{r}"].border = BORDER
 # colour the change cells (neutral for volumes; green/red for rates where direction matters)
@@ -278,6 +373,23 @@ d.conditional_formatting.add("E11", CellIsRule(operator="lessThan", formula=["0"
 for cell in ("E14", "E15"):
     d.conditional_formatting.add(cell, CellIsRule(operator="greaterThan", formula=["0"], font=Font(color=RED)))
     d.conditional_formatting.add(cell, CellIsRule(operator="lessThan", formula=["0"], font=Font(color=GREEN)))
+
+# policy KPIs next to key figures
+d["H8"] = "Policy view (selected month)"; d["H8"].font = font(9, True, WHITE); d["H8"].fill = fill(CHAR); d["I8"] = "Value"; d["I8"].font = font(9, True, WHITE); d["I8"].fill = fill(CHAR)
+pol_kpis = [
+    ("Late days (punch in after shift limit)", f'=COUNTIFS({C("C")},{M},{C("L")},1,{C("AP")},"Late")', "#,##0"),
+    ("No Show days (no punch in)", f'=COUNTIFS({C("C")},{M},{C("L")},1,{C("AP")},"No Show")', "#,##0"),
+    ("Absent after cut-off (e.g. General after 10:00)", f'=COUNTIFS({C("C")},{M},{C("L")},1,{C("AP")},"Absent (after cut-off)")', "#,##0"),
+    ("Missing punch out (where required)", f'=COUNTIFS({C("C")},{M},{C("L")},1,{C("AP")},"Missing Punch Out")', "#,##0"),
+    ("Days OK under shift policy", f'=COUNTIFS({C("C")},{M},{C("L")},1,{C("AP")},"OK")', "#,##0"),
+    ("Employees with a week below minimum hours", f'=COUNTIF({EMP("Q")},">0")', "#,##0"),
+    ("Employees with any policy exception", f'=COUNTIF({EMP("R")},">=1")', "#,##0"),
+]
+for i, (label, fx, fmt) in enumerate(pol_kpis):
+    r = 9 + i
+    d[f"H{r}"] = label; d[f"H{r}"].font = font(9); d[f"I{r}"] = fx; d[f"I{r}"].number_format = fmt; d[f"I{r}"].font = font(11, True)
+    d[f"H{r}"].border = BORDER; d[f"I{r}"].border = BORDER
+d.column_dimensions["H"].width = 40; d.column_dimensions["F"].width = 34; d.column_dimensions["G"].width = 3
 
 # ---- Status mix ------------------------------------------------------------------------------
 d["B17"] = "Attendance status (selected month, employee-days)"; d["B17"].font = font(12, True)
@@ -498,7 +610,51 @@ c5.series[0].graphicalProperties.solidFill = RED
 d.add_chart(c5, "U71")
 
 # ---- How to use --------------------------------------------------------------------------------
-d["B118"] = "How to use"; d["B118"].font = font(12, True)
+# ---- Shift policy compliance ------------------------------------------------------------------
+d["B118"] = "Shift policy compliance (selected month, employee-days, official shift rules from Settings)"; d["B118"].font = font(12, True)
+sp_hdr = ["Shift Name", "Employees", "Employee Days", "OK", "Late", "No Show", "Absent (cut-off)", "Missing Punch Out", "Late %", "No Show + Absent %", "Avg Hours", "Employees below weekly min"]
+for i, h in enumerate(sp_hdr):
+    c = d.cell(row=119, column=2 + i, value=h); c.font = font(9, True, WHITE); c.fill = fill(CHAR); c.alignment = Alignment(wrap_text=True, vertical="center")
+d.row_dimensions[119].height = 30
+SP_ROWS = 15
+for i in range(SP_ROWS):
+    r = 120 + i; k = i + 1
+    d[f"B{r}"] = f'=IFERROR(INDEX({C("W")},MATCH({k},{C("AC")},0)),"")'
+    b = f"$B{r}"
+    base = f'{C("C")},{M},{C("W")},{b},{C("L")},1'
+    d[f"C{r}"] = f'=IF({b}="","",COUNTIFS({C("C")},{M},{C("W")},{b},{C("M")},1))'
+    d[f"D{r}"] = f'=IF({b}="","",COUNTIFS({base}))'
+    d[f"E{r}"] = f'=IF({b}="","",COUNTIFS({base},{C("AP")},"OK"))'
+    d[f"F{r}"] = f'=IF({b}="","",COUNTIFS({base},{C("AP")},"Late"))'
+    d[f"G{r}"] = f'=IF({b}="","",COUNTIFS({base},{C("AP")},"No Show"))'
+    d[f"H{r}"] = f'=IF({b}="","",COUNTIFS({base},{C("AP")},"Absent (after cut-off)")+COUNTIFS({base},{C("AP")},"Absent"))'
+    d[f"I{r}"] = f'=IF({b}="","",COUNTIFS({base},{C("AP")},"Missing Punch Out"))'
+    d[f"J{r}"] = f'=IF({b}="","",IFERROR(F{r}/(E{r}+F{r}+G{r}+H{r}+I{r}),""))'
+    d[f"K{r}"] = f'=IF({b}="","",IFERROR((G{r}+H{r})/(E{r}+F{r}+G{r}+H{r}+I{r}),""))'
+    d[f"L{r}"] = f'=IF({b}="","",IFERROR(SUMIFS({C("G")},{C("C")},{M},{C("W")},{b},{C("O")},1)/COUNTIFS({base},{C("G")},">0"),""))'
+    d[f"M{r}"] = f'=IF({b}="","",COUNTIFS({EMP("P")},{b},{EMP("Q")},">0"))'
+    for c, fmt in zip("CDEFGHIJKLM", ("#,##0", "#,##0", "#,##0", "#,##0", "#,##0", "#,##0", "#,##0", "0.0%", "0.0%", "0.0", "#,##0")):
+        d[f"{c}{r}"].number_format = fmt; d[f"{c}{r}"].border = BORDER
+    d[f"B{r}"].border = BORDER
+d["B135"] = "Rates are over judged days (OK + Late + No Show + Absent + Missing Punch Out); Leave / Holiday / Rest days are excluded. Edit the rules on the Settings sheet (Shift policy)."; d["B135"].font = font(8, italic=True, color=GREY)
+
+d["B137"] = "Employees with policy exceptions (selected month, ranked by Late + No Show + Absent + Missing Punch Out)"; d["B137"].font = font(12, True)
+pe_hdr = ["Employee Code", "Employee Name", "Shift", "Business Unit", "Late Days", "No Show Days", "Absent (cut-off)", "Missing Punch Out", "Weeks below min", "Avg Hours"]
+for i, h in enumerate(pe_hdr):
+    c = d.cell(row=138, column=2 + i, value=h); c.font = font(9, True, WHITE); c.fill = fill(CHAR); c.alignment = Alignment(wrap_text=True, vertical="center")
+d.row_dimensions[138].height = 30
+for i in range(25):
+    r = 139 + i; k = i + 1
+    d[f"B{r}"] = f'=IFERROR(IF(LARGE({EMP("R")},{k})<1,"",INDEX({EMP("B")},MATCH(LARGE({EMP("R")},{k}),{EMP("R")},0))),"")'
+    for c_out, c_src in zip("CDEFGHIJK", "CPDLMNOQJ"):
+        d[f"{c_out}{r}"] = f'=IF($B{r}="","",INDEX({EMP(c_src)},MATCH($B{r},{EMP("B")},0)))'
+    for c, fmt in zip("FGHIJK", ("#,##0", "#,##0", "#,##0", "#,##0", "#,##0", "0.0")):
+        d[f"{c}{r}"].number_format = fmt
+    for c in "BCDEFGHIJK":
+        d[f"{c}{r}"].border = BORDER
+d["B164"] = "Full week-by-week hours for every employee are on the Weekly sheet."; d["B164"].font = font(8, italic=True, color=GREY)
+
+d["B166"] = "How to use"; d["B166"].font = font(12, True)
 steps = ["1. Open the Raw Data sheet and paste your attendance export below the red header row (same column order as the header: Employee Code ... Status2).",
          "2. Every month, paste the new rows under the existing ones - the dashboard picks up the new month automatically and defaults to it.",
          "3. Change the selected month in the yellow cell C4 to look at any earlier month.",
@@ -507,7 +663,7 @@ steps = ["1. Open the Raw Data sheet and paste your attendance export below the 
          "6. Employee-days are counted once even if a day is repeated (exact duplicate rows are ignored); statuses are taken from the first row of each employee-day.",
          "Definitions: Present % = Present employee-days / recorded employee-days (no roster available, so not a true attendance rate). Missing Punch % = Present days with a missing punch / Present days. Hours: '09:09' = 9.15 hours."]
 for i, s in enumerate(steps):
-    d[f"B{119 + i}"] = s; d[f"B{119 + i}"].font = font(9, color=GREY)
+    d[f"B{167 + i}"] = s; d[f"B{167 + i}"].font = font(9, color=GREY)
 d.freeze_panes = "A7"
 
 wb.active = 0

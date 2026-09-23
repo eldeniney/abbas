@@ -19,10 +19,10 @@ FIRST = ["AHMED", "MOHAMED", "SARA", "FATIMA", "OMAR", "KHALED", "NOUR", "YOUSSE
 LAST = ["MOHSEN", "SAYED", "SALEH", "IBRAHIM", "HASSAN", "ABDALLA", "MAHMOUD", "KAMAL", "FAWZY", "YOUSSEF", "NABIL", "SAMIR"]
 
 CLIENTS = [("eMinds", "SMB-41984", "20085-SMB-SALES-CW41984", "SMB DIGITAL BACK OFFICE", "48 Hours Weekly"),
-           ("eMinds", "SMB-41985", "20085-SMB-SALES-CW41985", "SMB FIELD SALES AM", "48 Hours Weekly"),
-           ("eMinds", "CONSUMER-22011", "20090-CONS-RETAIL-CW22011", "RETAIL STORE ROTATION", "45 Hours Weekly"),
-           ("Etisalat Services", "ENTERPRISE-30510", "20110-ENT-SUPPORT-CW30510", "ENTERPRISE SUPPORT DAY", "40 Hours Weekly"),
-           ("Etisalat Services", "ENTERPRISE-30511", "20110-ENT-SUPPORT-CW30511", "ENTERPRISE SUPPORT NIGHT", "40 Hours Weekly")]
+           ("eMinds", "SMB-41985", "20085-SMB-SALES-CW41985", "SMB-PRIME&BD-KAM-1", "48 Hours Weekly"),
+           ("eMinds", "CONSUMER-22011", "20090-CONS-RETAIL-CW22011", "SMB-GENERAL SHIFT", "45 Hours Weekly"),
+           ("Etisalat Services", "ENTERPRISE-30510", "20110-ENT-SUPPORT-CW30510", "SMB-Elite Business", "40 Hours Weekly"),
+           ("Etisalat Services", "ENTERPRISE-30511", "20110-ENT-SUPPORT-CW30511", "SMB-CCC & SOHO", "40 Hours Weekly")]
 
 TERMS_IN = ["SHJ-HRB-L03-D040 LOBBY ENTRY", "DXB-HQ-GF-GATE01 ENTRY", "AUH-TWR-L01-D002 ENTRY"]
 TERMS_OUT = ["SHJ-MSCP-GF-GATE04-TS EXIT EXIT", "DXB-HQ-GF-GATE01 EXIT", "AUH-TWR-L01-D002 EXIT"]
@@ -33,7 +33,7 @@ for i in range(60):
     if i == 57:
         code = "00123"          # numeric-looking id that must stay text
     c = CLIENTS[i % len(CLIENTS)]
-    employees.append({"code": code, "agency": f"PT{117600 + i}", "name": f"{random.choice(FIRST)} {random.choice(LAST)} {random.choice(LAST)}", "client": c, "night": (i % len(CLIENTS) == 4)})
+    employees.append({"code": code, "agency": f"PT{117600 + i}", "name": f"{random.choice(FIRST)} {random.choice(LAST)} {random.choice(LAST)}", "client": c, "night": False})
 
 def fmt_date(d):
     return d.strftime("%d-%b-%Y").upper()
