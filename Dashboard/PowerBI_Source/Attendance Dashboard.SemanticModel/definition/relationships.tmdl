@@ -1,0 +1,35 @@
+relationship ca98bef6-2c13-57bb-9972-90b42298d963
+	fromColumn: FactAttendance.'Process Date'
+	toColumn: DimDate.Date
+
+relationship 06aa09fb-2750-58af-ac57-4b1b505da961
+	fromColumn: FactAttendance.'Employee Code'
+	toColumn: DimEmployee.'Employee Code'
+
+relationship 07905662-37e1-59fa-859d-028f9c8d5064
+	fromColumn: FactAttendance.'Business Unit'
+	toColumn: DimBusinessUnit.'Business Unit'
+
+relationship f48d7bc5-1ae8-52b2-9e15-20c8ca723b0a
+	fromColumn: FactAttendance.'Client Name'
+	toColumn: DimClient.'Client Name'
+
+relationship cc01e873-47ce-5c9b-bc25-a7dc0381a6ee
+	fromColumn: FactAttendance.'Cost Center'
+	toColumn: DimCostCenter.'Cost Center'
+
+relationship 34bed188-5829-5dec-b840-023dc2e82c9a
+	fromColumn: FactAttendance.'Shift Name'
+	toColumn: DimShift.'Shift Name'
+
+relationship 0f6f8410-765d-58c6-9fe2-a3bf596c0a54
+	fromColumn: FactAttendance.'Source Name'
+	toColumn: DimSource.'Source Name'
+
+relationship ba63579a-4cf2-5e7a-886c-f6153661e15d
+	fromColumn: FactAttendance.'Pay Calendar'
+	toColumn: DimPayCalendar.'Pay Calendar'
+
+relationship 8eea7b80-a062-5520-94e4-dccd52f41e74
+	fromColumn: FactAttendance.'Attendance Status'
+	toColumn: DimStatus.'Attendance Status'

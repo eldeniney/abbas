@@ -1,0 +1,47 @@
+/// One row per Employee Code with the latest recorded name and agency ID. Business Unit, Client, Cost Center and Shift are deliberately NOT stored here because they can change over time - they stay on each attendance record.
+table DimEmployee
+	lineageTag: a27ee510-654c-5e8d-91ba-0fbb62f750d2
+
+	column 'Employee Code'
+		dataType: string
+		isKey
+		lineageTag: d23b2c1c-f709-5e28-9364-b2470e7b0058
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Employee Code]
+
+		annotation SummarizationSetBy = User
+
+	/// Name from the employee's most recent attendance record.
+	column 'Employee Name'
+		dataType: string
+		lineageTag: 34364d79-d662-57ba-84cc-071b9ec98c7f
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Employee Name]
+
+		annotation SummarizationSetBy = User
+
+	column 'Agency Emp ID'
+		dataType: string
+		lineageTag: f7129d10-0f01-5bf9-98a3-4469bf028256
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Agency Emp ID]
+
+		annotation SummarizationSetBy = User
+
+	partition DimEmployee = calculated
+		mode: import
+		source =
+				ADDCOLUMNS (
+				    DISTINCT ( FactAttendance[Employee Code] ),
+				    "Employee Name",
+				        LOOKUPVALUE ( FactAttendance[Employee Name (Latest)], FactAttendance[Employee Code], [Employee Code] ),
+				    "Agency Emp ID",
+				        LOOKUPVALUE ( FactAttendance[Agency Emp ID (Latest)], FactAttendance[Employee Code], [Employee Code] )
+				)
+

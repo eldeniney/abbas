@@ -1,0 +1,60 @@
+/// One row written at every refresh: refresh timestamp and the parameter values in force.
+table RefreshInfo
+	isHidden
+	lineageTag: ab32d139-7590-51f7-b99c-bd8019dcb02a
+
+	column 'Refresh DateTime'
+		dataType: dateTime
+		formatString: dd-mmm-yyyy hh:nn
+		lineageTag: 5d826ecd-c874-5e7b-a0fe-9011a14549c5
+		summarizeBy: none
+		sourceColumn: Refresh DateTime
+
+		annotation SummarizationSetBy = User
+
+	column 'Data Folder'
+		dataType: string
+		lineageTag: 99cb86ff-4cd6-57cc-860e-003532f978db
+		summarizeBy: none
+		sourceColumn: Data Folder
+
+		annotation SummarizationSetBy = User
+
+	column 'Short Hours Threshold'
+		dataType: double
+		formatString: 0.0
+		lineageTag: bece0536-35c4-59e8-afc1-e069153d2fa9
+		summarizeBy: none
+		sourceColumn: Short Hours Threshold
+
+		annotation SummarizationSetBy = User
+
+	column 'Long Hours Threshold'
+		dataType: double
+		formatString: 0.0
+		lineageTag: 8ab02442-e8b2-5614-b5b0-f6d6e2d5cc4f
+		summarizeBy: none
+		sourceColumn: Long Hours Threshold
+
+		annotation SummarizationSetBy = User
+
+	column 'Status2 Treated As Exception'
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 4a84414a-be27-5787-95b3-141f56fe5c82
+		summarizeBy: none
+		sourceColumn: Status2 Treated As Exception
+
+		annotation SummarizationSetBy = User
+
+	partition RefreshInfo = m
+		mode: import
+		source =
+				let
+				    Source = #table(
+				        type table [#"Refresh DateTime" = datetime, #"Data Folder" = text, #"Short Hours Threshold" = number, #"Long Hours Threshold" = number, #"Status2 Treated As Exception" = logical],
+				        {{DateTime.LocalNow(), pDataFolder, pShortHoursReviewThreshold, pLongHoursReviewThreshold, pStatus2IsException}}
+				    )
+				in
+				    Source
+

@@ -1,0 +1,1153 @@
+/// One row per attendance record from the monthly files. Employee-day level fields (status, hours, exceptions) are repeated on every record of the same employee-day so that distinct counts of Employee Day Key are always correct.
+table FactAttendance
+	lineageTag: 3562d2fd-c25a-5608-ab50-865a7fe198c1
+
+	column 'Employee Code'
+		dataType: string
+		isHidden
+		lineageTag: 9d06b1ab-a9a5-5dd8-a57c-58bb9d86f500
+		summarizeBy: none
+		sourceColumn: Employee Code
+
+		annotation SummarizationSetBy = User
+
+	column 'Agency Emp ID'
+		dataType: string
+		lineageTag: 77de7a5c-9ea0-5865-b35d-37cbba2c19fa
+		displayFolder: Employee
+		summarizeBy: none
+		sourceColumn: Agency Emp ID
+
+		annotation SummarizationSetBy = User
+
+	/// Employee name exactly as recorded on this attendance record.
+	column 'Employee Name'
+		dataType: string
+		lineageTag: dd2f9b0c-1b8c-55a7-a10f-e98b19f98406
+		displayFolder: Employee
+		summarizeBy: none
+		sourceColumn: Employee Name
+
+		annotation SummarizationSetBy = User
+
+	column 'Employee Name (Latest)'
+		dataType: string
+		isHidden
+		lineageTag: a53c4e8b-9f5d-5519-b716-42b1e5ccf5ea
+		summarizeBy: none
+		sourceColumn: Employee Name (Latest)
+
+		annotation SummarizationSetBy = User
+
+	column 'Agency Emp ID (Latest)'
+		dataType: string
+		isHidden
+		lineageTag: 61158b39-e241-5b9c-b573-03bbdbca7dba
+		summarizeBy: none
+		sourceColumn: Agency Emp ID (Latest)
+
+		annotation SummarizationSetBy = User
+
+	column 'Source Name'
+		dataType: string
+		isHidden
+		lineageTag: 4fc9b3fc-194e-5c04-91ff-a8615e43632b
+		summarizeBy: none
+		sourceColumn: Source Name
+
+		annotation SummarizationSetBy = User
+
+	column 'Business Unit'
+		dataType: string
+		isHidden
+		lineageTag: 34944ace-9bc7-5ad9-bb86-0e6a01b17c50
+		summarizeBy: none
+		sourceColumn: Business Unit
+
+		annotation SummarizationSetBy = User
+
+	column 'Client Name'
+		dataType: string
+		isHidden
+		lineageTag: 5349ace8-b86e-5966-bcb6-a0b47d9630df
+		summarizeBy: none
+		sourceColumn: Client Name
+
+		annotation SummarizationSetBy = User
+
+	column 'Cost Center'
+		dataType: string
+		isHidden
+		lineageTag: b4b972a2-f68f-5ed9-8367-1f42165b8430
+		summarizeBy: none
+		sourceColumn: Cost Center
+
+		annotation SummarizationSetBy = User
+
+	column 'Pay Calendar'
+		dataType: string
+		isHidden
+		lineageTag: 2d27a835-46d4-5048-87de-a1619a34f04a
+		summarizeBy: none
+		sourceColumn: Pay Calendar
+
+		annotation SummarizationSetBy = User
+
+	column 'Shift Name'
+		dataType: string
+		isHidden
+		lineageTag: 5b01290e-089b-5f8d-9e6e-da0e771915f0
+		summarizeBy: none
+		sourceColumn: Shift Name
+
+		annotation SummarizationSetBy = User
+
+	column 'Process Date'
+		dataType: dateTime
+		formatString: dd-mmm-yyyy
+		lineageTag: f08b601a-8629-5b9e-9016-5cb1b1370f72
+		displayFolder: Attendance Day
+		summarizeBy: none
+		sourceColumn: Process Date
+
+		annotation SummarizationSetBy = User
+
+	column 'Process Month Start'
+		dataType: dateTime
+		isHidden
+		formatString: mmm yyyy
+		lineageTag: f1f590aa-fa72-58ec-ae44-30bda61355c5
+		summarizeBy: none
+		sourceColumn: Process Month Start
+
+		annotation SummarizationSetBy = User
+
+	/// Day name as written in the source file.
+	column Day
+		dataType: string
+		lineageTag: 55350436-996a-512f-b9ea-42a30e52c74f
+		displayFolder: Attendance Day
+		summarizeBy: none
+		sourceColumn: Day
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch In Time'
+		dataType: dateTime
+		formatString: dd-mmm-yyyy hh:nn AM/PM
+		lineageTag: 97d8f867-553e-5081-ae1b-bd4ad9947728
+		displayFolder: Punches
+		summarizeBy: none
+		sourceColumn: Punch In Time
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch Out Time'
+		dataType: dateTime
+		formatString: dd-mmm-yyyy hh:nn AM/PM
+		lineageTag: 2b6ba984-6b37-5040-933f-c85693bc02b5
+		displayFolder: Punches
+		summarizeBy: none
+		sourceColumn: Punch Out Time
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch In Terminal'
+		dataType: string
+		lineageTag: b5dee9d8-095c-53fc-aa68-fd03a5fa04d4
+		displayFolder: Punches
+		summarizeBy: none
+		sourceColumn: Punch In Terminal
+
+		annotation SummarizationSetBy = User
+
+	/// Source header 'Punch Out Temrinal' is mapped to this column automatically.
+	column 'Punch Out Terminal'
+		dataType: string
+		lineageTag: cb44e5e4-dc7b-50c5-a2d3-309dff7b0b81
+		displayFolder: Punches
+		summarizeBy: none
+		sourceColumn: Punch Out Terminal
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch In Hour'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0a5bde77-f452-5e08-b352-199df0fc0f40
+		summarizeBy: none
+		sourceColumn: Punch In Hour
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch Out Hour'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c47c983c-1893-5499-84a9-cb3b689d68e8
+		summarizeBy: none
+		sourceColumn: Punch Out Hour
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch In Hour Label'
+		dataType: string
+		lineageTag: 6c31cfb7-41e3-55ac-b752-a9ec82b252d8
+		displayFolder: Punches
+		summarizeBy: none
+		sourceColumn: Punch In Hour Label
+		sortByColumn: 'Punch In Hour'
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch Out Hour Label'
+		dataType: string
+		lineageTag: 8b1e3377-c30e-57d5-b8b1-53f4fa741e3c
+		displayFolder: Punches
+		summarizeBy: none
+		sourceColumn: Punch Out Hour Label
+		sortByColumn: 'Punch Out Hour'
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch In Minutes From Midnight'
+		dataType: double
+		isHidden
+		formatString: 0
+		lineageTag: 01e9aa7a-c291-5fe9-8fee-f0b415e121dc
+		summarizeBy: none
+		sourceColumn: Punch In Minutes From Midnight
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch Out Minutes From Midnight'
+		dataType: double
+		isHidden
+		formatString: 0
+		lineageTag: afca88d1-3c27-56e8-ad07-7a108ef6f70e
+		summarizeBy: none
+		sourceColumn: Punch Out Minutes From Midnight
+
+		annotation SummarizationSetBy = User
+
+	/// Status text of this record (cleaned, spelling preserved).
+	column Status
+		dataType: string
+		lineageTag: 30ededad-746e-5ebc-8fee-7a4f57e4dcdd
+		displayFolder: Status
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = User
+
+	column 'Record Status Category'
+		dataType: string
+		isHidden
+		lineageTag: 3d792ebc-e2ea-5989-ae77-12ad66dd0f8a
+		summarizeBy: none
+		sourceColumn: Record Status Category
+
+		annotation SummarizationSetBy = User
+
+	/// Status resolved at employee-day level (when a day has several records, the record with the highest attendance priority wins).
+	column 'Attendance Status'
+		dataType: string
+		isHidden
+		lineageTag: 4fdc51d8-7925-5d18-b7cd-e0cf3b7dac29
+		summarizeBy: none
+		sourceColumn: Attendance Status
+
+		annotation SummarizationSetBy = User
+
+	column 'Status Category'
+		dataType: string
+		isHidden
+		lineageTag: fb02004a-a202-5540-b16d-5f00ff4a6bb0
+		summarizeBy: none
+		sourceColumn: Status Category
+
+		annotation SummarizationSetBy = User
+
+	column 'Status Category Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f03c2a12-ad2e-53a7-a084-e646f7c29d3c
+		summarizeBy: none
+		sourceColumn: Status Category Order
+
+		annotation SummarizationSetBy = User
+
+	column Status2
+		dataType: string
+		lineageTag: 6cb85e5c-ca8b-55ae-8c0f-ad959cb13d94
+		displayFolder: Status
+		summarizeBy: none
+		sourceColumn: Status2
+
+		annotation SummarizationSetBy = User
+
+	/// Status2 value, with '(None)' when blank.
+	column 'Status2 Category'
+		dataType: string
+		lineageTag: b48d3a1c-7af6-55c6-a67e-ca5cd13d381f
+		displayFolder: Status
+		summarizeBy: none
+		sourceColumn: Status2 Category
+
+		annotation SummarizationSetBy = User
+
+	column 'Is Justified'
+		dataType: string
+		lineageTag: 23b8116f-cd84-5f2b-a4e0-c3b974573f54
+		displayFolder: Status
+		summarizeBy: none
+		sourceColumn: Is Justified
+
+		annotation SummarizationSetBy = User
+
+	/// Justified / Not Justified / Pending / Not Recorded (blank is NOT assumed to mean unjustified).
+	column 'Justification Category'
+		dataType: string
+		lineageTag: 33e5dc8c-90c3-54c4-b4cb-2d4329a0fa12
+		displayFolder: Status
+		summarizeBy: none
+		sourceColumn: Justification Category
+
+		annotation SummarizationSetBy = User
+
+	/// Total Hours exactly as written in the source (e.g. 09:09 = 9 hours 9 minutes).
+	column 'Total Hours (Source)'
+		dataType: string
+		lineageTag: 8b2acf24-77ad-51bf-8489-9a2d93791f60
+		displayFolder: Hours
+		summarizeBy: none
+		sourceColumn: Total Hours (Source)
+
+		annotation SummarizationSetBy = User
+
+	/// Total Hours converted to decimal hours (09:09 -> 9.15).
+	column 'Source Worked Hours'
+		dataType: double
+		formatString: 0.00
+		lineageTag: c981bccc-7d54-5c1a-982d-3766d15aed20
+		displayFolder: Hours
+		summarizeBy: none
+		sourceColumn: Source Worked Hours
+
+		annotation SummarizationSetBy = User
+
+	/// Punch Out minus Punch In in decimal hours. Only used when the source Total Hours is blank or invalid.
+	column 'Calculated Worked Hours'
+		dataType: double
+		formatString: 0.00
+		lineageTag: 5bf7a099-d116-5806-ae43-a42cedd2cda6
+		displayFolder: Hours
+		summarizeBy: none
+		sourceColumn: Calculated Worked Hours
+
+		annotation SummarizationSetBy = User
+
+	column 'Record Worked Hours'
+		dataType: double
+		isHidden
+		formatString: 0.00
+		lineageTag: 304f9f27-2c2a-5196-9ecf-6e5908655749
+		summarizeBy: none
+		sourceColumn: Record Worked Hours
+
+		annotation SummarizationSetBy = User
+
+	/// Hours that drive the dashboard: source Total Hours when valid, otherwise calculated from punches. Null on exact duplicate records so hours are never double counted.
+	column 'Worked Hours Decimal'
+		dataType: double
+		formatString: 0.00
+		lineageTag: d9f57cdb-c509-5cc6-8234-6489eeacd4de
+		displayFolder: Hours
+		summarizeBy: none
+		sourceColumn: Worked Hours Decimal
+
+		annotation SummarizationSetBy = User
+
+	column 'Worked Hours Basis'
+		dataType: string
+		lineageTag: 2f60bf05-cfe4-5977-b89a-6774270034ff
+		displayFolder: Hours
+		summarizeBy: none
+		sourceColumn: Worked Hours Basis
+
+		annotation SummarizationSetBy = User
+
+	/// Total hours of the employee-day (sum of its non-duplicate records).
+	column 'Day Worked Hours'
+		dataType: double
+		formatString: 0.00
+		lineageTag: dc098ce7-ace6-5185-8662-75a862cb28ec
+		displayFolder: Hours
+		summarizeBy: none
+		sourceColumn: Day Worked Hours
+
+		annotation SummarizationSetBy = User
+
+	column 'Worked Hours Band'
+		dataType: string
+		lineageTag: 305e7f33-f686-51ec-8207-a6a13a3e8c00
+		displayFolder: Hours
+		summarizeBy: none
+		sourceColumn: Worked Hours Band
+		sortByColumn: 'Worked Hours Band Order'
+
+		annotation SummarizationSetBy = User
+
+	column 'Worked Hours Band Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2a571999-3e7b-5446-8fb7-e64c197fa283
+		summarizeBy: none
+		sourceColumn: Worked Hours Band Order
+
+		annotation SummarizationSetBy = User
+
+	column 'Employee Day Key'
+		dataType: string
+		isHidden
+		lineageTag: 097e7146-4738-5baa-af80-7d4b7907183e
+		summarizeBy: none
+		sourceColumn: Employee Day Key
+
+		annotation SummarizationSetBy = User
+
+	column 'Is Duplicate Record'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 753eb007-e499-594f-9fa0-63707ca8c4a7
+		summarizeBy: none
+		sourceColumn: Is Duplicate Record
+
+		annotation SummarizationSetBy = User
+
+	column 'Day Record Count'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 62197c21-94a0-5f92-a87f-0f0a41d4b218
+		summarizeBy: none
+		sourceColumn: Day Record Count
+
+		annotation SummarizationSetBy = User
+
+	column 'Is Day Primary'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: fdabbda9-c3f1-5216-8191-d706b7b9bf01
+		summarizeBy: none
+		sourceColumn: Is Day Primary
+
+		annotation SummarizationSetBy = User
+
+	column 'Multiple Records Day Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: fd8b8cef-00db-5011-bb60-5cb0d430713e
+		summarizeBy: none
+		sourceColumn: Multiple Records Day Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch Expected Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: fcca5141-e52c-55be-8dd9-2353b6bb8bf5
+		summarizeBy: none
+		sourceColumn: Punch Expected Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Missing Punch In Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 31e54a1e-80bb-59b9-99ae-d6707ceaf27a
+		summarizeBy: none
+		sourceColumn: Missing Punch In Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Missing Punch Out Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 08d9e698-9718-5b06-9b49-2741e04a23b4
+		summarizeBy: none
+		sourceColumn: Missing Punch Out Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Missing Both Punches Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 4d5298a5-7f18-503e-a8fe-8874fa93f9d4
+		summarizeBy: none
+		sourceColumn: Missing Both Punches Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Missing Punch Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7d871b23-0038-570d-9e89-a3c52f16836a
+		summarizeBy: none
+		sourceColumn: Missing Punch Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Complete Punch Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6b318d6b-1236-5a1c-b831-a57278bcc23e
+		summarizeBy: none
+		sourceColumn: Complete Punch Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch Out Before In Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 96d0eff8-bcbe-5104-9e4e-6eb2bac3fca1
+		summarizeBy: none
+		sourceColumn: Punch Out Before In Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch Crosses Midnight Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cc90eb69-3a52-5592-997d-572cd3acf578
+		summarizeBy: none
+		sourceColumn: Punch Crosses Midnight Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Status2 Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 39de9975-1979-5017-bd90-d3cbc0efc711
+		summarizeBy: none
+		sourceColumn: Status2 Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Day Missing Punch Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 22cf2377-86f3-5786-949d-f7600f52f984
+		summarizeBy: none
+		sourceColumn: Day Missing Punch Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Day Punch Expected Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ca222923-8263-54fb-9aeb-6eeacd909ca5
+		summarizeBy: none
+		sourceColumn: Day Punch Expected Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Day Status2 Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 38ea1c84-ada2-5bd1-b110-aa1e3f32f627
+		summarizeBy: none
+		sourceColumn: Day Status2 Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Exception Absent Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0726cdbb-ea1c-54ca-ada0-bcb925a3df40
+		summarizeBy: none
+		sourceColumn: Exception Absent Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Exception Missing Punch Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 84a2b747-0728-5622-8814-96c9999352de
+		summarizeBy: none
+		sourceColumn: Exception Missing Punch Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Exception Unrecognised Status Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 73cc5fa4-4833-5ea7-9aff-84827434bce4
+		summarizeBy: none
+		sourceColumn: Exception Unrecognised Status Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Exception Short Hours Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0b4ea123-85e5-51f3-9259-9c77f8435035
+		summarizeBy: none
+		sourceColumn: Exception Short Hours Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Exception Long Hours Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e33aa539-bd25-567a-a3ef-813e099fbdd7
+		summarizeBy: none
+		sourceColumn: Exception Long Hours Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'Exception Status2 Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 793040b6-3a6e-5976-8d96-d86aadd5e41f
+		summarizeBy: none
+		sourceColumn: Exception Status2 Flag
+
+		annotation SummarizationSetBy = User
+
+	/// All exception types recorded for this employee-day, separated by ';'.
+	column 'Exception Types'
+		dataType: string
+		lineageTag: 76640244-8054-5bbc-bf4d-c7702a1b3cfa
+		displayFolder: Exceptions
+		summarizeBy: none
+		sourceColumn: Exception Types
+
+		annotation SummarizationSetBy = User
+
+	column 'Exception Type Count'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e776a1c2-8472-5b74-9b46-3180e573d9d6
+		summarizeBy: none
+		sourceColumn: Exception Type Count
+
+		annotation SummarizationSetBy = User
+
+	column 'Exception Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c64b17ed-660a-5b2d-bbff-02ae668f0437
+		summarizeBy: none
+		sourceColumn: Exception Flag
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Missing Employee Code'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e2471f5e-f132-5b2d-b02d-678cd447cabd
+		summarizeBy: none
+		sourceColumn: DQ Missing Employee Code
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Missing Employee Name'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2e539703-4f1c-5522-8fae-9c8ab78d35fb
+		summarizeBy: none
+		sourceColumn: DQ Missing Employee Name
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Missing Process Date'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 412f2d9f-98d4-5bea-8d78-50b1d4da6217
+		summarizeBy: none
+		sourceColumn: DQ Missing Process Date
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Missing Total Hours'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a135c4b9-8727-5eb3-af9e-edc6abd6f432
+		summarizeBy: none
+		sourceColumn: DQ Missing Total Hours
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Invalid Total Hours'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0ec4f315-ee1f-5d22-9284-7ea73caa67df
+		summarizeBy: none
+		sourceColumn: DQ Invalid Total Hours
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Invalid Punch In'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9d177eda-cb9e-5e6b-a2e0-c396b55f0b88
+		summarizeBy: none
+		sourceColumn: DQ Invalid Punch In
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Invalid Punch Out'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6eb49180-2dcd-5626-bbd8-8ee16025dacd
+		summarizeBy: none
+		sourceColumn: DQ Invalid Punch Out
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Punch Out Before In'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e7df9d40-0024-5e4c-a901-c8df032f316e
+		summarizeBy: none
+		sourceColumn: DQ Punch Out Before In
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Duplicate Record'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b8baf0b5-8c2a-54c9-9fcb-2e0ed5fbb31e
+		summarizeBy: none
+		sourceColumn: DQ Duplicate Record
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Blank Status'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 37ee7730-f526-5e61-be71-27bf0f640211
+		summarizeBy: none
+		sourceColumn: DQ Blank Status
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Unrecognised Status'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 55aa964d-004b-5ddf-a023-433b6b71e361
+		summarizeBy: none
+		sourceColumn: DQ Unrecognised Status
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Blank Business Unit'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 743b5c6d-b1a9-57dc-b190-b1b316282283
+		summarizeBy: none
+		sourceColumn: DQ Blank Business Unit
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Blank Client'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e91ea237-2ab6-57b3-be4f-dc194ce3334f
+		summarizeBy: none
+		sourceColumn: DQ Blank Client
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Blank Shift'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 68a08cf6-53b5-5710-bb60-444a958a12ef
+		summarizeBy: none
+		sourceColumn: DQ Blank Shift
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Hours Differ From Punches'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 28ef0d02-41a4-5ef6-a0ee-fe3f081536c1
+		summarizeBy: none
+		sourceColumn: DQ Hours Differ From Punches
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Issue Types'
+		dataType: string
+		lineageTag: 54427406-6ada-503b-a394-0f2deb2e7d0f
+		displayFolder: Data Quality
+		summarizeBy: none
+		sourceColumn: DQ Issue Types
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Issue Count'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ffd503ca-66c9-593f-ab8d-b0c0be5a8a62
+		summarizeBy: none
+		sourceColumn: DQ Issue Count
+
+		annotation SummarizationSetBy = User
+
+	column 'DQ Issue Flag'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 25238df3-3610-59da-805b-293464c3de7b
+		summarizeBy: none
+		sourceColumn: DQ Issue Flag
+
+		annotation SummarizationSetBy = User
+
+	/// Original Punch In text when it could not be converted to a date/time.
+	column 'Punch In (Unparsed)'
+		dataType: string
+		lineageTag: 72353085-fef3-5906-966e-3202be5111f2
+		displayFolder: Data Quality
+		summarizeBy: none
+		sourceColumn: Punch In (Unparsed)
+
+		annotation SummarizationSetBy = User
+
+	column 'Punch Out (Unparsed)'
+		dataType: string
+		lineageTag: 52f11eca-dd44-5e1b-a69f-d2f106ce35b5
+		displayFolder: Data Quality
+		summarizeBy: none
+		sourceColumn: Punch Out (Unparsed)
+
+		annotation SummarizationSetBy = User
+
+	column 'Process Date (Unparsed)'
+		dataType: string
+		lineageTag: 45b8c907-59af-5679-b742-e1b7e288b5c5
+		displayFolder: Data Quality
+		summarizeBy: none
+		sourceColumn: Process Date (Unparsed)
+
+		annotation SummarizationSetBy = User
+
+	column 'Source File'
+		dataType: string
+		lineageTag: c1235f57-9857-50a8-b2f3-a22f4c6ccf87
+		displayFolder: Source
+		summarizeBy: none
+		sourceColumn: Source File
+
+		annotation SummarizationSetBy = User
+
+	column 'Source Folder'
+		dataType: string
+		lineageTag: 19a0ebb5-50f4-552a-8451-498c4811b7db
+		displayFolder: Source
+		summarizeBy: none
+		sourceColumn: Source Folder
+
+		annotation SummarizationSetBy = User
+
+	column 'Source Sheet'
+		dataType: string
+		lineageTag: 95f0e18c-fa0b-5edd-aceb-7d15c5631d9b
+		displayFolder: Source
+		summarizeBy: none
+		sourceColumn: Source Sheet
+
+		annotation SummarizationSetBy = User
+
+	/// Row number inside the source sheet (1 = first row of the sheet).
+	column 'Source Row Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 7b09cb25-bb9f-5d5e-9219-2a9f6e1da091
+		displayFolder: Source
+		summarizeBy: none
+		sourceColumn: Source Row Number
+
+		annotation SummarizationSetBy = User
+
+	column 'Source Modified Date'
+		dataType: dateTime
+		formatString: dd-mmm-yyyy hh:nn
+		lineageTag: 6405d562-7748-5b2a-8d84-127a41f66b48
+		displayFolder: Source
+		summarizeBy: none
+		sourceColumn: Source Modified Date
+
+		annotation SummarizationSetBy = User
+
+	partition FactAttendance = m
+		mode: import
+		source =
+				let
+				    // ---------------------------------------------------------------
+				    // 1. Read every monthly file in the data folder and combine
+				    // ---------------------------------------------------------------
+				    Files = SourceFiles,
+				    WithData = Table.AddColumn(Files, "Data", each fnReadAttendanceFile([Content], [Extension], [Name]), type table),
+				    NoContent = Table.RemoveColumns(WithData, {"Content", "Extension"}),
+				    Renamed = Table.RenameColumns(NoContent, {{"Name", "Source File"}, {"Folder Path", "Source Folder"}, {"Date modified", "Source Modified Date"}}),
+				    Expanded = Table.ExpandTableColumn(Renamed, "Data", CanonicalColumns & {"Source Sheet", "Source Row Number"}),
+
+				    // ---------------------------------------------------------------
+				    // 2. Clean text fields (trim, hidden characters, empty -> null)
+				    // ---------------------------------------------------------------
+				    TextCols = {"Employee Code", "Agency Emp ID", "Employee Name", "Source Name", "Business Unit", "Client Name", "Cost Center", "Pay Calendar", "Shift Name", "Day", "Status", "Punch In Terminal", "Punch Out Terminal", "Is Justified", "Status2"},
+				    Cleaned = Table.TransformColumns(Expanded, List.Transform(TextCols, each {_, fnCleanText, type nullable text})),
+				    UpperCodes = Table.TransformColumns(Cleaned, {{"Employee Code", each if _ = null then null else Text.Upper(_), type nullable text}, {"Agency Emp ID", each if _ = null then null else Text.Upper(_), type nullable text}}),
+
+				    // ---------------------------------------------------------------
+				    // 3. Parse dates, punches and hours (raw values are kept for DQ)
+				    // ---------------------------------------------------------------
+				    P1 = Table.AddColumn(UpperCodes, "Process Date Parsed", each fnParseDate([Process Date]), type nullable date),
+				    P2 = Table.AddColumn(P1, "Punch In Parsed", each fnParseDateTime([Punch In Time], [Process Date Parsed]), type nullable datetime),
+				    P3 = Table.AddColumn(P2, "Punch Out Parsed0", each fnParseDateTime([Punch Out Time], [Process Date Parsed]), type nullable datetime),
+				    // Time-only punch-out values (no date part in the source) that fall before the punch-in belong to the next day (night shift)
+				    P4 = Table.AddColumn(P3, "Punch Out Parsed", each
+				        let
+				            raw = [Punch Out Time],
+				            timeOnly = raw is time or (raw is number and raw < 1) or (raw is text and not Text.Contains(raw, "-") and not Text.Contains(raw, "/")),
+				            po = [Punch Out Parsed0],
+				            pi = [Punch In Parsed]
+				        in
+				            if timeOnly and po <> null and pi <> null and po < pi then po + #duration(1, 0, 0, 0) else po, type nullable datetime),
+				    P5 = Table.AddColumn(P4, "Source Worked Hours", each fnParseHours([Total Hours]), type nullable number),
+				    P6 = Table.AddColumn(P5, "Total Hours (Source)", each fnCleanText([Total Hours]), type nullable text),
+				    P7 = Table.AddColumn(P6, "Punch In (Unparsed)", each if fnCleanText([Punch In Time]) <> null and [Punch In Parsed] = null then fnCleanText([Punch In Time]) else null, type nullable text),
+				    P8 = Table.AddColumn(P7, "Punch Out (Unparsed)", each if fnCleanText([Punch Out Time]) <> null and [Punch Out Parsed] = null then fnCleanText([Punch Out Time]) else null, type nullable text),
+				    P9 = Table.AddColumn(P8, "Process Date (Unparsed)", each if fnCleanText([Process Date]) <> null and [Process Date Parsed] = null then fnCleanText([Process Date]) else null, type nullable text),
+				    DropRaw = Table.RemoveColumns(P9, {"Process Date", "Punch In Time", "Punch Out Time", "Total Hours", "Punch Out Parsed0"}),
+				    RenParsed = Table.RenameColumns(DropRaw, {{"Process Date Parsed", "Process Date"}, {"Punch In Parsed", "Punch In Time"}, {"Punch Out Parsed", "Punch Out Time"}}),
+
+				    // ---------------------------------------------------------------
+				    // 4. Hours: source value drives the dashboard; punches are the fallback
+				    // ---------------------------------------------------------------
+				    H1 = Table.AddColumn(RenParsed, "Calculated Worked Hours", each
+				        if [Punch In Time] <> null and [Punch Out Time] <> null and [Punch Out Time] > [Punch In Time]
+				        then let h = Duration.TotalHours([Punch Out Time] - [Punch In Time]) in (if h <= 24 then Number.Round(h, 4) else null)
+				        else null, type nullable number),
+				    H2 = Table.AddColumn(H1, "Source Hours Valid", each if [Source Worked Hours] <> null and [Source Worked Hours] >= 0 and [Source Worked Hours] <= 24 then 1 else 0, Int64.Type),
+				    H3 = Table.AddColumn(H2, "Record Worked Hours", each if [Source Hours Valid] = 1 then Number.Round([Source Worked Hours], 4) else [Calculated Worked Hours], type nullable number),
+				    H4 = Table.AddColumn(H3, "Worked Hours Basis", each if [Source Hours Valid] = 1 then "Source Total Hours" else if [Calculated Worked Hours] <> null then "Calculated from Punches" else "Not Available", type text),
+
+				    // ---------------------------------------------------------------
+				    // 5. Status classification (per distinct value, then joined back)
+				    // ---------------------------------------------------------------
+				    S1 = Table.AddColumn(H4, "Status Key", each if [Status] = null then "" else Text.Lower([Status]), type text),
+				    StatusMap = Table.Buffer(Table.AddColumn(Table.Distinct(Table.SelectColumns(S1, {"Status Key", "Status"})), "Record Status Category", each fnStatusCategory([Status]), type text)),
+				    StatusMapKeyed = Table.RenameColumns(Table.Distinct(Table.SelectColumns(StatusMap, {"Status Key", "Record Status Category"}), {"Status Key"}), {{"Status Key", "Status Key_"}}),
+				    S2 = Table.Join(S1, "Status Key", StatusMapKeyed, "Status Key_", JoinKind.LeftOuter),
+				    S3 = Table.RemoveColumns(S2, {"Status Key_"}),
+				    S4 = Table.AddColumn(S3, "Record Status Priority", each
+				        let c = [Record Status Category] in
+				        if c = "Present" then 1 else if c = "Other" then 2 else if c = "Leave" then 3 else if c = "Holiday" then 4
+				        else if c = "Weekend / Rest Day" then 5 else if c = "Absent" then 6 else 7, Int64.Type),
+				    S5 = Table.AddColumn(S4, "Justification Category", each fnJustificationCategory([Is Justified]), type text),
+				    S6 = Table.AddColumn(S5, "Status2 Category", each if [Status2] = null then "(None)" else [Status2], type text),
+				    S7 = Table.AddColumn(S6, "Status2 Flag", each if [Status2] = null then 0 else 1, Int64.Type),
+
+				    // ---------------------------------------------------------------
+				    // 6. Record-level punch flags (only where a punch is expected)
+				    // ---------------------------------------------------------------
+				    K1 = Table.AddColumn(S7, "Punch Expected Flag", each if [Record Status Category] = "Present" or [Punch In Time] <> null or [Punch Out Time] <> null then 1 else 0, Int64.Type),
+				    K2 = Table.AddColumn(K1, "Missing Punch In Flag", each if [Punch In Time] = null and [Punch Expected Flag] = 1 then 1 else 0, Int64.Type),
+				    K3 = Table.AddColumn(K2, "Missing Punch Out Flag", each if [Punch Out Time] = null and [Punch Expected Flag] = 1 then 1 else 0, Int64.Type),
+				    K4 = Table.AddColumn(K3, "Missing Both Punches Flag", each if [Missing Punch In Flag] = 1 and [Missing Punch Out Flag] = 1 then 1 else 0, Int64.Type),
+				    K5 = Table.AddColumn(K4, "Missing Punch Flag", each if [Missing Punch In Flag] = 1 or [Missing Punch Out Flag] = 1 then 1 else 0, Int64.Type),
+				    K6 = Table.AddColumn(K5, "Complete Punch Flag", each if [Punch In Time] <> null and [Punch Out Time] <> null then 1 else 0, Int64.Type),
+				    K7 = Table.AddColumn(K6, "Punch Out Before In Flag", each if [Punch In Time] <> null and [Punch Out Time] <> null and [Punch Out Time] < [Punch In Time] then 1 else 0, Int64.Type),
+				    K8 = Table.AddColumn(K7, "Punch Crosses Midnight Flag", each if [Punch In Time] <> null and [Punch Out Time] <> null and DateTime.Date([Punch Out Time]) > DateTime.Date([Punch In Time]) then 1 else 0, Int64.Type),
+				    K9 = Table.AddColumn(K8, "Punch In Minutes From Midnight", each if [Punch In Time] = null then null else Time.Hour(DateTime.Time([Punch In Time])) * 60 + Time.Minute(DateTime.Time([Punch In Time])) + Time.Second(DateTime.Time([Punch In Time])) / 60, type nullable number),
+				    K10 = Table.AddColumn(K9, "Punch Out Minutes From Midnight", each if [Punch Out Time] = null then null else Time.Hour(DateTime.Time([Punch Out Time])) * 60 + Time.Minute(DateTime.Time([Punch Out Time])) + Time.Second(DateTime.Time([Punch Out Time])) / 60, type nullable number),
+				    K11 = Table.AddColumn(K10, "Punch In Hour", each if [Punch In Time] = null then null else Time.Hour(DateTime.Time([Punch In Time])), Int64.Type),
+				    K12 = Table.AddColumn(K11, "Punch Out Hour", each if [Punch Out Time] = null then null else Time.Hour(DateTime.Time([Punch Out Time])), Int64.Type),
+				    K13 = Table.AddColumn(K12, "Punch In Hour Label", each if [Punch In Hour] = null then "No Punch In" else Text.PadStart(Text.From([Punch In Hour]), 2, "0") & ":00", type text),
+				    K14 = Table.AddColumn(K13, "Punch Out Hour Label", each if [Punch Out Hour] = null then "No Punch Out" else Text.PadStart(Text.From([Punch Out Hour]), 2, "0") & ":00", type text),
+
+				    // ---------------------------------------------------------------
+				    // 7. Keys, duplicate detection, buffering
+				    // ---------------------------------------------------------------
+				    Key1 = Table.AddColumn(K14, "Employee Day Key", each if [Employee Code] = null or [Process Date] = null then null else [Employee Code] & "|" & Date.ToText([Process Date], [Format = "yyyyMMdd"]), type nullable text),
+				    Key2 = Table.AddIndexColumn(Key1, "Index", 0, 1),
+				    Key3 = Table.AddColumn(Key2, "RowSig", each Text.Combine(List.Transform(
+				        {[Employee Code], [Agency Emp ID], [Employee Name], [Source Name], [Business Unit], [Client Name], [Cost Center], [Pay Calendar], [Shift Name], [Process Date], [Day], [Punch In Time], [Punch Out Time], [Total Hours (Source)], [Status], [Punch In Terminal], [Punch Out Terminal], [Is Justified], [Status2]},
+				        each if _ = null then "" else Text.From(_)), "|"), type text),
+				    Buffered = Table.Buffer(Key3),
+				    DupGroups = Table.Group(Buffered, {"RowSig"}, {{"First Index", each List.Min([Index]), Int64.Type}}),
+				    DupGroupsKeyed = Table.RenameColumns(DupGroups, {{"RowSig", "RowSig_"}}),
+				    D1 = Table.Join(Buffered, "RowSig", DupGroupsKeyed, "RowSig_", JoinKind.LeftOuter),
+				    D2 = Table.AddColumn(D1, "Is Duplicate Record", each if [Index] <> [First Index] then 1 else 0, Int64.Type),
+				    D3 = Table.AddColumn(D2, "Worked Hours Decimal", each if [Is Duplicate Record] = 1 then null else [Record Worked Hours], type nullable number),
+				    D4 = Table.AddColumn(D3, "Non Duplicate", each 1 - [Is Duplicate Record], Int64.Type),
+				    D5 = Table.AddColumn(D4, "Status Sort Key", each Text.From([Record Status Priority]) & "|" & [Record Status Category] & "|" & (if [Status] = null then "" else [Status]), type text),
+				    D6 = Table.RemoveColumns(D5, {"RowSig", "RowSig_", "First Index"}),
+				    Buffered2 = Table.Buffer(D6),
+
+				    // ---------------------------------------------------------------
+				    // 8. Employee-day aggregation (one attendance day = one Employee Day Key)
+				    // ---------------------------------------------------------------
+				    DayAgg = Table.Group(Buffered2, {"Employee Day Key"}, {
+				        {"Day Record Count", each List.Sum([Non Duplicate]), Int64.Type},
+				        {"Day First Index", each List.Min([Index]), Int64.Type},
+				        {"Day Status Sort", each List.Min([Status Sort Key]), type text},
+				        {"Day Worked Hours", each List.Sum([Worked Hours Decimal]), type nullable number},
+				        {"Day Missing Punch Flag", each List.Max([Missing Punch Flag]), Int64.Type},
+				        {"Day Punch Expected Flag", each List.Max([Punch Expected Flag]), Int64.Type},
+				        {"Day Status2 Flag", each List.Max([Status2 Flag]), Int64.Type}
+				    }),
+				    DayAggKeyed = Table.RenameColumns(DayAgg, {{"Employee Day Key", "Employee Day Key_"}}),
+				    A1 = Table.Join(Buffered2, "Employee Day Key", DayAggKeyed, "Employee Day Key_", JoinKind.LeftOuter),
+				    A2 = Table.RemoveColumns(A1, {"Employee Day Key_"}),
+				    A3 = Table.AddColumn(A2, "Is Day Primary", each if [Employee Day Key] <> null and [Index] = [Day First Index] then 1 else 0, Int64.Type),
+				    A4 = Table.AddColumn(A3, "Multiple Records Day Flag", each if [Employee Day Key] <> null and [Day Record Count] > 1 then 1 else 0, Int64.Type),
+				    A5 = Table.AddColumn(A4, "Status Category", each let parts = Text.Split([Day Status Sort], "|") in parts{1}, type text),
+				    A6 = Table.AddColumn(A5, "Attendance Status", each let parts = Text.Split([Day Status Sort], "|") in (if parts{2} = "" then "(Blank)" else parts{2}), type text),
+				    A7 = Table.AddColumn(A6, "Status Category Order", each
+				        let c = [Status Category] in
+				        if c = "Present" then 1 else if c = "Absent" then 2 else if c = "Leave" then 3 else if c = "Holiday" then 4
+				        else if c = "Weekend / Rest Day" then 5 else if c = "Other" then 6 else 7, Int64.Type),
+				    A8 = Table.AddColumn(A7, "Worked Hours Band", each
+				        let h = [Day Worked Hours] in
+				        if h = null or h <= 0 then "No Hours Recorded" else if h < 4 then "< 4 hrs" else if h < 6 then "4 – 6 hrs" else if h < 8 then "6 – 8 hrs"
+				        else if h < 10 then "8 – 10 hrs" else if h < 12 then "10 – 12 hrs" else "12+ hrs", type text),
+				    A9 = Table.AddColumn(A8, "Worked Hours Band Order", each
+				        let h = [Day Worked Hours] in
+				        if h = null or h <= 0 then 0 else if h < 4 then 1 else if h < 6 then 2 else if h < 8 then 3 else if h < 10 then 4 else if h < 12 then 5 else 6, Int64.Type),
+
+				    // ---------------------------------------------------------------
+				    // 9. Attendance exceptions (day level, neutral wording)
+				    // ---------------------------------------------------------------
+				    E1 = Table.AddColumn(A9, "Exception Absent Flag", each if [Status Category] = "Absent" then 1 else 0, Int64.Type),
+				    E2 = Table.AddColumn(E1, "Exception Missing Punch Flag", each if [Day Missing Punch Flag] = 1 then 1 else 0, Int64.Type),
+				    E3 = Table.AddColumn(E2, "Exception Unrecognised Status Flag", each if [Status Category] = "Other" or [Status Category] = "Unknown" then 1 else 0, Int64.Type),
+				    E4 = Table.AddColumn(E3, "Exception Short Hours Flag", each if [Status Category] = "Present" and [Day Worked Hours] <> null and [Day Worked Hours] > 0 and [Day Worked Hours] < pShortHoursReviewThreshold then 1 else 0, Int64.Type),
+				    E5 = Table.AddColumn(E4, "Exception Long Hours Flag", each if [Day Worked Hours] <> null and [Day Worked Hours] > pLongHoursReviewThreshold then 1 else 0, Int64.Type),
+				    E6 = Table.AddColumn(E5, "Exception Status2 Flag", each if pStatus2IsException and [Day Status2 Flag] = 1 then 1 else 0, Int64.Type),
+				    E7 = Table.AddColumn(E6, "Exception Types", each Text.Combine(List.Select({
+				            if [Exception Absent Flag] = 1 then "Absent" else null,
+				            if [Exception Missing Punch Flag] = 1 then "Missing Punch" else null,
+				            if [Exception Unrecognised Status Flag] = 1 then "Unrecognised Status" else null,
+				            if [Exception Short Hours Flag] = 1 then "Short Working Hours (review)" else null,
+				            if [Exception Long Hours Flag] = 1 then "Long Working Hours (review)" else null,
+				            if [Exception Status2 Flag] = 1 then "Status2 Condition" else null
+				        }, each _ <> null), "; "), type text),
+				    E8 = Table.AddColumn(E7, "Exception Type Count", each [Exception Absent Flag] + [Exception Missing Punch Flag] + [Exception Unrecognised Status Flag] + [Exception Short Hours Flag] + [Exception Long Hours Flag] + [Exception Status2 Flag], Int64.Type),
+				    E9 = Table.AddColumn(E8, "Exception Flag", each if [Exception Type Count] > 0 then 1 else 0, Int64.Type),
+
+				    // ---------------------------------------------------------------
+				    // 10. Data-quality flags (record level)
+				    // ---------------------------------------------------------------
+				    Q1 = Table.AddColumn(E9, "DQ Missing Employee Code", each if [Employee Code] = null then 1 else 0, Int64.Type),
+				    Q2 = Table.AddColumn(Q1, "DQ Missing Employee Name", each if [Employee Name] = null then 1 else 0, Int64.Type),
+				    Q3 = Table.AddColumn(Q2, "DQ Missing Process Date", each if [Process Date] = null then 1 else 0, Int64.Type),
+				    Q4 = Table.AddColumn(Q3, "DQ Missing Total Hours", each if [Total Hours (Source)] = null and [Record Status Category] = "Present" then 1 else 0, Int64.Type),
+				    Q5 = Table.AddColumn(Q4, "DQ Invalid Total Hours", each if [Total Hours (Source)] <> null and [Source Hours Valid] = 0 and Text.Length(Text.Select([Total Hours (Source)], {"0".."9"})) > 0 then 1 else 0, Int64.Type),
+				    Q6 = Table.AddColumn(Q5, "DQ Invalid Punch In", each if [Punch In (Unparsed)] <> null then 1 else 0, Int64.Type),
+				    Q7 = Table.AddColumn(Q6, "DQ Invalid Punch Out", each if [Punch Out (Unparsed)] <> null then 1 else 0, Int64.Type),
+				    Q8 = Table.AddColumn(Q7, "DQ Punch Out Before In", each [Punch Out Before In Flag], Int64.Type),
+				    Q9 = Table.AddColumn(Q8, "DQ Duplicate Record", each [Is Duplicate Record], Int64.Type),
+				    Q10 = Table.AddColumn(Q9, "DQ Blank Status", each if [Status] = null then 1 else 0, Int64.Type),
+				    Q11 = Table.AddColumn(Q10, "DQ Unrecognised Status", each if [Record Status Category] = "Other" then 1 else 0, Int64.Type),
+				    Q12 = Table.AddColumn(Q11, "DQ Blank Business Unit", each if [Business Unit] = null then 1 else 0, Int64.Type),
+				    Q13 = Table.AddColumn(Q12, "DQ Blank Client", each if [Client Name] = null then 1 else 0, Int64.Type),
+				    Q14 = Table.AddColumn(Q13, "DQ Blank Shift", each if [Shift Name] = null then 1 else 0, Int64.Type),
+				    Q15 = Table.AddColumn(Q14, "DQ Hours Differ From Punches", each if [Source Hours Valid] = 1 and [Calculated Worked Hours] <> null and Number.Abs([Source Worked Hours] - [Calculated Worked Hours]) > 0.5 then 1 else 0, Int64.Type),
+				    Q16 = Table.AddColumn(Q15, "DQ Issue Types", each Text.Combine(List.Select({
+				            if [DQ Missing Employee Code] = 1 then "Missing Employee Code" else null,
+				            if [DQ Missing Employee Name] = 1 then "Missing Employee Name" else null,
+				            if [DQ Missing Process Date] = 1 then "Missing Process Date" else null,
+				            if [DQ Missing Total Hours] = 1 then "Missing Total Hours (Present)" else null,
+				            if [DQ Invalid Total Hours] = 1 then "Invalid Total Hours" else null,
+				            if [DQ Invalid Punch In] = 1 then "Invalid Punch In" else null,
+				            if [DQ Invalid Punch Out] = 1 then "Invalid Punch Out" else null,
+				            if [DQ Punch Out Before In] = 1 then "Punch Out Before Punch In" else null,
+				            if [DQ Duplicate Record] = 1 then "Duplicate Record" else null,
+				            if [DQ Blank Status] = 1 then "Blank Status" else null,
+				            if [DQ Unrecognised Status] = 1 then "Unrecognised Status" else null,
+				            if [DQ Blank Business Unit] = 1 then "Blank Business Unit" else null,
+				            if [DQ Blank Client] = 1 then "Blank Client" else null,
+				            if [DQ Blank Shift] = 1 then "Blank Shift" else null
+				        }, each _ <> null), "; "), type text),
+				    Q17 = Table.AddColumn(Q16, "DQ Issue Count", each [DQ Missing Employee Code] + [DQ Missing Employee Name] + [DQ Missing Process Date] + [DQ Missing Total Hours] + [DQ Invalid Total Hours] + [DQ Invalid Punch In] + [DQ Invalid Punch Out] + [DQ Punch Out Before In] + [DQ Duplicate Record] + [DQ Blank Status] + [DQ Unrecognised Status] + [DQ Blank Business Unit] + [DQ Blank Client] + [DQ Blank Shift], Int64.Type),
+				    Q18 = Table.AddColumn(Q17, "DQ Issue Flag", each if [DQ Issue Count] > 0 then 1 else 0, Int64.Type),
+
+				    // ---------------------------------------------------------------
+				    // 11. Latest employee attributes (for the Employee dimension only;
+				    //     historical Business Unit / Client / Shift stay on each record)
+				    // ---------------------------------------------------------------
+				    EmpSortAdded = Table.AddColumn(Q18, "Emp Sort Key", each
+				        (if [Process Date] = null then "00000000" else Date.ToText([Process Date], [Format = "yyyyMMdd"])) & "|" & (if [Employee Name] = null then "" else [Employee Name]) & "|" & (if [Agency Emp ID] = null then "" else [Agency Emp ID]), type text),
+				    EmpAgg = Table.Group(Table.SelectRows(EmpSortAdded, each [Employee Code] <> null), {"Employee Code"}, {{"Emp Latest", each List.Max([Emp Sort Key]), type text}}),
+				    EmpAggKeyed = Table.RenameColumns(EmpAgg, {{"Employee Code", "Employee Code_"}}),
+				    L1 = Table.Join(EmpSortAdded, "Employee Code", EmpAggKeyed, "Employee Code_", JoinKind.LeftOuter),
+				    L2 = Table.AddColumn(L1, "Employee Name (Latest)", each if [Emp Latest] = null then null else let p = Text.Split([Emp Latest], "|") in (if p{1} = "" then null else p{1}), type nullable text),
+				    L3 = Table.AddColumn(L2, "Agency Emp ID (Latest)", each if [Emp Latest] = null then null else let p = Text.Split([Emp Latest], "|") in (if p{2} = "" then null else p{2}), type nullable text),
+
+				    // ---------------------------------------------------------------
+				    // 12. Final shaping
+				    // ---------------------------------------------------------------
+				    BlankFill = Table.TransformColumns(L3, List.Transform({"Source Name", "Business Unit", "Client Name", "Cost Center", "Pay Calendar", "Shift Name"}, each {_, (v) => if v = null then "(Blank)" else v, type text})),
+				    MonthStart = Table.AddColumn(BlankFill, "Process Month Start", each if [Process Date] = null then null else Date.StartOfMonth([Process Date]), type nullable date),
+				    Removed = Table.RemoveColumns(MonthStart, {"Index", "Status Key", "Status Sort Key", "Day Status Sort", "Day First Index", "Non Duplicate", "Emp Sort Key", "Emp Latest", "Employee Code_", "Source Hours Valid", "Record Status Priority"}),
+				    Typed = Table.TransformColumnTypes(Removed, {
+				        {"Employee Code", type text}, {"Agency Emp ID", type text}, {"Employee Name", type text}, {"Source Name", type text}, {"Business Unit", type text},
+				        {"Client Name", type text}, {"Cost Center", type text}, {"Pay Calendar", type text}, {"Shift Name", type text}, {"Process Date", type date},
+				        {"Day", type text}, {"Punch In Time", type datetime}, {"Punch Out Time", type datetime}, {"Status", type text}, {"Punch In Terminal", type text},
+				        {"Punch Out Terminal", type text}, {"Is Justified", type text}, {"Status2", type text}, {"Source File", type text}, {"Source Folder", type text},
+				        {"Source Sheet", type text}, {"Source Row Number", Int64.Type}, {"Source Modified Date", type datetime}, {"Source Worked Hours", type number},
+				        {"Calculated Worked Hours", type number}, {"Record Worked Hours", type number}, {"Worked Hours Decimal", type number}, {"Day Worked Hours", type number},
+				        {"Punch In Minutes From Midnight", type number}, {"Punch Out Minutes From Midnight", type number}, {"Employee Day Key", type text},
+				        {"Employee Name (Latest)", type text}, {"Agency Emp ID (Latest)", type text}, {"Process Month Start", type date},
+				        {"Total Hours (Source)", type text}, {"Punch In (Unparsed)", type text}, {"Punch Out (Unparsed)", type text}, {"Process Date (Unparsed)", type text}
+				    })
+				in
+				    Typed
+

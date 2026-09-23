@@ -1,0 +1,20 @@
+/// Cost Centers as recorded on attendance records.
+table DimCostCenter
+	lineageTag: d645737a-e506-502c-b5b5-254f9da7d045
+
+	column 'Cost Center'
+		dataType: string
+		isKey
+		lineageTag: edf23201-80e7-56d7-85e3-8469ac7c9dbf
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Cost Center]
+
+		annotation SummarizationSetBy = User
+
+	partition DimCostCenter = calculated
+		mode: import
+		source =
+				DISTINCT ( FactAttendance[Cost Center] )
+

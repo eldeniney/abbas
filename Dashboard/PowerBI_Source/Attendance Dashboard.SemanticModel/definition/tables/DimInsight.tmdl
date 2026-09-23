@@ -1,0 +1,33 @@
+/// Rows for the management insight panel (each row shows one dynamic statement).
+table DimInsight
+	lineageTag: e42b5ec5-df4e-5456-923b-315104b9a08a
+
+	column 'Insight Order'
+		dataType: int64
+		isKey
+		isHidden
+		formatString: 0
+		lineageTag: 829d81ed-b3ec-57e2-970b-03a69f63e928
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Insight Order]
+
+		annotation SummarizationSetBy = User
+
+	column Area
+		dataType: string
+		lineageTag: ff50d242-9a8f-528e-9ea1-d92f082ea7b0
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Area]
+		sortByColumn: 'Insight Order'
+
+		annotation SummarizationSetBy = User
+
+	partition DimInsight = calculated
+		mode: import
+		source =
+				DATATABLE ( "Insight Order", INTEGER, "Area", STRING, { { 1, "Workforce" }, { 2, "Attendance" }, { 3, "Working Hours" }, { 4, "Missing Punches" }, { 5, "Exceptions" }, { 6, "Focus Area" } } )
+

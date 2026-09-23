@@ -1,0 +1,20 @@
+/// Source (e.g. OUTSOURCE) as recorded on attendance records.
+table DimSource
+	lineageTag: 8546ebf6-1660-5f5f-a7b9-25df4da79f21
+
+	column 'Source Name'
+		dataType: string
+		isKey
+		lineageTag: d306c82f-0a8d-5543-b9cc-fdc3fecf20ac
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Source Name]
+
+		annotation SummarizationSetBy = User
+
+	partition DimSource = calculated
+		mode: import
+		source =
+				DISTINCT ( FactAttendance[Source Name] )
+

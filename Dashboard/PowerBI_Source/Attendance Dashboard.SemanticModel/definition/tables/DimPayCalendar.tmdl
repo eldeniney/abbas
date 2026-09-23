@@ -1,0 +1,20 @@
+/// Pay Calendar as recorded on attendance records.
+table DimPayCalendar
+	lineageTag: 6620c3ff-4841-5cb5-ad8e-5bff7014e3a6
+
+	column 'Pay Calendar'
+		dataType: string
+		isKey
+		lineageTag: f50543a4-2d2f-5e7e-b436-842c0a44f658
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Pay Calendar]
+
+		annotation SummarizationSetBy = User
+
+	partition DimPayCalendar = calculated
+		mode: import
+		source =
+				DISTINCT ( FactAttendance[Pay Calendar] )
+

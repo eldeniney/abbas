@@ -1,0 +1,32 @@
+/// Hours of the day 00:00-23:00 (disconnected helper for punch-time distributions).
+table DimHour
+	lineageTag: 056e25c7-e912-50dd-9753-4d9567a5ec1d
+
+	column Hour
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: 8afa2a6b-c4c8-5785-81c3-8959f07ce7fa
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Hour]
+
+		annotation SummarizationSetBy = User
+
+	column 'Hour Label'
+		dataType: string
+		lineageTag: 6e0448d2-d6da-5b08-bf13-5d029a555bc0
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Hour Label]
+		sortByColumn: Hour
+
+		annotation SummarizationSetBy = User
+
+	partition DimHour = calculated
+		mode: import
+		source =
+				SELECTCOLUMNS ( GENERATESERIES ( 0, 23, 1 ), "Hour", [Value], "Hour Label", FORMAT ( [Value], "00" ) & ":00" )
+

@@ -1,0 +1,402 @@
+/// Folder that holds the monthly attendance extracts. Sub-folders are scanned too (the Dashboard folder is skipped).
+expression pDataFolder =
+		"C:\Users\aeldeneiny\OneDrive - e&\alaa_data" meta [
+			IsParameterQuery = true,
+			Type = "Text",
+			IsParameterQueryRequired = true
+		]
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000001
+
+	annotation PBI_ResultType = Text
+
+/// REVIEW threshold only (not HR policy): a Present day with recorded hours below this value is flagged "Short Working Hours (review)".
+expression pShortHoursReviewThreshold =
+		4 meta [
+			IsParameterQuery = true,
+			Type = "Number",
+			IsParameterQueryRequired = true
+		]
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000002
+
+	annotation PBI_ResultType = Number
+
+/// REVIEW threshold only (not HR policy): a day with recorded hours above this value is flagged "Long Working Hours (review)".
+expression pLongHoursReviewThreshold =
+		12 meta [
+			IsParameterQuery = true,
+			Type = "Number",
+			IsParameterQueryRequired = true
+		]
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000003
+
+	annotation PBI_ResultType = Number
+
+/// When true, any non-blank Status2 value is treated as an attendance exception type ("Status2 Condition"). Set to false if Status2 turns out to be informational only.
+expression pStatus2IsException =
+		true meta [
+			IsParameterQuery = true,
+			Type = "Logical",
+			IsParameterQueryRequired = true
+		]
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000004
+
+	annotation PBI_ResultType = Logical
+
+/// Manual overrides for status classification. Add rows as (raw status text, category). Category must be one of: Present, Absent, Leave, Holiday, Weekend / Rest Day, Other. Keyword rules apply when no override matches.
+expression StatusCategoryOverrides =
+		let
+		    Source = #table(
+		        type table [Status = text, Category = text],
+		        {
+		            // Examples (remove or edit as needed):
+		            // {"WFH", "Present"},
+		            // {"Business Trip", "Present"},
+		            // {"Sick Leave", "Leave"}
+		        }
+		    )
+		in
+		    Source
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000005
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
+/// Normalises a header name so that spelling, spacing and case differences between monthly files do not matter. "Punch Out Temrinal" -> "punchouttemrinal".
+expression fnHeaderKey =
+		(v as any) as text =>
+		let
+		    t = if v = null then "" else Text.From(v),
+		    k = Text.Lower(Text.Select(t, {"a".."z", "A".."Z", "0".."9"}))
+		in
+		    k
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000006
+
+	annotation PBI_ResultType = Function
+
+/// Map of normalised header keys to the canonical column names used by the model. Includes the "Punch Out Temrinal" typo and a few safe aliases.
+expression HeaderMap =
+		let
+		    Source = #table(
+		        type table [Key = text, Canonical = text],
+		        {
+		            {"employeecode", "Employee Code"},
+		            {"empcode", "Employee Code"},
+		            {"employeeno", "Employee Code"},
+		            {"agencyempid", "Agency Emp ID"},
+		            {"agencyemployeeid", "Agency Emp ID"},
+		            {"agencyid", "Agency Emp ID"},
+		            {"employeename", "Employee Name"},
+		            {"empname", "Employee Name"},
+		            {"sourcename", "Source Name"},
+		            {"source", "Source Name"},
+		            {"businessunit", "Business Unit"},
+		            {"bu", "Business Unit"},
+		            {"clientname", "Client Name"},
+		            {"client", "Client Name"},
+		            {"costcenter", "Cost Center"},
+		            {"costcentre", "Cost Center"},
+		            {"paycalendar", "Pay Calendar"},
+		            {"shiftname", "Shift Name"},
+		            {"shift", "Shift Name"},
+		            {"processdate", "Process Date"},
+		            {"date", "Process Date"},
+		            {"day", "Day"},
+		            {"dayname", "Day"},
+		            {"punchintime", "Punch In Time"},
+		            {"punchin", "Punch In Time"},
+		            {"punchouttime", "Punch Out Time"},
+		            {"punchout", "Punch Out Time"},
+		            {"totalhours", "Total Hours"},
+		            {"totalhour", "Total Hours"},
+		            {"workedhours", "Total Hours"},
+		            {"status", "Status"},
+		            {"punchinterminal", "Punch In Terminal"},
+		            {"punchintemrinal", "Punch In Terminal"},
+		            {"punchoutterminal", "Punch Out Terminal"},
+		            {"punchouttemrinal", "Punch Out Terminal"},
+		            {"isjustified", "Is Justified"},
+		            {"justified", "Is Justified"},
+		            {"status2", "Status2"}
+		        }
+		    )
+		in
+		    Source
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000007
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
+/// Canonical columns every attendance record is expected to carry (missing optional ones are added as null).
+expression CanonicalColumns =
+		{
+		    "Employee Code", "Agency Emp ID", "Employee Name", "Source Name", "Business Unit", "Client Name",
+		    "Cost Center", "Pay Calendar", "Shift Name", "Process Date", "Day", "Punch In Time", "Punch Out Time",
+		    "Total Hours", "Status", "Punch In Terminal", "Punch Out Terminal", "Is Justified", "Status2"
+		}
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000008
+
+	annotation PBI_ResultType = List
+
+/// Trims, removes hidden control characters and non-breaking spaces, collapses repeated spaces and converts empty strings to null. Spelling and case are preserved.
+expression fnCleanText =
+		(v as any) as nullable text =>
+		let
+		    t0 = if v = null then null else if v is text then v else Text.From(v),
+		    t1 = if t0 = null then null else Text.Clean(Text.Replace(Text.Replace(t0, "#(00A0)", " "), "#(tab)", " ")),
+		    t2 = if t1 = null then null else Text.Trim(Text.Combine(List.Select(Text.Split(t1, " "), each _ <> ""), " ")),
+		    r = if t2 = null or t2 = "" then null else t2
+		in
+		    r
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000009
+
+	annotation PBI_ResultType = Function
+
+/// Parses a Process Date value that may arrive as a real date, an Excel serial number or text such as "27-AUG-2026", "27/08/2026" (day first) or "2026-08-27".
+expression fnParseDate =
+		(v as any) as nullable date =>
+		let
+		    months = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"},
+		    parseText = (t as text) as nullable date =>
+		        let
+		            s = Text.Upper(Text.Trim(t)),
+		            s2 = if Text.Length(s) > 10 and Text.Middle(s, 10, 1) = "T" then Text.ReplaceRange(s, 10, 1, " ") else s,
+		            datePart = Text.Split(s2, " "){0},
+		            parts = List.Select(Text.SplitAny(datePart, "-/."), each _ <> ""),
+		            fromParts =
+		                if List.Count(parts) <> 3 then null
+		                else
+		                    let
+		                        p0 = parts{0}, p1 = parts{1}, p2 = parts{2},
+		                        mIdx = List.PositionOf(months, Text.Start(p1, 3)),
+		                        yRaw = Number.From(p2),
+		                        yFull = if yRaw < 100 then 2000 + yRaw else yRaw
+		                    in
+		                        if mIdx >= 0 then #date(yFull, mIdx + 1, Number.From(p0))
+		                        else if Text.Length(p0) = 4 then #date(Number.From(p0), Number.From(p1), Number.From(p2))
+		                        else #date(yFull, Number.From(p1), Number.From(p0)),
+		            r1 = try fromParts otherwise null,
+		            r2 = if r1 <> null then r1 else try Date.From(DateTime.FromText(t, [Culture = "en-GB"])) otherwise null,
+		            r3 = if r2 <> null then r2 else try Date.From(DateTime.FromText(t, [Culture = "en-US"])) otherwise null
+		        in
+		            r3,
+		    r =
+		        if v = null then null
+		        else if v is date then v
+		        else if v is datetime then DateTime.Date(v)
+		        else if v is datetimezone then DateTime.Date(DateTimeZone.RemoveZone(v))
+		        else if v is number then (if v > 20000 and v < 80000 then try Date.From(v) otherwise null else null)
+		        else if v is text then (if Text.Trim(v) = "" then null else parseText(v))
+		        else null
+		in
+		    r
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000010
+
+	annotation PBI_ResultType = Function
+
+/// Parses a punch value into a real datetime. Accepts datetimes, Excel serials, time-only values (combined with the process date) and text such as "27-AUG-2026 04:17:07 PM", "27-AUG-2026 16:17" or "16:17:07".
+expression fnParseDateTime =
+		(v as any, baseDate as nullable date) as nullable datetime =>
+		let
+		    parseTime = (tp as text, ampm as text) as nullable time =>
+		        let
+		            bits = Text.Split(tp, ":"),
+		            h0 = Number.From(bits{0}),
+		            m0 = if List.Count(bits) > 1 then Number.From(bits{1}) else 0,
+		            s0 = if List.Count(bits) > 2 then Number.RoundDown(Number.From(bits{2})) else 0,
+		            h1 = if ampm = "PM" and h0 < 12 then h0 + 12 else if ampm = "AM" and h0 = 12 then 0 else h0
+		        in
+		            #time(h1, m0, s0),
+		    parseText = (t as text) as nullable datetime =>
+		        let
+		            s0 = Text.Upper(Text.Trim(t)),
+		            s = if Text.Length(s0) > 10 and Text.Middle(s0, 10, 1) = "T" then Text.ReplaceRange(s0, 10, 1, " ") else s0,
+		            tokens = List.Select(Text.Split(s, " "), each _ <> ""),
+		            timeTokens = List.Select(tokens, each Text.Contains(_, ":")),
+		            dateTokens = List.Select(tokens, each not Text.Contains(_, ":") and _ <> "AM" and _ <> "PM"),
+		            ampm = if List.Contains(tokens, "PM") then "PM" else if List.Contains(tokens, "AM") then "AM" else "",
+		            d = if List.Count(dateTokens) > 0 then fnParseDate(dateTokens{0}) else baseDate,
+		            tm = if List.Count(timeTokens) > 0 then parseTime(timeTokens{0}, ampm) else null,
+		            r1 = if d <> null and tm <> null then d & tm else null,
+		            r2 = if r1 <> null then r1 else try DateTime.FromText(t, [Culture = "en-GB"]) otherwise null
+		        in
+		            r2,
+		    r =
+		        if v = null then null
+		        else if v is datetime then v
+		        else if v is datetimezone then DateTimeZone.RemoveZone(v)
+		        else if v is time then (if baseDate <> null then baseDate & v else null)
+		        else if v is date then null
+		        else if v is number then
+		            (if v >= 0 and v < 1 then (if baseDate <> null then baseDate & Time.From(v) else null)
+		             else if v > 20000 and v < 80000 then try DateTime.From(v) otherwise null
+		             else null)
+		        else if v is text then (if Text.Trim(v) = "" then null else try parseText(v) otherwise null)
+		        else null
+		in
+		    r
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000011
+
+	annotation PBI_ResultType = Function
+
+/// Parses Total Hours into decimal hours. "09:09" = 9 hours 9 minutes = 9.15 (never 9.09). Also accepts time, duration and Excel day-fraction values. Returns null when blank or unparseable.
+expression fnParseHours =
+		(v as any) as nullable number =>
+		let
+		    parseText = (t as text) as nullable number =>
+		        let
+		            s = Text.Trim(t),
+		            hasDigit = Text.Length(Text.Select(s, {"0".."9"})) > 0,
+		            bits = Text.Split(s, ":"),
+		            r =
+		                if not hasDigit then null
+		                else if List.Count(bits) >= 2 then
+		                    Number.From(bits{0}) + Number.From(bits{1}) / 60 + (if List.Count(bits) > 2 then Number.From(bits{2}) / 3600 else 0)
+		                else null
+		        in
+		            r,
+		    r =
+		        if v = null then null
+		        else if v is time then Time.Hour(v) + Time.Minute(v) / 60 + Time.Second(v) / 3600
+		        else if v is duration then Duration.TotalHours(v)
+		        else if v is datetime then Duration.TotalHours(v - #datetime(1899, 12, 30, 0, 0, 0))
+		        else if v is number then (if v >= 0 and v < 1 then v * 24 else null)
+		        else if v is text then try parseText(v) otherwise null
+		        else null
+		in
+		    r
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000012
+
+	annotation PBI_ResultType = Function
+
+/// Classifies a raw Status value. Overrides table first, then neutral keyword rules. Anything unrecognised becomes "Other" and is listed on the Data Quality page.
+expression fnStatusCategory =
+		(s as nullable text) as text =>
+		let
+		    k = if s = null then "" else Text.Lower(Text.Trim(s)),
+		    k2 = Text.Remove(k, {" ", "-", "_", "/"}),
+		    overrides = Table.Buffer(Table.TransformColumns(StatusCategoryOverrides, {{"Status", each Text.Lower(Text.Trim(_)), type text}})),
+		    ov = Table.SelectRows(overrides, each [Status] = k),
+		    hasOv = Table.RowCount(ov) > 0,
+		    r =
+		        if k = "" then "Unknown"
+		        else if hasOv then ov{0}[Category]
+		        else if Text.Contains(k, "absent") or k = "a" or k = "ab" then "Absent"
+		        else if Text.Contains(k, "present") or k = "p" then "Present"
+		        else if Text.Contains(k, "leave") or Text.Contains(k, "vacation") or Text.Contains(k, "sick") or Text.Contains(k, "maternity") or Text.Contains(k, "paternity") then "Leave"
+		        else if Text.Contains(k, "holiday") then "Holiday"
+		        else if Text.Contains(k2, "weekend") or Text.Contains(k2, "weekoff") or Text.Contains(k2, "weeklyoff") or Text.Contains(k2, "restday") or Text.Contains(k2, "dayoff") or Text.Contains(k2, "offday") or k = "off" or k = "wo" or k = "w/o" then "Weekend / Rest Day"
+		        else "Other"
+		in
+		    r
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000013
+
+	annotation PBI_ResultType = Function
+
+/// Classifies Is Justified. Blank is reported as "Not Recorded" (it is NOT assumed to mean unjustified).
+expression fnJustificationCategory =
+		(s as nullable text) as text =>
+		let
+		    k = if s = null then "" else Text.Lower(Text.Trim(s)),
+		    r =
+		        if k = "" then "Not Recorded"
+		        else if List.Contains({"y", "yes", "true", "1", "justified", "approved"}, k) then "Justified"
+		        else if List.Contains({"n", "no", "false", "0", "not justified", "unjustified", "rejected"}, k) then "Not Justified"
+		        else if Text.Contains(k, "pending") or Text.Contains(k, "await") then "Pending"
+		        else "Other: " & s
+		in
+		    r
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000014
+
+	annotation PBI_ResultType = Function
+
+/// Reads one source file (xlsx/xlsm/xls/csv), finds the header row on every sheet that looks like an attendance extract, renames columns to the canonical names and returns the combined rows. Sheets that are not attendance extracts are ignored. Fails only when an attendance sheet lacks Employee Code or Process Date.
+expression fnReadAttendanceFile =
+		(Content as binary, Extension as text, FileName as text) as table =>
+		let
+		    ext = Text.Lower(Extension),
+		    knownKeys = List.Buffer(HeaderMap[Key]),
+		    headerLookup = Record.FromList(HeaderMap[Canonical], HeaderMap[Key]),
+		    csvDelimiter =
+		        let
+		            firstLine = try Lines.FromBinary(Content, null, null, 65001){0} otherwise "",
+		            counts = {{",", List.Count(Text.PositionOf(firstLine, ",", Occurrence.All))}, {";", List.Count(Text.PositionOf(firstLine, ";", Occurrence.All))}, {"#(tab)", List.Count(Text.PositionOf(firstLine, "#(tab)", Occurrence.All))}},
+		            best = List.Max(counts, null, each _{1})
+		        in
+		            if best{1} = 0 then "," else best{0},
+		    rawSheets =
+		        if ext = ".csv" or ext = ".txt" then
+		            {[Name = "CSV", Data = Csv.Document(Content, [Delimiter = csvDelimiter, Encoding = 65001, QuoteStyle = QuoteStyle.Csv])]}
+		        else
+		            let
+		                wb = Excel.Workbook(Content, false, true),
+		                sheets = Table.SelectRows(wb, each [Kind] = "Sheet" and not Text.StartsWith([Name], "_"))
+		            in
+		                Table.ToRecords(Table.SelectColumns(sheets, {"Name", "Data"})),
+		    processSheet = (sheetName as text, t as table) as nullable table =>
+		        let
+		            topRows = Table.ToRows(Table.FirstN(t, 40)),
+		            scores = List.Transform(topRows, (r) => List.Count(List.Intersect({List.Transform(r, fnHeaderKey), knownKeys}))),
+		            maxScore = List.Max(scores & {0}),
+		            headerIdx = if maxScore >= 5 then List.PositionOf(scores, maxScore) else -1,
+		            result =
+		                if headerIdx < 0 then null
+		                else
+		                    let
+		                        headerRow = topRows{headerIdx},
+		                        colNames = Table.ColumnNames(t),
+		                        pairs = List.Transform(List.Positions(colNames), each {colNames{_}, try Record.FieldOrDefault(headerLookup, fnHeaderKey(headerRow{_}), null) otherwise null}),
+		                        mapped = List.Select(pairs, each _{1} <> null),
+		                        firstOnly = List.Distinct(mapped, each _{1}),
+		                        canonicalFound = List.Transform(firstOnly, each _{1}),
+		                        missingRequired = List.Select({"Employee Code", "Process Date"}, each not List.Contains(canonicalFound, _)),
+		                        check =
+		                            if List.Count(missingRequired) > 0 then
+		                                error Error.Record("Attendance source error", "File '" & FileName & "', sheet '" & sheetName & "' looks like an attendance extract but is missing required column(s): " & Text.Combine(missingRequired, ", "), null)
+		                            else null,
+		                        dataRows = Table.Skip(t, headerIdx + 1),
+		                        withIndex = Table.AddIndexColumn(dataRows, "Source Row Number", headerIdx + 2, 1),
+		                        selected = Table.SelectColumns(withIndex, List.Transform(firstOnly, each _{0}) & {"Source Row Number"}),
+		                        renamed = Table.RenameColumns(selected, List.Transform(firstOnly, each {_{0}, _{1}})),
+		                        missingOptional = List.Select(CanonicalColumns, each not List.Contains(canonicalFound, _)),
+		                        completed = List.Accumulate(missingOptional, renamed, (state, c) => Table.AddColumn(state, c, each null)),
+		                        withSheet = Table.AddColumn(completed, "Source Sheet", each sheetName, type text),
+		                        // drop blank rows, footer/total rows (no date and no name) and repeated header rows
+		                        nonBlank = Table.SelectRows(withSheet, each
+		                            not (fnCleanText([Process Date]) = null and fnCleanText([Employee Name]) = null)
+		                            and fnHeaderKey([Employee Code]) <> "employeecode"),
+		                        ordered = Table.SelectColumns(nonBlank, CanonicalColumns & {"Source Sheet", "Source Row Number"})
+		                    in
+		                        if check = null then ordered else check
+		            in
+		                result,
+		    parsed = List.Select(List.Transform(rawSheets, each processSheet([Name], [Data])), each _ <> null),
+		    combined =
+		        if List.Count(parsed) = 0 then
+		            #table(CanonicalColumns & {"Source Sheet", "Source Row Number"}, {})
+		        else
+		            Table.Combine(parsed)
+		in
+		    combined
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000015
+
+	annotation PBI_ResultType = Function
+
+/// Lists the candidate source files in the data folder (used by FactAttendance). Skips temporary Excel files (~$), hidden files, the Dashboard output folder and non-data extensions.
+expression SourceFiles =
+		let
+		    Source = Folder.Files(pDataFolder),
+		    keepExt = Table.SelectRows(Source, each List.Contains({".xlsx", ".xlsm", ".xls", ".csv"}, Text.Lower([Extension]))),
+		    notTemp = Table.SelectRows(keepExt, each not Text.StartsWith([Name], "~$") and not Text.StartsWith([Name], ".")),
+		    notHidden = Table.SelectRows(notTemp, each try not [Attributes][Hidden] otherwise true),
+		    notDashboard = Table.SelectRows(notHidden, each not Text.Contains(Text.Lower([Folder Path]), "\dashboard\")),
+		    kept = Table.SelectColumns(notDashboard, {"Content", "Name", "Extension", "Folder Path", "Date modified"}),
+		    sorted = Table.Sort(kept, {{"Folder Path", Order.Ascending}, {"Name", Order.Ascending}})
+		in
+		    sorted
+	lineageTag: 2d7c3a1e-0b1c-4d7a-9c1a-000000000016
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation

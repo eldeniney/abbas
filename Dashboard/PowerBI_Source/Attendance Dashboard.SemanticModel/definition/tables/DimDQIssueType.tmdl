@@ -1,0 +1,33 @@
+/// Data-quality issue types (disconnected helper table used with the measure 'DQ Issue Records by Type').
+table DimDQIssueType
+	lineageTag: bfbc4602-8636-5961-853a-068a64cba486
+
+	column 'Issue Type'
+		dataType: string
+		isKey
+		lineageTag: c558213a-7552-5ae6-81d8-44ba29eed82a
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Issue Type]
+		sortByColumn: 'Issue Type Order'
+
+		annotation SummarizationSetBy = User
+
+	column 'Issue Type Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d67ec91f-6592-5837-a3e9-fd08c238b5c2
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Issue Type Order]
+
+		annotation SummarizationSetBy = User
+
+	partition DimDQIssueType = calculated
+		mode: import
+		source =
+				DATATABLE ( "Issue Type", STRING, "Issue Type Order", INTEGER, { { "Missing Employee Code", 1 }, { "Missing Employee Name", 2 }, { "Missing Process Date", 3 }, { "Missing Total Hours (Present)", 4 }, { "Invalid Total Hours", 5 }, { "Invalid Punch In", 6 }, { "Invalid Punch Out", 7 }, { "Punch Out Before Punch In", 8 }, { "Duplicate Record", 9 }, { "Blank Status", 10 }, { "Unrecognised Status", 11 }, { "Blank Business Unit", 12 }, { "Blank Client", 13 }, { "Blank Shift", 14 } } )
+

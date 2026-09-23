@@ -1,0 +1,33 @@
+/// Exception types (disconnected helper table used with the measure 'Exception Days by Type').
+table DimExceptionType
+	lineageTag: 914b51f3-ec7c-531b-bd11-c51dea9c3d40
+
+	column 'Exception Type'
+		dataType: string
+		isKey
+		lineageTag: d8294c20-51ed-52c7-ad01-ac6e9f32c555
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Exception Type]
+		sortByColumn: 'Exception Type Order'
+
+		annotation SummarizationSetBy = User
+
+	column 'Exception Type Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f47084c0-54f8-5d2a-a539-0938c420734d
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Exception Type Order]
+
+		annotation SummarizationSetBy = User
+
+	partition DimExceptionType = calculated
+		mode: import
+		source =
+				DATATABLE ( "Exception Type", STRING, "Exception Type Order", INTEGER, { { "Absent", 1 }, { "Missing Punch", 2 }, { "Unrecognised Status", 3 }, { "Short Working Hours (review)", 4 }, { "Long Working Hours (review)", 5 }, { "Status2 Condition", 6 } } )
+

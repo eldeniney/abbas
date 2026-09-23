@@ -1,0 +1,271 @@
+/// Official date table. Covers whole months from the first to the last Process Date in the data.
+table DimDate
+	lineageTag: 0f4eb093-ea71-5a80-83ec-822fe86fb52d
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: dd-mmm-yyyy
+		lineageTag: 5f6bb738-6f05-5cd9-89ac-c99e5f5cbce3
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = User
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 41cabafa-f77e-59f8-b8fc-691db4dd794b
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = User
+
+	column Quarter
+		dataType: string
+		lineageTag: f626d79b-7edf-577a-88c1-cb9a4fc05d5d
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Quarter]
+
+		annotation SummarizationSetBy = User
+
+	column 'Year Quarter'
+		dataType: string
+		lineageTag: 4e8c94cd-40b7-5a25-85a8-d0c920c199be
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Year Quarter]
+
+		annotation SummarizationSetBy = User
+
+	column 'Month Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 6a28e5e8-c02f-50a3-a9ed-bad591bba5f0
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Month Number]
+
+		annotation SummarizationSetBy = User
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: 0014d2e0-375d-538d-ad34-68b1e6af0294
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Month Name]
+		sortByColumn: 'Month Number'
+
+		annotation SummarizationSetBy = User
+
+	column 'Month Name Long'
+		dataType: string
+		lineageTag: 865cc5a2-27e2-5a7f-8da6-01a703b5cb50
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Month Name Long]
+		sortByColumn: 'Month Number'
+
+		annotation SummarizationSetBy = User
+
+	column 'Year Month'
+		dataType: string
+		lineageTag: 24cec932-2066-5474-87c0-431520cddbb5
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Year Month]
+		sortByColumn: 'Year Month Sort'
+
+		annotation SummarizationSetBy = User
+
+	column 'Year Month Sort'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: e2b1bd7f-cab0-55f2-a7de-55d41533fa9b
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Year Month Sort]
+
+		annotation SummarizationSetBy = User
+
+	column 'Month Start'
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 18980dcb-d619-5ec5-aa17-b0746c741fee
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Month Start]
+
+		annotation SummarizationSetBy = User
+
+	column 'Week Start'
+		dataType: dateTime
+		formatString: dd-mmm-yyyy
+		lineageTag: b5163027-607a-51e4-a309-64cfdc2853aa
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Week Start]
+
+		annotation SummarizationSetBy = User
+
+	column 'Week Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: 2801c0ad-e1f8-5dba-ab9e-082306a5a14a
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Week Number]
+
+		annotation SummarizationSetBy = User
+
+	column Day
+		dataType: int64
+		formatString: 0
+		lineageTag: 58bff5f6-0afb-55e8-8925-baf83f3f3bfb
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Day]
+
+		annotation SummarizationSetBy = User
+
+	column 'Day Name'
+		dataType: string
+		lineageTag: 782fd641-b4eb-5c66-a79d-68aa7083aba2
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Day Name]
+		sortByColumn: 'Day Of Week Number'
+
+		annotation SummarizationSetBy = User
+
+	column 'Day Name Short'
+		dataType: string
+		lineageTag: 70305d8c-c204-57be-a0c5-8b6a083440f1
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Day Name Short]
+		sortByColumn: 'Day Of Week Number'
+
+		annotation SummarizationSetBy = User
+
+	column 'Day Of Week Number'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 3fe88b8d-4dc3-5e3b-85c2-8430998edab7
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Day Of Week Number]
+
+		annotation SummarizationSetBy = User
+
+	/// Calendar weekend (Saturday/Sunday, UAE). Individual rosters may differ - use the Status field for actual rest days.
+	column 'Is Weekend (Sat-Sun)'
+		dataType: string
+		lineageTag: de3f42be-1d5e-5d07-8952-3beda2df6ba6
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Is Weekend (Sat-Sun)]
+
+		annotation SummarizationSetBy = User
+
+	/// Same as Year Month, except that the most recent month in the data is labelled 'Latest Month'. Selecting 'Latest Month' in a slicer keeps following the newest month after every refresh.
+	column 'Reporting Month'
+		dataType: string
+		lineageTag: f9597821-ec2e-537b-a700-badf9c231f0e
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Reporting Month]
+		sortByColumn: 'Year Month Sort'
+
+		annotation SummarizationSetBy = User
+
+	/// 0 = latest month in the data, -1 = previous month, ...
+	column 'Month Offset'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f9f3609b-185b-5b99-8c77-3292ba33ec74
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Month Offset]
+
+		annotation SummarizationSetBy = User
+
+	column 'Is Latest Month'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: d8fef4c3-8a07-5a95-8595-abe71726dc04
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Is Latest Month]
+
+		annotation SummarizationSetBy = User
+
+	partition DimDate = calculated
+		mode: import
+		source =
+				VAR _minRaw = MIN ( FactAttendance[Process Date] )
+				VAR _maxRaw = MAX ( FactAttendance[Process Date] )
+				VAR _min = IF ( ISBLANK ( _minRaw ), TODAY (), _minRaw )
+				VAR _max = IF ( ISBLANK ( _maxRaw ), TODAY (), _maxRaw )
+				VAR _start = DATE ( YEAR ( _min ), MONTH ( _min ), 1 )
+				VAR _end = EOMONTH ( _max, 0 )
+				VAR _latestMonthStart = DATE ( YEAR ( _max ), MONTH ( _max ), 1 )
+				RETURN
+				    ADDCOLUMNS (
+				        CALENDAR ( _start, _end ),
+				        "Year", YEAR ( [Date] ),
+				        "Quarter", "Q" & QUARTER ( [Date] ),
+				        "Year Quarter", YEAR ( [Date] ) & " Q" & QUARTER ( [Date] ),
+				        "Month Number", MONTH ( [Date] ),
+				        "Month Name", FORMAT ( [Date], "mmm" ),
+				        "Month Name Long", FORMAT ( [Date], "mmmm" ),
+				        "Year Month", FORMAT ( [Date], "mmm yyyy" ),
+				        "Year Month Sort", YEAR ( [Date] ) * 100 + MONTH ( [Date] ),
+				        "Month Start", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ),
+				        "Week Start", [Date] - WEEKDAY ( [Date], 2 ) + 1,
+				        "Week Number", WEEKNUM ( [Date], 21 ),
+				        "Day", DAY ( [Date] ),
+				        "Day Name", FORMAT ( [Date], "dddd" ),
+				        "Day Name Short", FORMAT ( [Date], "ddd" ),
+				        "Day Of Week Number", WEEKDAY ( [Date], 2 ),
+				        "Is Weekend (Sat-Sun)", IF ( WEEKDAY ( [Date], 2 ) >= 6, "Weekend", "Weekday" ),
+				        "Reporting Month",
+				            IF (
+				                DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ) = _latestMonthStart,
+				                "Latest Month",
+				                FORMAT ( [Date], "mmm yyyy" )
+				            ),
+				        "Month Offset",
+				            ( YEAR ( [Date] ) - YEAR ( _latestMonthStart ) ) * 12 + MONTH ( [Date] ) - MONTH ( _latestMonthStart ),
+				        "Is Latest Month", IF ( DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 ) = _latestMonthStart, 1, 0 )
+				    )
+

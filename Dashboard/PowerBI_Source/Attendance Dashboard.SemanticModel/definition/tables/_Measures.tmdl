@@ -1,0 +1,1074 @@
+/// All report measures, organised in display folders.
+table _Measures
+	lineageTag: 3e680ac4-bdf5-5a89-a816-af50439f24d9
+
+	/// Number of distinct employees with at least one attendance record in the selected context.
+	measure 'Active Employees' = DISTINCTCOUNTNOBLANK ( FactAttendance[Employee Code] )
+		formatString: #,0
+		displayFolder: 01 Workforce
+		lineageTag: 1ce86840-5955-5dcf-9c30-df6f979576f4
+	/// Distinct employee-days (Employee Code + Process Date). Several records on the same day count once.
+	measure 'Employee Days' = DISTINCTCOUNTNOBLANK ( FactAttendance[Employee Day Key] )
+		formatString: #,0
+		displayFolder: 01 Workforce
+		lineageTag: 00c7febd-e819-5e86-9b2f-883438538e04
+	/// Raw rows loaded from the source files (including exact duplicates).
+	measure 'Attendance Records' = COUNTROWS ( FactAttendance )
+		formatString: #,0
+		displayFolder: 01 Workforce
+		lineageTag: 11be3d18-803c-5bc3-a015-c91275c15043
+	measure 'Attendance Records (Excl. Duplicates)' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[Is Duplicate Record] = 0 )
+		formatString: #,0
+		displayFolder: 01 Workforce
+		lineageTag: b3ba4e9c-1571-5624-956e-e3b94c8b9629
+	/// Average number of employees with a record per calendar day that has data.
+	measure 'Avg Daily Employees' = AVERAGEX ( VALUES ( DimDate[Date] ), [Active Employees] )
+		formatString: #,0
+		displayFolder: 01 Workforce
+		lineageTag: cb53f91f-73cb-5756-9415-fd50d607f714
+	measure 'Days With Data' = DISTINCTCOUNTNOBLANK ( FactAttendance[Process Date] )
+		formatString: #,0
+		displayFolder: 01 Workforce
+		lineageTag: 7e62cf38-d598-5dc4-8f29-f3fe84693493
+	measure 'Employees Present (1+ Day)' = CALCULATE ( [Active Employees], FactAttendance[Status Category] = "Present" )
+		formatString: #,0
+		displayFolder: 01 Workforce
+		lineageTag: c9423782-c755-5085-b719-2dbd8f392fa0
+	measure 'Employees With Exceptions' = CALCULATE ( [Active Employees], FactAttendance[Exception Flag] = 1 )
+		formatString: #,0
+		displayFolder: 01 Workforce
+		lineageTag: 43048e6c-d65e-5e56-b3f5-4b742fd5ca2d
+	measure 'Employees With Missing Punch' = CALCULATE ( [Active Employees], FactAttendance[Day Missing Punch Flag] = 1 )
+		formatString: #,0
+		displayFolder: 01 Workforce
+		lineageTag: 5dc2d817-e6f3-5c4f-a435-f77dc3fba878
+	/// Employee-days whose resolved status category is 'Present'.
+	measure 'Present Days' = CALCULATE ( [Employee Days], FactAttendance[Status Category] = "Present" )
+		formatString: #,0
+		displayFolder: 02 Attendance
+		lineageTag: c9e076b5-bde4-5968-a14c-ef0a9edca0c4
+	/// Employee-days whose resolved status category is 'Absent'.
+	measure 'Absent Days' = CALCULATE ( [Employee Days], FactAttendance[Status Category] = "Absent" )
+		formatString: #,0
+		displayFolder: 02 Attendance
+		lineageTag: 544cbec5-b551-55b4-9119-a60bdddf24ac
+	/// Employee-days whose resolved status category is 'Leave'.
+	measure 'Leave Days' = CALCULATE ( [Employee Days], FactAttendance[Status Category] = "Leave" )
+		formatString: #,0
+		displayFolder: 02 Attendance
+		lineageTag: 1d1e387b-a6b4-505e-8029-4535ff25ff77
+	/// Employee-days whose resolved status category is 'Holiday'.
+	measure 'Holiday Days' = CALCULATE ( [Employee Days], FactAttendance[Status Category] = "Holiday" )
+		formatString: #,0
+		displayFolder: 02 Attendance
+		lineageTag: 051879ef-e99c-5d67-8120-5966802e15fd
+	/// Employee-days whose resolved status category is 'Weekend / Rest Day'.
+	measure 'Rest Day Days' = CALCULATE ( [Employee Days], FactAttendance[Status Category] = "Weekend / Rest Day" )
+		formatString: #,0
+		displayFolder: 02 Attendance
+		lineageTag: 137989bb-27ab-5f2b-8145-4c7d107bc848
+	/// Employee-days whose resolved status category is 'Other'.
+	measure 'Other Status Days' = CALCULATE ( [Employee Days], FactAttendance[Status Category] = "Other" )
+		formatString: #,0
+		displayFolder: 02 Attendance
+		lineageTag: 57ac2490-49b8-589c-8da1-c2a8a7f26cb3
+	/// Employee-days whose resolved status category is 'Unknown'.
+	measure 'Unknown Status Days' = CALCULATE ( [Employee Days], FactAttendance[Status Category] = "Unknown" )
+		formatString: #,0
+		displayFolder: 02 Attendance
+		lineageTag: bce3a1f1-9e8b-519f-b832-2f18ae71b3c1
+	/// Share of recorded employee-days with a Present status. The source does not contain a roster, so this is a share of RECORDED days, not a true attendance rate.
+	measure 'Present % of Recorded Days' = DIVIDE ( [Present Days], [Employee Days] )
+		formatString: 0.0%
+		displayFolder: 02 Attendance
+		lineageTag: c3c1eb5d-a068-5edc-b239-8a7fbd99c2c3
+	measure 'Absent % of Recorded Days' = DIVIDE ( [Absent Days], [Employee Days] )
+		formatString: 0.0%
+		displayFolder: 02 Attendance
+		lineageTag: e74f6448-1d32-54a8-8384-58285e56a8d9
+	measure 'Leave % of Recorded Days' = DIVIDE ( [Leave Days], [Employee Days] )
+		formatString: 0.0%
+		displayFolder: 02 Attendance
+		lineageTag: eb251d2a-1788-582b-bb04-ae1bceaabfc3
+	measure 'Other Status % of Recorded Days' = DIVIDE ( [Other Status Days] + [Unknown Status Days], [Employee Days] )
+		formatString: 0.0%
+		displayFolder: 02 Attendance
+		lineageTag: 6af46609-1b5f-5af2-b819-c028b5e90e8e
+	/// Present days divided by recorded days that are not Leave, Holiday or Rest days. Still based on recorded days only.
+	measure 'Present % (Excl. Leave & Rest Days)' = DIVIDE ( [Present Days], [Employee Days] - [Leave Days] - [Holiday Days] - [Rest Days] )
+		formatString: 0.0%
+		displayFolder: 02 Attendance
+		lineageTag: 45eeb627-73a6-5afb-ada2-5615bf2d15a7
+	measure 'Status Share %' = DIVIDE ( [Employee Days], CALCULATE ( [Employee Days], REMOVEFILTERS ( DimStatus ) ) )
+		formatString: 0.0%
+		displayFolder: 02 Attendance
+		lineageTag: 588e4bad-02e7-5689-a2fd-55aee3f1bb3e
+	/// Sum of worked hours (source Total Hours, or hours calculated from punches when the source value is blank/invalid). Exact duplicate records are excluded.
+	measure 'Total Worked Hours' = SUM ( FactAttendance[Worked Hours Decimal] )
+		formatString: #,0 "hrs"
+		displayFolder: 03 Hours
+		lineageTag: 0ad06135-2760-554b-8539-b9e9bd4e3927
+	/// Employee-days with recorded hours greater than zero.
+	measure 'Worked Days' = CALCULATE ( [Employee Days], FactAttendance[Day Worked Hours] > 0 )
+		formatString: #,0
+		displayFolder: 03 Hours
+		lineageTag: 201b6ba8-16ab-50c1-981f-91b7f7d57aae
+	/// Total worked hours divided by employee-days that have hours > 0 (absent/leave days are not in the denominator).
+	measure 'Avg Hours / Worked Day' = DIVIDE ( [Total Worked Hours], [Worked Days] )
+		formatString: 0.0 "hrs"
+		displayFolder: 03 Hours
+		lineageTag: 51ebda7f-aced-58fa-b49d-8cad0c4a883b
+	/// Total worked hours divided by active employees in the selected period.
+	measure 'Avg Hours / Employee' = DIVIDE ( [Total Worked Hours], [Active Employees] )
+		formatString: 0.0 "hrs"
+		displayFolder: 03 Hours
+		lineageTag: 35ee7a48-7497-5120-8d09-edf4ba396e8a
+	measure 'Median Hours / Worked Day' = CALCULATE ( MEDIAN ( FactAttendance[Day Worked Hours] ), FactAttendance[Is Day Primary] = 1, FactAttendance[Day Worked Hours] > 0 )
+		formatString: 0.0 "hrs"
+		displayFolder: 03 Hours
+		lineageTag: f88a6f4f-aff4-5341-b5a2-5dea11d094c8
+	measure 'Min Hours / Worked Day' = CALCULATE ( MIN ( FactAttendance[Day Worked Hours] ), FactAttendance[Is Day Primary] = 1, FactAttendance[Day Worked Hours] > 0 )
+		formatString: 0.0 "hrs"
+		displayFolder: 03 Hours
+		lineageTag: 7d91264a-130b-5257-9933-a5e25d9407b4
+	measure 'Max Hours / Worked Day' = CALCULATE ( MAX ( FactAttendance[Day Worked Hours] ), FactAttendance[Is Day Primary] = 1 )
+		formatString: 0.0 "hrs"
+		displayFolder: 03 Hours
+		lineageTag: 009b6962-47be-52db-a85d-61ef141246b1
+	/// Employee-days whose hours had to be calculated from punches because the source Total Hours was blank or invalid.
+	measure 'Days Using Calculated Hours' = CALCULATE ( [Employee Days], FactAttendance[Worked Hours Basis] = "Calculated from Punches" )
+		formatString: #,0
+		displayFolder: 03 Hours
+		lineageTag: f05b077d-2bd1-5031-b144-cee06820e917
+	measure 'Avg Punch In Minutes' = CALCULATE ( AVERAGE ( FactAttendance[Punch In Minutes From Midnight] ), FactAttendance[Is Duplicate Record] = 0 )
+		formatString: 0
+		isHidden
+		displayFolder: 03 Hours\Punch
+		lineageTag: c7c5b66c-a612-52af-8cb0-53c874ace345
+	measure 'Avg Punch Out Minutes' = CALCULATE ( AVERAGE ( FactAttendance[Punch Out Minutes From Midnight] ), FactAttendance[Is Duplicate Record] = 0 )
+		formatString: 0
+		isHidden
+		displayFolder: 03 Hours\Punch
+		lineageTag: d1428834-8b0c-5cce-98fa-30c8793fcbcf
+	/// Average punch-in clock time, computed from minutes since midnight (not from text).
+	measure 'Avg Punch In Time' =
+				VAR _m = [Avg Punch In Minutes]
+				RETURN
+				    IF ( ISBLANK ( _m ), BLANK (), FORMAT ( TIME ( 0, ROUND ( _m, 0 ), 0 ), "hh:mm AM/PM" ) )
+		displayFolder: 03 Hours\Punch
+		lineageTag: b17a1c71-73c1-5023-903b-8a3c2abccb31
+	measure 'Avg Punch Out Time' =
+				VAR _m = [Avg Punch Out Minutes]
+				RETURN
+				    IF ( ISBLANK ( _m ), BLANK (), FORMAT ( TIME ( 0, ROUND ( _m, 0 ), 0 ), "hh:mm AM/PM" ) )
+		displayFolder: 03 Hours\Punch
+		lineageTag: 648cd379-df70-59d5-9842-758842678da9
+	/// Average punch-in time as decimal hours (7.5 = 07:30) for charts.
+	measure 'Avg Punch In (Decimal Hours)' = DIVIDE ( [Avg Punch In Minutes], 60 )
+		formatString: 0.00
+		displayFolder: 03 Hours\Punch
+		lineageTag: 9efdba74-0b3a-54b1-89f0-e32ef02a41be
+	measure 'Avg Punch Out (Decimal Hours)' = DIVIDE ( [Avg Punch Out Minutes], 60 )
+		formatString: 0.00
+		displayFolder: 03 Hours\Punch
+		lineageTag: 4c00362b-238d-52a4-b826-a93c861e394d
+	/// Use with DimHour[Hour Label] on the axis.
+	measure 'Punch In Records by Hour' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[Is Duplicate Record] = 0, TREATAS ( VALUES ( DimHour[Hour] ), FactAttendance[Punch In Hour] ) )
+		formatString: #,0
+		displayFolder: 03 Hours\Punch
+		lineageTag: 8c20594d-4bff-55b0-bd7b-5701707e938d
+	measure 'Punch Out Records by Hour' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[Is Duplicate Record] = 0, TREATAS ( VALUES ( DimHour[Hour] ), FactAttendance[Punch Out Hour] ) )
+		formatString: #,0
+		displayFolder: 03 Hours\Punch
+		lineageTag: 7d4cf566-cbcb-5aa7-82af-80348b0a3f18
+	/// Employee-days with at least one attendance exception: Absent, Missing Punch, Unrecognised Status, Short/Long hours (review thresholds) or a Status2 condition.
+	measure 'Exception Days' = CALCULATE ( [Employee Days], FactAttendance[Exception Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions
+		lineageTag: aeb33a5b-aa89-53db-bb81-6eb3b1d476be
+	measure 'Exception % of Recorded Days' = DIVIDE ( [Exception Days], [Employee Days] )
+		formatString: 0.0%
+		displayFolder: 04 Exceptions
+		lineageTag: 6659fa4a-1406-53e6-8bce-92b3965aa6c2
+	measure 'Exception Days per Employee' = DIVIDE ( [Exception Days], [Employees With Exceptions] )
+		formatString: 0.0
+		displayFolder: 04 Exceptions
+		lineageTag: c89302e2-f863-5026-9066-2b23ff2b2677
+	measure 'Exception Days - Absent' = CALCULATE ( [Employee Days], FactAttendance[Exception Absent Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\By Type
+		lineageTag: 39ef72c8-c522-5571-90c8-ba8160b93d98
+	measure 'Exception Days - Missing Punch' = CALCULATE ( [Employee Days], FactAttendance[Exception Missing Punch Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\By Type
+		lineageTag: 2248ec36-98a4-5b51-8ef5-859effcb7a59
+	measure 'Exception Days - Unrecognised Status' = CALCULATE ( [Employee Days], FactAttendance[Exception Unrecognised Status Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\By Type
+		lineageTag: ef08704d-c16a-5248-ad9a-37e0b7990786
+	/// Present days with hours below the configurable review threshold (pShortHoursReviewThreshold). Not a policy violation.
+	measure 'Exception Days - Short Hours (review)' = CALCULATE ( [Employee Days], FactAttendance[Exception Short Hours Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\By Type
+		lineageTag: ec7b3ff1-d0bd-50c9-8a53-deccab6910a9
+	/// Days with hours above the configurable review threshold (pLongHoursReviewThreshold). Not a policy violation.
+	measure 'Exception Days - Long Hours (review)' = CALCULATE ( [Employee Days], FactAttendance[Exception Long Hours Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\By Type
+		lineageTag: 62e32fd1-aa47-5dd7-af0e-1e60dba676be
+	/// Days with a non-blank Status2 value (controlled by parameter pStatus2IsException).
+	measure 'Exception Days - Status2 Condition' = CALCULATE ( [Employee Days], FactAttendance[Exception Status2 Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\By Type
+		lineageTag: 7060a4a8-ed67-5cdb-b0ee-ec26879220ff
+	/// Exception days split by DimExceptionType. A day with two exception types appears under both; the total is distinct days.
+	measure 'Exception Days by Type' =
+				SWITCH (
+				    SELECTEDVALUE ( DimExceptionType[Exception Type] ),
+				    "Absent", [Exception Days - Absent],
+				    "Missing Punch", [Exception Days - Missing Punch],
+				    "Unrecognised Status", [Exception Days - Unrecognised Status],
+				    "Short Working Hours (review)", [Exception Days - Short Hours (review)],
+				    "Long Working Hours (review)", [Exception Days - Long Hours (review)],
+				    "Status2 Condition", [Exception Days - Status2 Condition],
+				    [Exception Days]
+				)
+		formatString: #,0
+		displayFolder: 04 Exceptions
+		lineageTag: 1481c2b9-e086-5565-8cdf-712fa11f8960
+	/// Employee-days where a punch was expected (Present status or one punch recorded) but Punch In and/or Punch Out is missing.
+	measure 'Missing Punch Days' = CALCULATE ( [Employee Days], FactAttendance[Day Missing Punch Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\Punch
+		lineageTag: cd2b0a77-15fe-573e-998b-793f8c5f1ac2
+	measure 'Missing Punch In Days' = CALCULATE ( [Employee Days], FactAttendance[Missing Punch In Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\Punch
+		lineageTag: ec4eda95-9354-5aba-98e3-0a10bb9b940d
+	measure 'Missing Punch Out Days' = CALCULATE ( [Employee Days], FactAttendance[Missing Punch Out Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\Punch
+		lineageTag: 243842c0-4d7c-5da5-8e4e-3f730c5b1e87
+	measure 'Missing Both Punches Days' = CALCULATE ( [Employee Days], FactAttendance[Missing Both Punches Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\Punch
+		lineageTag: f122bc98-7a2a-583f-b662-7690bb99db88
+	/// Employee-days where punches are expected: Present status or at least one punch recorded. Absent / Leave / Rest days without punches are excluded.
+	measure 'Punch-Expected Days' = CALCULATE ( [Employee Days], FactAttendance[Day Punch Expected Flag] = 1 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\Punch
+		lineageTag: 5aa51b7a-741f-54f7-a5f7-bf6bc2f2c6fc
+	measure 'Complete Punch Days' = CALCULATE ( [Employee Days], FactAttendance[Day Punch Expected Flag] = 1, FactAttendance[Day Missing Punch Flag] = 0 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\Punch
+		lineageTag: 68170f13-6d3f-5885-83f4-05ecb3604f01
+	/// Missing Punch Days divided by Punch-Expected Days.
+	measure 'Missing Punch %' = DIVIDE ( [Missing Punch Days], [Punch-Expected Days] )
+		formatString: 0.0%
+		displayFolder: 04 Exceptions\Punch
+		lineageTag: 68770f89-2d7d-5e1f-833d-2282f8fc354c
+	measure 'Missing Punch Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[Missing Punch Flag] = 1, FactAttendance[Is Duplicate Record] = 0 )
+		formatString: #,0
+		displayFolder: 04 Exceptions\Punch
+		lineageTag: ec8869ec-c101-5284-8468-02d00c830e04
+	measure 'Justified Exception Days' = CALCULATE ( [Exception Days], FactAttendance[Justification Category] = "Justified" )
+		formatString: #,0
+		displayFolder: 04 Exceptions\Justification
+		lineageTag: 3af42c9e-e69f-5264-970d-128767545274
+	/// Exception days where Is Justified explicitly says No.
+	measure 'Not Justified Exception Days' = CALCULATE ( [Exception Days], FactAttendance[Justification Category] = "Not Justified" )
+		formatString: #,0
+		displayFolder: 04 Exceptions\Justification
+		lineageTag: 8be9692c-4991-5320-b257-9b463bab9dcf
+	measure 'Pending Justification Days' = CALCULATE ( [Exception Days], FactAttendance[Justification Category] = "Pending" )
+		formatString: #,0
+		displayFolder: 04 Exceptions\Justification
+		lineageTag: ffdead87-40d6-5b33-80a5-87444d083236
+	/// Exception days where Is Justified is blank. Blank is NOT treated as unjustified.
+	measure 'Justification Not Recorded Days' = CALCULATE ( [Exception Days], FactAttendance[Justification Category] = "Not Recorded" )
+		formatString: #,0
+		displayFolder: 04 Exceptions\Justification
+		lineageTag: a46d6121-b859-5854-b8cb-ebfb0b22de74
+	measure 'Justified % (Where Recorded)' = DIVIDE ( [Justified Exception Days], [Justified Exception Days] + [Not Justified Exception Days] )
+		formatString: 0.0%
+		displayFolder: 04 Exceptions\Justification
+		lineageTag: 56f08cc2-f4ba-56eb-8a6b-2242b7462338
+	measure 'Latest Exception Date' = CALCULATE ( MAX ( FactAttendance[Process Date] ), FactAttendance[Exception Flag] = 1 )
+		formatString: dd-mmm-yyyy
+		displayFolder: 04 Exceptions
+		lineageTag: b83577c1-0dad-5f26-8d0c-c479940e2ee7
+	/// Plain-language list of the exception counts behind an employee's review ranking. No score is computed.
+	measure 'Review Reasons' =
+				VAR _a = [Exception Days - Absent]
+				VAR _m = [Exception Days - Missing Punch]
+				VAR _u = [Exception Days - Unrecognised Status]
+				VAR _s = [Exception Days - Short Hours (review)]
+				VAR _l = [Exception Days - Long Hours (review)]
+				VAR _s2 = [Exception Days - Status2 Condition]
+				VAR _txt =
+				    IF ( _a > 0, "Absent " & _a & " | ", "" )
+				        & IF ( _m > 0, "Missing punch " & _m & " | ", "" )
+				        & IF ( _u > 0, "Unrecognised status " & _u & " | ", "" )
+				        & IF ( _s > 0, "Short hours " & _s & " | ", "" )
+				        & IF ( _l > 0, "Long hours " & _l & " | ", "" )
+				        & IF ( _s2 > 0, "Status2 " & _s2 & " | ", "" )
+				RETURN
+				    IF ( LEN ( _txt ) > 3, LEFT ( _txt, LEN ( _txt ) - 3 ), BLANK () )
+		displayFolder: 04 Exceptions
+		lineageTag: 8b8b1c76-41c7-5963-8827-d5f49104c1e9
+	/// Font colour helper: red when the row's exception rate is more than 1.5x the overall rate for the same period (minimum 20 employee-days).
+	measure 'Exception % Colour' =
+				VAR _overall =
+				    CALCULATE (
+				        [Exception % of Recorded Days],
+				        REMOVEFILTERS ( DimBusinessUnit, DimClient, DimCostCenter, DimShift, DimSource, DimPayCalendar, DimEmployee )
+				    )
+				RETURN
+				    IF ( [Exception % of Recorded Days] > 1.5 * _overall && [Employee Days] >= 20, "#E60000", "#2E2E2E" )
+		isHidden
+		displayFolder: 04 Exceptions\Formatting
+		lineageTag: b3a3e44e-44d1-50e0-ba92-a5f944153aba
+	measure 'Missing Punch % Colour' =
+				VAR _overall =
+				    CALCULATE (
+				        [Missing Punch %],
+				        REMOVEFILTERS ( DimBusinessUnit, DimClient, DimCostCenter, DimShift, DimSource, DimPayCalendar, DimEmployee )
+				    )
+				RETURN
+				    IF ( [Missing Punch %] > 1.5 * _overall && [Punch-Expected Days] >= 20, "#E60000", "#2E2E2E" )
+		isHidden
+		displayFolder: 04 Exceptions\Formatting
+		lineageTag: 5b012e57-8e98-5b60-a508-13aa852749a4
+	/// Active Employees for the previous month (same day range shifted back one month).
+	measure 'Active Employees PM' = CALCULATE ( [Active Employees], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: b376c126-059a-5ac1-bb05-c6252e907828
+	measure 'Active Employees MoM' = IF ( ISBLANK ( [Active Employees] ) || ISBLANK ( [Active Employees PM] ), BLANK (), [Active Employees] - [Active Employees PM] )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: d76a3008-bb6b-5114-bdb2-102e99fa9089
+	measure 'Active Employees MoM %' = DIVIDE ( [Active Employees MoM], [Active Employees PM] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: 8e90f460-3544-5a06-ad5b-471c6594c7dd
+	measure 'KPI Note - Active Employees' =
+				VAR _cur = [Active Employees]
+				VAR _pm = [Active Employees PM]
+				VAR _d = [Active Employees MoM %]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0%;-0.0%;0.0%" ) & " vs prev. month (" & FORMAT ( _pm, "#,0" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: a2f08d12-8fd0-5aca-a2eb-10ad06f43e72
+	measure 'KPI Colour - Active Employees' =
+				VAR _d = [Active Employees MoM %]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", "#6B6B6B" )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 14c7bbea-b3e8-582a-9213-fc312b371983
+	/// Employee Days for the previous month (same day range shifted back one month).
+	measure 'Employee Days PM' = CALCULATE ( [Employee Days], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: 6c5060be-150c-50b0-beca-bd5e2e9c1f8d
+	measure 'Employee Days MoM' = IF ( ISBLANK ( [Employee Days] ) || ISBLANK ( [Employee Days PM] ), BLANK (), [Employee Days] - [Employee Days PM] )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: b4b4e9a6-9bc9-5e2b-b2b4-0bf2beb9403a
+	measure 'Employee Days MoM %' = DIVIDE ( [Employee Days MoM], [Employee Days PM] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: a62ee0ff-7803-5287-9f25-ea38eb94b30e
+	measure 'KPI Note - Employee Days' =
+				VAR _cur = [Employee Days]
+				VAR _pm = [Employee Days PM]
+				VAR _d = [Employee Days MoM %]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0%;-0.0%;0.0%" ) & " vs prev. month (" & FORMAT ( _pm, "#,0" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 4cff97da-ca67-5e5c-805c-34b35348b025
+	measure 'KPI Colour - Employee Days' =
+				VAR _d = [Employee Days MoM %]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", "#6B6B6B" )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 98478fd1-12c1-551f-8b46-939f4a9ce2e9
+	/// Avg Daily Employees for the previous month (same day range shifted back one month).
+	measure 'Avg Daily Employees PM' = CALCULATE ( [Avg Daily Employees], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: 86007b4d-fd57-5923-878d-caf8a2977f7d
+	measure 'Avg Daily Employees MoM' = IF ( ISBLANK ( [Avg Daily Employees] ) || ISBLANK ( [Avg Daily Employees PM] ), BLANK (), [Avg Daily Employees] - [Avg Daily Employees PM] )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: 314795dc-f583-5c2c-93cd-b6425a8cce2f
+	measure 'Avg Daily Employees MoM %' = DIVIDE ( [Avg Daily Employees MoM], [Avg Daily Employees PM] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: 022e7139-b1c3-50dd-a4c2-9cb8bd38d60e
+	measure 'KPI Note - Avg Daily Employees' =
+				VAR _cur = [Avg Daily Employees]
+				VAR _pm = [Avg Daily Employees PM]
+				VAR _d = [Avg Daily Employees MoM %]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0%;-0.0%;0.0%" ) & " vs prev. month (" & FORMAT ( _pm, "#,0" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 969d2026-6870-5dc1-a187-0798afea68db
+	measure 'KPI Colour - Avg Daily Employees' =
+				VAR _d = [Avg Daily Employees MoM %]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", "#6B6B6B" )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 6314e03c-074f-5aea-be12-9b90d8834fe4
+	/// Present % of Recorded Days for the previous month (same day range shifted back one month).
+	measure 'Present % of Recorded Days PM' = CALCULATE ( [Present % of Recorded Days], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: 0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: 263bb1cb-3119-514a-b544-7a80ec88121a
+	/// Percentage-point change versus the previous month.
+	measure 'Present % of Recorded Days Change (pp)' = IF ( ISBLANK ( [Present % of Recorded Days] ) || ISBLANK ( [Present % of Recorded Days PM] ), BLANK (), ( [Present % of Recorded Days] - [Present % of Recorded Days PM] ) * 100 )
+		formatString: +0.0 "pp";-0.0 "pp";0.0 "pp"
+		displayFolder: 05 Month Comparison
+		lineageTag: c968caf1-8b86-5a82-8bf6-8a003c3fca48
+	measure 'KPI Note - Present % of Recorded Days' =
+				VAR _cur = [Present % of Recorded Days]
+				VAR _pm = [Present % of Recorded Days PM]
+				VAR _d = [Present % of Recorded Days Change (pp)]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0;-0.0;0.0" ) & " pp" & " vs prev. month (" & FORMAT ( _pm, "0.0%" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 17bad7ae-7b09-5fd3-8b6a-8635d504d11d
+	measure 'KPI Colour - Present % of Recorded Days' =
+				VAR _d = [Present % of Recorded Days Change (pp)]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", IF ( _d > 0, "#2E7D5B", IF ( _d < 0, "#E60000", "#6B6B6B" ) ) )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 66a32fb7-ea4f-597d-9ca2-41538d94ff2b
+	/// Total Worked Hours for the previous month (same day range shifted back one month).
+	measure 'Total Worked Hours PM' = CALCULATE ( [Total Worked Hours], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: #,0 "hrs"
+		displayFolder: 05 Month Comparison
+		lineageTag: 331fbb7d-7119-5f4b-9444-11ddd8e99dc1
+	measure 'Total Worked Hours MoM' = IF ( ISBLANK ( [Total Worked Hours] ) || ISBLANK ( [Total Worked Hours PM] ), BLANK (), [Total Worked Hours] - [Total Worked Hours PM] )
+		formatString: #,0 "hrs"
+		displayFolder: 05 Month Comparison
+		lineageTag: b8db7315-a793-572c-ae10-f26e0416e295
+	measure 'Total Worked Hours MoM %' = DIVIDE ( [Total Worked Hours MoM], [Total Worked Hours PM] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: be59e55c-ec5a-5a7d-996c-6590d231ae84
+	measure 'KPI Note - Total Worked Hours' =
+				VAR _cur = [Total Worked Hours]
+				VAR _pm = [Total Worked Hours PM]
+				VAR _d = [Total Worked Hours MoM %]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0%;-0.0%;0.0%" ) & " vs prev. month (" & FORMAT ( _pm, "#,0" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 6a1a5b1d-2ab8-5752-a897-423e3ab0b920
+	measure 'KPI Colour - Total Worked Hours' =
+				VAR _d = [Total Worked Hours MoM %]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", "#6B6B6B" )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 8436932d-61da-5f42-b139-07beecd724db
+	/// Avg Hours / Worked Day for the previous month (same day range shifted back one month).
+	measure 'Avg Hours / Worked Day PM' = CALCULATE ( [Avg Hours / Worked Day], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: 0.0 "hrs"
+		displayFolder: 05 Month Comparison
+		lineageTag: ff43a97c-de39-5f0a-a190-cc9f9edb9658
+	measure 'Avg Hours / Worked Day MoM' = IF ( ISBLANK ( [Avg Hours / Worked Day] ) || ISBLANK ( [Avg Hours / Worked Day PM] ), BLANK (), [Avg Hours / Worked Day] - [Avg Hours / Worked Day PM] )
+		formatString: 0.0 "hrs"
+		displayFolder: 05 Month Comparison
+		lineageTag: 1e12197b-2b16-5811-b808-556217595e0b
+	measure 'Avg Hours / Worked Day MoM %' = DIVIDE ( [Avg Hours / Worked Day MoM], [Avg Hours / Worked Day PM] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: f5853177-5a81-5a5d-9cf2-1eaa584c7f18
+	measure 'KPI Note - Avg Hours / Worked Day' =
+				VAR _cur = [Avg Hours / Worked Day]
+				VAR _pm = [Avg Hours / Worked Day PM]
+				VAR _d = [Avg Hours / Worked Day MoM %]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0%;-0.0%;0.0%" ) & " vs prev. month (" & FORMAT ( _pm, "#,0.0" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 31fc5dc9-1e6e-572d-9d0c-58ee4f5c3e3c
+	measure 'KPI Colour - Avg Hours / Worked Day' =
+				VAR _d = [Avg Hours / Worked Day MoM %]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", "#6B6B6B" )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 18a4f1f7-5641-56fb-9d27-d39ecb241259
+	/// Exception Days for the previous month (same day range shifted back one month).
+	measure 'Exception Days PM' = CALCULATE ( [Exception Days], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: 0f402695-5f86-57e2-b3ab-8163308fecc5
+	measure 'Exception Days MoM' = IF ( ISBLANK ( [Exception Days] ) || ISBLANK ( [Exception Days PM] ), BLANK (), [Exception Days] - [Exception Days PM] )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: d5692b6a-d8b5-58f5-9074-59a144e0ba5d
+	measure 'Exception Days MoM %' = DIVIDE ( [Exception Days MoM], [Exception Days PM] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: c2971da7-708d-5f06-ae2f-2be2f729e271
+	measure 'KPI Note - Exception Days' =
+				VAR _cur = [Exception Days]
+				VAR _pm = [Exception Days PM]
+				VAR _d = [Exception Days MoM %]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0%;-0.0%;0.0%" ) & " vs prev. month (" & FORMAT ( _pm, "#,0" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: f5e2b736-e7b3-5950-8c4e-beb4f75ad9a5
+	measure 'KPI Colour - Exception Days' =
+				VAR _d = [Exception Days MoM %]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", IF ( _d > 0, "#E60000", IF ( _d < 0, "#2E7D5B", "#6B6B6B" ) ) )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: b8c27bb8-5ff7-558c-80f3-2db0662ac49d
+	/// Exception % of Recorded Days for the previous month (same day range shifted back one month).
+	measure 'Exception % of Recorded Days PM' = CALCULATE ( [Exception % of Recorded Days], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: 0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: 77db633a-4d4e-5a3b-9f4d-f48260472040
+	/// Percentage-point change versus the previous month.
+	measure 'Exception % of Recorded Days Change (pp)' = IF ( ISBLANK ( [Exception % of Recorded Days] ) || ISBLANK ( [Exception % of Recorded Days PM] ), BLANK (), ( [Exception % of Recorded Days] - [Exception % of Recorded Days PM] ) * 100 )
+		formatString: +0.0 "pp";-0.0 "pp";0.0 "pp"
+		displayFolder: 05 Month Comparison
+		lineageTag: ee2ded54-c1cb-5b4f-9888-66e4dd4edd31
+	measure 'KPI Note - Exception % of Recorded Days' =
+				VAR _cur = [Exception % of Recorded Days]
+				VAR _pm = [Exception % of Recorded Days PM]
+				VAR _d = [Exception % of Recorded Days Change (pp)]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0;-0.0;0.0" ) & " pp" & " vs prev. month (" & FORMAT ( _pm, "0.0%" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 0756a173-1b4a-5082-8104-f2b52c758a59
+	measure 'KPI Colour - Exception % of Recorded Days' =
+				VAR _d = [Exception % of Recorded Days Change (pp)]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", IF ( _d > 0, "#E60000", IF ( _d < 0, "#2E7D5B", "#6B6B6B" ) ) )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 37e8d6e7-e75e-5197-a1f1-cb2deeb8fc01
+	/// Missing Punch Days for the previous month (same day range shifted back one month).
+	measure 'Missing Punch Days PM' = CALCULATE ( [Missing Punch Days], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: 86d90dc1-9aef-5d12-a08b-878479548e3a
+	measure 'Missing Punch Days MoM' = IF ( ISBLANK ( [Missing Punch Days] ) || ISBLANK ( [Missing Punch Days PM] ), BLANK (), [Missing Punch Days] - [Missing Punch Days PM] )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: c0d76fbc-e1b2-5579-86ed-df8cca26e6ae
+	measure 'Missing Punch Days MoM %' = DIVIDE ( [Missing Punch Days MoM], [Missing Punch Days PM] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: 84134bfc-ad4d-5a14-ab31-2ecd20532db6
+	measure 'KPI Note - Missing Punch Days' =
+				VAR _cur = [Missing Punch Days]
+				VAR _pm = [Missing Punch Days PM]
+				VAR _d = [Missing Punch Days MoM %]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0%;-0.0%;0.0%" ) & " vs prev. month (" & FORMAT ( _pm, "#,0" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 28c37b53-da14-56c4-8ba5-5d9124284ba3
+	measure 'KPI Colour - Missing Punch Days' =
+				VAR _d = [Missing Punch Days MoM %]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", IF ( _d > 0, "#E60000", IF ( _d < 0, "#2E7D5B", "#6B6B6B" ) ) )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: f367803c-1535-5ebc-aebd-4473bc0d3644
+	/// Missing Punch % for the previous month (same day range shifted back one month).
+	measure 'Missing Punch % PM' = CALCULATE ( [Missing Punch %], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: 0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: cbc1b8aa-8941-5ed5-aea4-dc9c96965122
+	/// Percentage-point change versus the previous month.
+	measure 'Missing Punch % Change (pp)' = IF ( ISBLANK ( [Missing Punch %] ) || ISBLANK ( [Missing Punch % PM] ), BLANK (), ( [Missing Punch %] - [Missing Punch % PM] ) * 100 )
+		formatString: +0.0 "pp";-0.0 "pp";0.0 "pp"
+		displayFolder: 05 Month Comparison
+		lineageTag: cc671c42-2221-5f49-b974-b48716bc33e1
+	measure 'KPI Note - Missing Punch %' =
+				VAR _cur = [Missing Punch %]
+				VAR _pm = [Missing Punch % PM]
+				VAR _d = [Missing Punch % Change (pp)]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0;-0.0;0.0" ) & " pp" & " vs prev. month (" & FORMAT ( _pm, "0.0%" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 11a02bb0-5be4-53a4-94cd-ea17eb9b1548
+	measure 'KPI Colour - Missing Punch %' =
+				VAR _d = [Missing Punch % Change (pp)]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", IF ( _d > 0, "#E60000", IF ( _d < 0, "#2E7D5B", "#6B6B6B" ) ) )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: e0d79ac8-a2db-59e3-8e5a-8aa6b9e23119
+	/// Present Days for the previous month (same day range shifted back one month).
+	measure 'Present Days PM' = CALCULATE ( [Present Days], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: e2cdae56-949e-5154-9929-fdd0f1fbf99f
+	measure 'Present Days MoM' = IF ( ISBLANK ( [Present Days] ) || ISBLANK ( [Present Days PM] ), BLANK (), [Present Days] - [Present Days PM] )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: e38b1401-bf8a-511d-8c06-5995c3b8c515
+	measure 'Present Days MoM %' = DIVIDE ( [Present Days MoM], [Present Days PM] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: 617cfa87-399a-581b-9493-ad7a6149b39b
+	measure 'KPI Note - Present Days' =
+				VAR _cur = [Present Days]
+				VAR _pm = [Present Days PM]
+				VAR _d = [Present Days MoM %]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0%;-0.0%;0.0%" ) & " vs prev. month (" & FORMAT ( _pm, "#,0" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 19e69443-5466-52f5-b4a0-a7db795391fa
+	measure 'KPI Colour - Present Days' =
+				VAR _d = [Present Days MoM %]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", "#6B6B6B" )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 009adc5b-9476-58c2-a70b-5abe98a0eccd
+	/// Absent Days for the previous month (same day range shifted back one month).
+	measure 'Absent Days PM' = CALCULATE ( [Absent Days], DATEADD ( DimDate[Date], -1, MONTH ) )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: 4fe20590-30a1-54dd-91ea-278e5d16f2d4
+	measure 'Absent Days MoM' = IF ( ISBLANK ( [Absent Days] ) || ISBLANK ( [Absent Days PM] ), BLANK (), [Absent Days] - [Absent Days PM] )
+		formatString: #,0
+		displayFolder: 05 Month Comparison
+		lineageTag: c3b59e32-783d-5236-a185-370938417937
+	measure 'Absent Days MoM %' = DIVIDE ( [Absent Days MoM], [Absent Days PM] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 05 Month Comparison
+		lineageTag: 05d82560-366f-59d0-bc35-6cdba07e78d3
+	measure 'KPI Note - Absent Days' =
+				VAR _cur = [Absent Days]
+				VAR _pm = [Absent Days PM]
+				VAR _d = [Absent Days MoM %]
+				RETURN
+				    IF (
+				        ISBLANK ( _pm ) || ISBLANK ( _cur ),
+				        "No previous-month data",
+				        IF ( _d > 0, UNICHAR ( 9650 ) & " ", IF ( _d < 0, UNICHAR ( 9660 ) & " ", UNICHAR ( 9644 ) & " " ) )
+				            & FORMAT ( _d, "+0.0%;-0.0%;0.0%" ) & " vs prev. month (" & FORMAT ( _pm, "#,0" ) & ")"
+				    )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 028a805e-332f-5a33-9cd5-c04623f3c12c
+	measure 'KPI Colour - Absent Days' =
+				VAR _d = [Absent Days MoM %]
+				RETURN
+				    IF ( ISBLANK ( _d ), "#6B6B6B", IF ( _d > 0, "#E60000", IF ( _d < 0, "#2E7D5B", "#6B6B6B" ) ) )
+		isHidden
+		displayFolder: 05 Month Comparison\KPI Notes
+		lineageTag: 67376f2d-81c1-58db-b4ac-ce7e265849fc
+	/// Records with at least one data-integrity issue (missing key fields, invalid dates/times/hours, duplicates, blank organisation fields, unrecognised status). Missing punches are counted as attendance exceptions, not here.
+	measure 'DQ Issue Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Issue Flag] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality
+		lineageTag: b2a9f513-dae4-5927-a8f6-1a88a077f4fa
+	/// Share of records without any data-integrity issue.
+	measure 'Data Quality % (Clean Records)' = 1 - DIVIDE ( [DQ Issue Records], [Attendance Records] )
+		formatString: 0.0%
+		displayFolder: 06 Data Quality
+		lineageTag: 9ce7da80-fbd2-501e-94b5-1a10c5a0623e
+	measure 'Missing Employee Code Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Missing Employee Code] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: 226c18f0-8c10-5b93-975a-ff32f333ec21
+	measure 'Missing Employee Name Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Missing Employee Name] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: 18a08f08-6538-5775-a10a-274d64e8eefe
+	measure 'Missing Process Date Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Missing Process Date] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: a4277dc0-3d15-5593-ac40-15edee226f01
+	measure 'Missing Total Hours Records (Present)' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Missing Total Hours] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: bd4b67fd-3f03-575b-898a-7acc40ccbaf9
+	measure 'Invalid Total Hours Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Invalid Total Hours] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: 544f883f-a2cc-53ea-a988-ee23589a5339
+	measure 'Invalid Punch In Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Invalid Punch In] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: 1a9ca414-6233-5bfd-8913-1e6f97c8b1a5
+	measure 'Invalid Punch Out Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Invalid Punch Out] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: 80c1fc62-dbb8-5878-9a58-d7e64ea03572
+	measure 'Punch Out Before Punch In Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Punch Out Before In] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: e0734375-5679-5f33-9c6d-ba5336d4d6c7
+	measure 'Duplicate Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Duplicate Record] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: e7b4a64e-e25d-5e47-b2c1-d92e14b39296
+	measure 'Blank Status Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Blank Status] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: 0660b472-374a-5a07-945b-4ff67536cc62
+	measure 'Unrecognised Status Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Unrecognised Status] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: 9cb49aee-def3-557b-a9d8-6ad538946f0f
+	measure 'Blank Business Unit Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Blank Business Unit] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: 606ae250-2bc9-5419-86ed-c06f5d6ec25a
+	measure 'Blank Client Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Blank Client] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: 0f9e31ad-b621-5451-bf45-787ee36a0688
+	measure 'Blank Shift Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Blank Shift] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: 5de04515-93dd-552e-9949-f0189f1942ea
+	measure 'Invalid DateTime Records' = [Invalid Punch In Records] + [Invalid Punch Out Records]
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: d128611d-082f-5db9-8e38-85a4d88ab904
+	measure 'Missing Punch In Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[Missing Punch In Flag] = 1, FactAttendance[Is Duplicate Record] = 0 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: e553b03b-1116-5e05-9247-5f420db4563f
+	measure 'Missing Punch Out Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[Missing Punch Out Flag] = 1, FactAttendance[Is Duplicate Record] = 0 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: cd323df5-b11f-58ec-bbdf-22879dc3bf53
+	measure 'Missing Both Punches Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[Missing Both Punches Flag] = 1, FactAttendance[Is Duplicate Record] = 0 )
+		formatString: #,0
+		displayFolder: 06 Data Quality\By Issue
+		lineageTag: 68277513-f4d6-5b33-84c8-7c343376f871
+	/// Employee-days that have more than one (non-identical) record. Not necessarily an error - listed for review.
+	measure 'Multiple-Record Employee Days' = CALCULATE ( [Employee Days], FactAttendance[Multiple Records Day Flag] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality
+		lineageTag: 30645624-201c-574c-8b86-0fb4b73687fb
+	/// Informational: records where source Total Hours and punch-to-punch duration differ by more than 30 minutes (breaks, rounding). Not counted as a data-quality issue.
+	measure 'Hours Differ From Punches Records' = CALCULATE ( COUNTROWS ( FactAttendance ), FactAttendance[DQ Hours Differ From Punches] = 1 )
+		formatString: #,0
+		displayFolder: 06 Data Quality
+		lineageTag: dd79f525-4109-5ad7-bd04-369f2ae11c95
+	/// Number of distinct Status values that the keyword rules could not classify. Map them in the StatusCategoryOverrides query.
+	measure 'Unrecognised Status Values' = CALCULATE ( DISTINCTCOUNT ( FactAttendance[Status] ), FactAttendance[Record Status Category] = "Other" )
+		formatString: #,0
+		displayFolder: 06 Data Quality
+		lineageTag: a875e73d-5c44-5e7a-bf2b-29e84de3b28c
+	/// Use with DimDQIssueType[Issue Type] on the axis.
+	measure 'DQ Issue Records by Type' =
+				SWITCH (
+				    SELECTEDVALUE ( DimDQIssueType[Issue Type] ),
+				    "Missing Employee Code", [Missing Employee Code Records],
+				    "Missing Employee Name", [Missing Employee Name Records],
+				    "Missing Process Date", [Missing Process Date Records],
+				    "Missing Total Hours (Present)", [Missing Total Hours Records (Present)],
+				    "Invalid Total Hours", [Invalid Total Hours Records],
+				    "Invalid Punch In", [Invalid Punch In Records],
+				    "Invalid Punch Out", [Invalid Punch Out Records],
+				    "Punch Out Before Punch In", [Punch Out Before Punch In Records],
+				    "Duplicate Record", [Duplicate Records],
+				    "Blank Status", [Blank Status Records],
+				    "Unrecognised Status", [Unrecognised Status Records],
+				    "Blank Business Unit", [Blank Business Unit Records],
+				    "Blank Client", [Blank Client Records],
+				    "Blank Shift", [Blank Shift Records],
+				    [DQ Issue Records]
+				)
+		formatString: #,0
+		displayFolder: 06 Data Quality
+		lineageTag: 6f99cc67-1994-5d45-814e-ea4165e790bf
+	/// Most recent Process Date in the whole dataset (ignores slicers).
+	measure 'Latest Data Date' = CALCULATE ( MAX ( FactAttendance[Process Date] ), REMOVEFILTERS () )
+		formatString: dd-mmm-yyyy
+		displayFolder: 07 Refresh Information
+		lineageTag: ed38cda0-2a51-5227-be14-77059740d557
+	measure 'Earliest Data Date' = CALCULATE ( MIN ( FactAttendance[Process Date] ), REMOVEFILTERS () )
+		formatString: dd-mmm-yyyy
+		displayFolder: 07 Refresh Information
+		lineageTag: a459bf87-8cae-58a2-a516-6f3fca903b5f
+	measure 'Latest Month' = FORMAT ( [Latest Data Date], "mmmm yyyy" )
+		displayFolder: 07 Refresh Information
+		lineageTag: 099a8d42-3bc2-54a6-9ebe-f627541ea8e7
+	/// Timestamp written by Power Query at the last refresh.
+	measure 'Last Refresh' = MAX ( RefreshInfo[Refresh DateTime] )
+		formatString: dd-mmm-yyyy hh:nn
+		displayFolder: 07 Refresh Information
+		lineageTag: c9d875fa-2e74-52d3-a8f8-fd41f320e94a
+	measure 'Months Loaded' = CALCULATE ( DISTINCTCOUNTNOBLANK ( FactAttendance[Process Month Start] ), REMOVEFILTERS () )
+		formatString: #,0
+		displayFolder: 07 Refresh Information
+		lineageTag: 9aa52b2c-dd56-5601-af01-4b0197d85b09
+	measure 'Source Files Loaded' = CALCULATE ( DISTINCTCOUNT ( FactAttendance[Source File] ), REMOVEFILTERS () )
+		formatString: #,0
+		displayFolder: 07 Refresh Information
+		lineageTag: 9d38a05e-6da4-5861-8ef6-b894e73ba4a8
+	/// Period covered by the data in the current filter context.
+	measure 'Selected Period' =
+				VAR _mn = MIN ( FactAttendance[Process Date] )
+				VAR _mx = MAX ( FactAttendance[Process Date] )
+				RETURN
+				    IF (
+				        ISBLANK ( _mn ),
+				        "No data for the current selection",
+				        IF (
+				            FORMAT ( _mn, "yyyymm" ) = FORMAT ( _mx, "yyyymm" ),
+				            FORMAT ( _mn, "mmmm yyyy" ),
+				            FORMAT ( _mn, "dd mmm yyyy" ) & " - " & FORMAT ( _mx, "dd mmm yyyy" )
+				        )
+				    )
+		displayFolder: 07 Refresh Information
+		lineageTag: fcf52aa2-e248-5298-b49f-84555cf69eef
+	measure 'Data Status Line' =
+				"Data through " & FORMAT ( [Latest Data Date], "dd mmm yyyy" )
+				    & "   |   Refreshed " & FORMAT ( [Last Refresh], "dd mmm yyyy hh:mm AM/PM" )
+				    & "   |   " & [Months Loaded] & " months, " & [Source Files Loaded] & " files"
+		displayFolder: 07 Refresh Information
+		lineageTag: bb9bba82-3427-55f8-8024-2d8deaeaee1d
+	measure 'Records Summary Line' = FORMAT ( [Attendance Records], "#,0" ) & " records   |   " & FORMAT ( [Active Employees], "#,0" ) & " employees   |   " & [Selected Period]
+		displayFolder: 07 Refresh Information
+		lineageTag: 8c3b9ef1-f2bc-5085-b0be-eb0ec0cfca09
+	measure 'Review Thresholds Text' =
+				"Review thresholds (configurable, not HR policy): short < "
+				    & FORMAT ( MAX ( RefreshInfo[Short Hours Threshold] ), "0.#" ) & " hrs  |  long > "
+				    & FORMAT ( MAX ( RefreshInfo[Long Hours Threshold] ), "0.#" ) & " hrs  |  Status2 as exception: "
+				    & IF ( MAX ( RefreshInfo[Status2 Treated As Exception] ), "Yes", "No" )
+		displayFolder: 07 Refresh Information
+		lineageTag: f65d266d-b53d-561e-8880-2b78f53f2526
+	measure 'Insight - Workforce' =
+				VAR _cur = [Employee Days]
+				VAR _pm = [Employee Days PM]
+				VAR _emp = [Active Employees]
+				RETURN
+				    IF (
+				        ISBLANK ( _cur ),
+				        "No attendance records in the current selection.",
+				        FORMAT ( _emp, "#,0" ) & " employees and " & FORMAT ( _cur, "#,0" ) & " employee-days recorded"
+				            & IF (
+				                ISBLANK ( _pm ),
+				                " (no previous month to compare).",
+				                ", " & IF ( _cur >= _pm, "up ", "down " ) & FORMAT ( ABS ( DIVIDE ( _cur - _pm, _pm ) ), "0.0%" )
+				                    & " versus the previous month (" & FORMAT ( _pm, "#,0" ) & ")."
+				            )
+				    )
+		displayFolder: 08 Insights
+		lineageTag: 4932552e-af7e-53a2-a185-d6ecc093847c
+	measure 'Insight - Attendance' =
+				VAR _cur = [Present % of Recorded Days]
+				VAR _pm = [Present % of Recorded Days PM]
+				RETURN
+				    IF (
+				        ISBLANK ( _cur ),
+				        BLANK (),
+				        "Present share of recorded days is " & FORMAT ( _cur, "0.0%" )
+				            & IF (
+				                ISBLANK ( _pm ),
+				                ".",
+				                " (" & FORMAT ( ( _cur - _pm ) * 100, "+0.0;-0.0;0.0" ) & " pp versus the previous month)."
+				            )
+				            & " Absent " & FORMAT ( [Absent % of Recorded Days], "0.0%" ) & ", leave " & FORMAT ( [Leave % of Recorded Days], "0.0%" ) & "."
+				    )
+		displayFolder: 08 Insights
+		lineageTag: 43e3b886-6656-5e34-87ff-dda43771d450
+	measure 'Insight - Hours' =
+				VAR _cur = [Avg Hours / Worked Day]
+				VAR _pm = [Avg Hours / Worked Day PM]
+				RETURN
+				    IF (
+				        ISBLANK ( _cur ),
+				        BLANK (),
+				        "Average " & FORMAT ( _cur, "0.0" ) & " hrs per worked day across " & FORMAT ( [Total Worked Hours], "#,0" ) & " total hours"
+				            & IF (
+				                ISBLANK ( _pm ),
+				                ".",
+				                ", " & IF ( _cur >= _pm, "up ", "down " ) & FORMAT ( ABS ( _cur - _pm ), "0.0" ) & " hrs versus the previous month."
+				            )
+				    )
+		displayFolder: 08 Insights
+		lineageTag: ee019c63-81f7-539b-805e-13390cdabd15
+	measure 'Insight - Missing Punches' =
+				VAR _cur = [Missing Punch %]
+				VAR _pm = [Missing Punch % PM]
+				VAR _days = [Missing Punch Days]
+				RETURN
+				    IF (
+				        ISBLANK ( [Punch-Expected Days] ),
+				        BLANK (),
+				        FORMAT ( _days, "#,0" ) & " employee-days have a missing punch (" & FORMAT ( _cur, "0.0%" ) & " of punch-expected days)"
+				            & IF (
+				                ISBLANK ( _pm ),
+				                ".",
+				                ", " & IF ( _cur >= _pm, "up ", "down " ) & FORMAT ( ABS ( _cur - _pm ) * 100, "0.0" ) & " pp versus the previous month."
+				            )
+				    )
+		displayFolder: 08 Insights
+		lineageTag: bee84977-5838-5ee6-a26b-4acbc80820e6
+	measure 'Insight - Exceptions' =
+				VAR _tot = [Exception Days]
+				VAR _t =
+				    ADDCOLUMNS ( VALUES ( DimBusinessUnit[Business Unit] ), "@ex", [Exception Days] )
+				VAR _top = TOPN ( 1, _t, [@ex], DESC )
+				VAR _name = MAXX ( _top, DimBusinessUnit[Business Unit] )
+				VAR _ex = MAXX ( _top, [@ex] )
+				RETURN
+				    IF (
+				        ISBLANK ( _tot ) || _tot = 0,
+				        "No attendance exceptions recorded in the current selection.",
+				        FORMAT ( _tot, "#,0" ) & " exception days (" & FORMAT ( [Exception % of Recorded Days], "0.0%" ) & " of recorded days). "
+				            & _name & " has the largest share: " & FORMAT ( DIVIDE ( _ex, _tot ), "0%" ) & " (" & FORMAT ( _ex, "#,0" ) & " days)."
+				    )
+		displayFolder: 08 Insights
+		lineageTag: 56e19651-6579-5e60-9dd6-8d0240d7f71b
+	measure 'Insight - Focus Area' =
+				VAR _minDays = 50
+				VAR _t =
+				    FILTER (
+				        ADDCOLUMNS ( VALUES ( DimClient[Client Name] ), "@pe", [Punch-Expected Days], "@mp", [Missing Punch %] ),
+				        [@pe] >= _minDays && NOT ISBLANK ( [@mp] ) && [@mp] > 0
+				    )
+				VAR _top = TOPN ( 1, _t, [@mp], DESC )
+				VAR _name = MAXX ( _top, DimClient[Client Name] )
+				VAR _mp = MAXX ( _top, [@mp] )
+				RETURN
+				    IF (
+				        ISBLANK ( _name ),
+				        "No client with at least " & _minDays & " punch-expected days has missing punches.",
+				        _name & " has the highest missing-punch rate: " & FORMAT ( _mp, "0.0%" ) & " (clients with at least " & _minDays & " punch-expected days)."
+				    )
+		displayFolder: 08 Insights
+		lineageTag: 09bfb5be-0b36-5624-8675-b4a07d1716c9
+	/// Dynamic, factual statements derived from the current filter context. Shown in the insight panel (rows come from DimInsight).
+	measure 'Insight Text' =
+				SWITCH (
+				    SELECTEDVALUE ( DimInsight[Insight Order] ),
+				    1, [Insight - Workforce],
+				    2, [Insight - Attendance],
+				    3, [Insight - Hours],
+				    4, [Insight - Missing Punches],
+				    5, [Insight - Exceptions],
+				    6, [Insight - Focus Area]
+				)
+		displayFolder: 08 Insights
+		lineageTag: 6a815aae-ddfa-5615-acb2-29832cd891e8
+	measure 'Employee Header' = SELECTEDVALUE ( DimEmployee[Employee Name], IF ( HASONEVALUE ( DimEmployee[Employee Code] ), "(Name not recorded)", "Select one employee (drill through from any table)" ) )
+		displayFolder: 09 Employee 360
+		lineageTag: 1eaf89e8-e387-5831-984b-59f439e15a82
+	measure 'Employee Sub Header' =
+				VAR _code = SELECTEDVALUE ( DimEmployee[Employee Code] )
+				VAR _agency = SELECTEDVALUE ( DimEmployee[Agency Emp ID] )
+				RETURN
+				    IF ( ISBLANK ( _code ), BLANK (), "Employee Code " & _code & IF ( ISBLANK ( _agency ), "", "   |   Agency Emp ID " & _agency ) )
+		displayFolder: 09 Employee 360
+		lineageTag: 0d31a4d7-d6aa-563f-9cd5-9f6e78ff2959
+	/// Assignments recorded in the selected period. Several values appear when the employee changed Client / Cost Center / Shift.
+	measure 'Employee Assignment' =
+				VAR _bu = CONCATENATEX ( VALUES ( FactAttendance[Business Unit] ), FactAttendance[Business Unit], ", " )
+				VAR _cl = CONCATENATEX ( VALUES ( FactAttendance[Client Name] ), FactAttendance[Client Name], ", " )
+				VAR _cc = CONCATENATEX ( VALUES ( FactAttendance[Cost Center] ), FactAttendance[Cost Center], ", " )
+				VAR _sh = CONCATENATEX ( VALUES ( FactAttendance[Shift Name] ), FactAttendance[Shift Name], ", " )
+				VAR _src = CONCATENATEX ( VALUES ( FactAttendance[Source Name] ), FactAttendance[Source Name], ", " )
+				RETURN
+				    IF (
+				        ISBLANK ( [Attendance Records] ),
+				        BLANK (),
+				        "Business Unit: " & _bu & "   |   Client: " & _cl & "   |   Cost Center: " & _cc & "   |   Shift: " & _sh & "   |   Source: " & _src
+				    )
+		displayFolder: 09 Employee 360
+		lineageTag: 33f71327-ad75-5246-80fc-ee7b9d531e94
+
+	column 'Measure Holder'
+		dataType: string
+		isHidden
+		lineageTag: 209d0907-ab34-51dd-936b-1fdb8079c487
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Measure Holder]
+
+		annotation SummarizationSetBy = User
+
+	partition _Measures = calculated
+		mode: import
+		source =
+				ROW ( "Measure Holder", BLANK () )
+

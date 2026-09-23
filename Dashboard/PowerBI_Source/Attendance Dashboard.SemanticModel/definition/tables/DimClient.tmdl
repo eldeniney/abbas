@@ -1,0 +1,20 @@
+/// Clients as recorded on attendance records.
+table DimClient
+	lineageTag: 6b6cad1a-8466-55f6-b54c-12d44b22e2ad
+
+	column 'Client Name'
+		dataType: string
+		isKey
+		lineageTag: 9830cdfa-21c8-5a53-b96b-4e98b2c79f43
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Client Name]
+
+		annotation SummarizationSetBy = User
+
+	partition DimClient = calculated
+		mode: import
+		source =
+				DISTINCT ( FactAttendance[Client Name] )
+

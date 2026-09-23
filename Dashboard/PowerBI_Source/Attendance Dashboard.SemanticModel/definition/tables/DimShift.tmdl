@@ -1,0 +1,20 @@
+/// Shifts as recorded on attendance records.
+table DimShift
+	lineageTag: 7fea1236-f693-57cc-90ee-15163947c1c9
+
+	column 'Shift Name'
+		dataType: string
+		isKey
+		lineageTag: 03e7e9e3-2f81-551a-925f-6fef35648f8b
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Shift Name]
+
+		annotation SummarizationSetBy = User
+
+	partition DimShift = calculated
+		mode: import
+		source =
+				DISTINCT ( FactAttendance[Shift Name] )
+

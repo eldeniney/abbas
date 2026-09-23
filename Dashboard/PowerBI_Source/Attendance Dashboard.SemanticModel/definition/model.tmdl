@@ -1,0 +1,32 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-GB
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation PBI_QueryOrder = ["pDataFolder","pShortHoursReviewThreshold","pLongHoursReviewThreshold","pStatus2IsException","StatusCategoryOverrides","fnHeaderKey","HeaderMap","CanonicalColumns","fnCleanText","fnParseDate","fnParseDateTime","fnParseHours","fnStatusCategory","fnJustificationCategory","fnReadAttendanceFile","SourceFiles","FactAttendance","RefreshInfo"]
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table FactAttendance
+ref table DimDate
+ref table DimEmployee
+ref table DimBusinessUnit
+ref table DimClient
+ref table DimCostCenter
+ref table DimShift
+ref table DimSource
+ref table DimPayCalendar
+ref table DimStatus
+ref table DimExceptionType
+ref table DimDQIssueType
+ref table DimHour
+ref table DimInsight
+ref table RefreshInfo
+ref table _Measures
+
+ref cultureInfo en-US

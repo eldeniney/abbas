@@ -1,0 +1,20 @@
+/// Business Units as recorded on attendance records ('(Blank)' when the source is empty).
+table DimBusinessUnit
+	lineageTag: 48abf7d5-948e-58d2-8fd3-8b180c807041
+
+	column 'Business Unit'
+		dataType: string
+		isKey
+		lineageTag: a2fc19fc-2ba6-55e2-b123-009d9cb54749
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Business Unit]
+
+		annotation SummarizationSetBy = User
+
+	partition DimBusinessUnit = calculated
+		mode: import
+		source =
+				DISTINCT ( FactAttendance[Business Unit] )
+

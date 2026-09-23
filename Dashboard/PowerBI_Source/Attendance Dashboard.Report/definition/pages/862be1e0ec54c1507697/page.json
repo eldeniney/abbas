@@ -1,0 +1,80 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/1.4.0/schema.json",
+  "name": "862be1e0ec54c1507697",
+  "displayName": "Hours",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "objects": {
+    "background": [
+      {
+        "properties": {
+          "color": {
+            "solid": {
+              "color": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'#F4F4F4'"
+                  }
+                }
+              }
+            }
+          },
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspace": [
+      {
+        "properties": {
+          "color": {
+            "solid": {
+              "color": {
+                "expr": {
+                  "Literal": {
+                    "Value": "'#EBEBEB'"
+                  }
+                }
+              }
+            }
+          },
+          "transparency": {
+            "expr": {
+              "Literal": {
+                "Value": "0D"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visualInteractions": [
+    {
+      "source": "10b126a3d62f826ab2a1",
+      "target": "c70030ffe1b9665e4d87",
+      "type": "NoFilter"
+    },
+    {
+      "source": "10b126a3d62f826ab2a1",
+      "target": "d0305d77af83d5a3930d",
+      "type": "NoFilter"
+    },
+    {
+      "source": "632af95cbe23a8bd1336",
+      "target": "c70030ffe1b9665e4d87",
+      "type": "NoFilter"
+    },
+    {
+      "source": "632af95cbe23a8bd1336",
+      "target": "d0305d77af83d5a3930d",
+      "type": "NoFilter"
+    }
+  ]
+}

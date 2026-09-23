@@ -1,0 +1,51 @@
+/// Attendance status values and their category.
+table DimStatus
+	lineageTag: 3cac6286-9c9f-55d5-a2e3-76036da554b0
+
+	/// Status text resolved at employee-day level.
+	column 'Attendance Status'
+		dataType: string
+		isKey
+		lineageTag: 22c14e2f-d687-53e2-ae59-b9ecfce47ac2
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Attendance Status]
+
+		annotation SummarizationSetBy = User
+
+	/// Present / Absent / Leave / Holiday / Weekend - Rest Day / Other / Unknown. 'Other' values are listed on the Exceptions & Data Quality page and can be mapped in the StatusCategoryOverrides query.
+	column 'Status Category'
+		dataType: string
+		lineageTag: 7c144d38-a684-51cc-b1e1-a9e7b20f92ef
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Status Category]
+		sortByColumn: 'Status Category Order'
+
+		annotation SummarizationSetBy = User
+
+	column 'Status Category Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2db011a7-04b8-5c2b-b42b-38956144cdcb
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Status Category Order]
+
+		annotation SummarizationSetBy = User
+
+	partition DimStatus = calculated
+		mode: import
+		source =
+				ADDCOLUMNS (
+				    DISTINCT ( FactAttendance[Attendance Status] ),
+				    "Status Category",
+				        LOOKUPVALUE ( FactAttendance[Status Category], FactAttendance[Attendance Status], [Attendance Status] ),
+				    "Status Category Order",
+				        LOOKUPVALUE ( FactAttendance[Status Category Order], FactAttendance[Attendance Status], [Attendance Status] )
+				)
+
