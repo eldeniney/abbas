@@ -14,6 +14,7 @@ Interactive, Arabic-first (RTL) design prototype of the Twaa hyperlocal quick-co
 - `twaa/DESIGN.md` — screen-by-screen design guideline mapped to the BRD
 - `twaa/docs/Twaa-Project-and-Plan.pptx` — 20-slide project overview and delivery plan deck
 - `twaa/ops-blueprint/` — end-to-end operating process blueprint in Arabic (28 flowcharts, state machine, swimlanes, exception/rule/SLA/notification/liability matrices), HTML + A3 PDF, generated from a small flowchart DSL
+- `twaa/business/` — business plan: business model canvas, nine revenue streams, 2026–2031 roadmap, gated launch plan, risks and funding (`Twaa-Business-Plan.html`), plus a formula-driven Excel financial model with three scenarios (`Twaa-Financial-Model.xlsx`). Regenerate with `python3 src/build_model.py`, `src/evaluate.py Twaa-Financial-Model.xlsx`, `src/sensitivity.py`, then `src/build_plan.py`, run from `twaa/business/`
 
 Open `twaa/index.html` in a browser, or serve the folder:
 
