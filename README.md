@@ -13,6 +13,7 @@ Interactive, Arabic-first (RTL) design prototype of the Twaa hyperlocal quick-co
 - `twaa/design-system.html` — tokens and components
 - `twaa/DESIGN.md` — screen-by-screen design guideline mapped to the BRD
 - `twaa/docs/Twaa-Project-and-Plan.pptx` — 20-slide project overview and delivery plan deck
+- `twaa/ops-blueprint/` — end-to-end operating process blueprint in Arabic (28 flowcharts, state machine, swimlanes, exception/rule/SLA/notification/liability matrices), HTML + A3 PDF, generated from a small flowchart DSL
 
 Open `twaa/index.html` in a browser, or serve the folder:
 
