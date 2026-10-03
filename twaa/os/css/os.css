@@ -197,7 +197,7 @@ textarea.input { min-height: 80px; resize: vertical; }
 
 /* overlays */
 #tt { position: fixed; z-index: 400; pointer-events: none; background: var(--ink); color: var(--bg); padding: 6px 10px; border-radius: 8px; font-size: 12.5px; max-width: 320px; opacity: 0; transition: opacity 0.12s; line-height: 1.45; }
-.toasts { position: fixed; z-index: 300; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); left: 16px; display: flex; flex-direction: column; gap: 8px; max-width: min(380px, calc(100vw - 32px)); }
+.toasts { position: fixed; z-index: 300; top: calc(62px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; width: max-content; max-width: min(420px, calc(100vw - 32px)); pointer-events: none; }
 .toast { background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 12px; box-shadow: var(--shadow-2); font-size: 13.5px; display: flex; gap: 8px; align-items: flex-start; animation: tin 0.2s ease-out; }
 .toast.bad { background: var(--bad); color: #fff; } .toast.ok { background: var(--ok); color: #fff; }
 .toast b { display: block; }

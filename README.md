@@ -14,7 +14,8 @@ Interactive, Arabic-first (RTL) design prototype of the Twaa hyperlocal quick-co
 - `twaa/DESIGN.md` — screen-by-screen design guideline mapped to the BRD
 - `twaa/docs/Twaa-Project-and-Plan.pptx` — 20-slide project overview and delivery plan deck
 - `twaa/ops-blueprint/` — end-to-end operating process blueprint in Arabic (28 flowcharts, state machine, swimlanes, exception/rule/SLA/notification/liability matrices), HTML + A3 PDF, generated from a small flowchart DSL
-- `twaa/business/` — business plan: business model canvas, nine revenue streams, 2026–2031 roadmap, gated launch plan, risks and funding (`Twaa-Business-Plan.html`), plus a formula-driven Excel financial model with three scenarios (`Twaa-Financial-Model.xlsx`). Regenerate with `python3 src/build_model.py`, `src/evaluate.py Twaa-Financial-Model.xlsx`, `src/sensitivity.py`, then `src/build_plan.py`, run from `twaa/business/`
+- `twaa/os/` — **Twaa Business OS**: clickable Arabic-first demo of the whole operating platform (customer, merchant and rider apps plus a Control Center with 53 sections and 6 detail views) on one shared store, with 14 end-to-end scenarios. Open `twaa/os/index.html` or the single-file `twaa/os/dist/twaa-business-os.html`
+- `twaa/business/` — business plan: business model canvas, nine revenue streams, 2026–2031 roadmap, gated launch plan, risks and funding (`Twaa-Business-Plan.html`, Arabic: `Twaa-Business-Plan-AR.html`), plus a formula-driven Excel financial model with three scenarios (`Twaa-Financial-Model.xlsx`, Arabic: `Twaa-Financial-Model-AR.xlsx`). Regenerate with `python3 src/build_model.py`, `src/evaluate.py Twaa-Financial-Model.xlsx`, `src/sensitivity.py`, then `src/build_plan.py`, run from `twaa/business/`
 
 Open `twaa/index.html` in a browser, or serve the folder:
 

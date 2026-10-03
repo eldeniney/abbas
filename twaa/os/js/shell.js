@@ -151,9 +151,11 @@ TW.cycleTheme = () => { const cur = TW.store.get("twaa-os-theme") || "system"; c
 /* ===================================================================== router & layouts ===================== */
 let root, osbarEl, viewEl, directorEl, curView = null, curApp = null;
 const VIEWS = [["home", "النظام", "layers"], ["customer", "العميل", "bag"], ["merchant", "التاجر", "store"], ["rider", "المندوب", "bike"], ["admin", "الكنترول", "chart"], ["live", "عرض متزامن", "zap"]];
-TW.nav = (p, replace) => { const h = "#" + toHash(p); if (location.hash === h) route(); else if (replace) { history.replaceState(null, "", h); route(); } else location.hash = h; };
+let navPath = null;
+TW.nav = (p, replace) => { navPath = p; const h = "#" + toHash(p); try { if (location.hash !== h) { if (replace) history.replaceState(null, "", h); else history.pushState(null, "", h); } } catch (e) { /* sandboxed frame: keep routing in memory */ } route(); };
+function onHash() { const p = location.hash ? fromHash(location.hash) : "/home"; if (p !== navPath) { navPath = p; route(); } }
 function route() {
-  const p = location.hash ? fromHash(location.hash) : "/home";
+  const p = navPath || (location.hash ? fromHash(location.hash) : "/home");
   const seg = p.split("/").filter(Boolean);
   const view = seg[0] && (TW.apps[seg[0]] || seg[0] === "live" || seg[0] === "home") ? seg[0] : "home";
   const path = seg.length ? p : "/home";
@@ -183,9 +185,10 @@ TW.liveInstance = (name) => [...instances].find((i) => i.name === name && i.el.c
 function renderOsbar() {
   const pend = TW.S.approvals.filter((a) => a.status === "PENDING").length, al = TW.alerts().filter((a) => a.sev === "critical").length;
   const theme = TW.store.get("twaa-os-theme") || "system";
-  osbarEl.innerHTML = `<button class="brand" data-nav="/home" aria-label="الصفحة الرئيسية للنظام">${logo("currentColor", "var(--logo-spark)")}<span>توّا OS<small> · Twaa Business OS</small></span></button>
+  const h = `<button class="brand" data-nav="/home" aria-label="الصفحة الرئيسية للنظام">${logo("currentColor", "var(--logo-spark)")}<span>توّا OS<small> · Twaa Business OS</small></span></button>
   <nav aria-label="التطبيقات">${VIEWS.slice(1).map(([v, l, i]) => `<button class="${curView === v ? "on" : ""}" data-nav="/${v}">${ic(i, "ic sm")}${l}${v === "admin" && al ? ` <span class="chip t-bad" style="line-height:16px">${al}</span>` : ""}</button>`).join("")}</nav>
   <div class="tools"><button class="btn sm accent" data-dir="open">${ic("play", "ic xs")}<span class="hide-sm">السيناريوهات</span></button><button class="btn sm icon" data-theme-btn aria-label="تغيير المظهر" title="المظهر">${ic(theme === "dark" ? "moon" : theme === "light" ? "sun" : "settings", "ic sm")}</button></div>`;
+  if (h !== osbarEl._h) { osbarEl._h = h; osbarEl.innerHTML = h; }
 }
 
 /* ===================================================================== ecosystem home ===================== */
@@ -277,17 +280,19 @@ TW.director = {
 };
 function viewOf(st) { return typeof st.view === "function" ? st.view() : st.view; }
 function highlight(st) { if (!st || !st.hl) return; setTimeout(() => { const e = document.querySelector(st.hl); if (e) { e.classList.add("hl"); e.scrollIntoView({ block: "nearest", behavior: "smooth" }); setTimeout(() => e.classList.remove("hl"), 3800); } }, 250); }
+let dirHtml = "";
+function setDir(h) { if (h !== dirHtml) { dirHtml = h; directorEl.innerHTML = h; } }
 function renderDirector() {
-  if (!dir.open) { directorEl.innerHTML = ""; return; }
+  if (!dir.open) { setDir(""); return; }
   const sc = (TW.scenarios || []).find((s) => s.id === dir.id);
   const who = { customer: ["العميل", "bag"], merchant: ["التاجر", "store"], rider: ["المندوب", "bike"], admin: ["الكنترول", "chart"], system: ["النظام", "zap"] };
   if (!sc) {
-    directorEl.innerHTML = `<div class="director ${dir.min ? "min" : ""}"><div class="dh">${ic("play", "ic sm")}<b>سيناريوهات العرض</b><button class="btn sm icon" data-d="min" aria-label="تصغير">${ic(dir.min ? "chevD" : "minus", "ic xs")}</button><button class="btn sm icon" data-d="close" aria-label="إغلاق">${ic("x", "ic xs")}</button></div><div class="db">${(TW.scenarios || []).map((s, i) => `<button class="btn block" style="justify-content:flex-start;text-align:right;height:auto;padding:8px 10px" data-d="start" data-id="${s.id}"><span class="mono">${i + 1}</span> ${esc(s.title)}</button>`).join("")}</div></div>`;
+    setDir(`<div class="director ${dir.min ? "min" : ""}"><div class="dh">${ic("play", "ic sm")}<b>سيناريوهات العرض</b><button class="btn sm icon" data-d="min" aria-label="تصغير">${ic(dir.min ? "chevD" : "minus", "ic xs")}</button><button class="btn sm icon" data-d="close" aria-label="إغلاق">${ic("x", "ic xs")}</button></div><div class="db">${(TW.scenarios || []).map((s, i) => `<button class="btn block" style="justify-content:flex-start;text-align:right;height:auto;padding:8px 10px" data-d="start" data-id="${s.id}"><span class="mono">${i + 1}</span> ${esc(s.title)}</button>`).join("")}</div></div>`);
     return;
   }
   if (sc.steps[dir.step] && sc.steps[dir.step].done && safe(sc.steps[dir.step].done) && !dir.autoAdv) { /* auto-advance when the user did the step themselves */ dir.autoAdv = true; setTimeout(() => { dir.autoAdv = false; const cur = sc.steps[dir.step]; if (cur && cur.done && safe(cur.done)) { dir.step++; const nx = sc.steps[dir.step]; if (nx && nx.view && nx.follow !== false) TW.nav(viewOf(nx)); highlight(nx); renderDirector(); } }, 900); }
   const steps = sc.steps.map((st, i) => { const done = i < dir.step || (st.done && safe(st.done)); const now = i === dir.step; const [w, wi] = who[st.who] || who.system; return `<div class="dstep ${now ? "now" : ""} ${done && !now ? "done" : ""}"><span class="w">${ic(wi, "ic xs")} ${w} · خطوة ${i + 1}${done ? " ✓" : ""}</span><span>${st.text}</span>${now ? `<div class="row wrap">${st.view ? `<button class="btn sm" data-d="view" data-i="${i}">${ic("eye", "ic xs")}افتح الشاشة</button>` : ""}${st.auto ? `<button class="btn sm primary" data-d="auto" data-i="${i}">${ic("play", "ic xs")}نفّذها عني</button>` : ""}<button class="btn sm ghost" data-d="next">التالي</button></div>` : ""}</div>`; }).join("");
-  directorEl.innerHTML = `<div class="director ${dir.min ? "min" : ""}"><div class="dh">${ic("play", "ic sm")}<b>${esc(sc.title)}</b><button class="btn sm icon" data-d="list" aria-label="كل السيناريوهات" title="كل السيناريوهات">${ic("list", "ic xs")}</button><button class="btn sm icon" data-d="min" aria-label="تصغير">${ic(dir.min ? "chevD" : "minus", "ic xs")}</button><button class="btn sm icon" data-d="close" aria-label="إغلاق">${ic("x", "ic xs")}</button></div><div class="db"><p class="muted" style="font-size:12.5px">${esc(sc.sub)}</p>${steps}${dir.step >= sc.steps.length ? `<div class="banner ok">${ic("check", "ic sm")}<div><b>السيناريو خلص.</b> ${esc(sc.outcome || "")}</div></div>` : ""}</div></div>`;
+  setDir(`<div class="director ${dir.min ? "min" : ""}"><div class="dh">${ic("play", "ic sm")}<b>${esc(sc.title)}</b><button class="btn sm icon" data-d="list" aria-label="كل السيناريوهات" title="كل السيناريوهات">${ic("list", "ic xs")}</button><button class="btn sm icon" data-d="min" aria-label="تصغير">${ic(dir.min ? "chevD" : "minus", "ic xs")}</button><button class="btn sm icon" data-d="close" aria-label="إغلاق">${ic("x", "ic xs")}</button></div><div class="db"><p class="muted" style="font-size:12.5px">${esc(sc.sub)}</p>${steps}${dir.step >= sc.steps.length ? `<div class="banner ok">${ic("check", "ic sm")}<div><b>السيناريو خلص.</b> ${esc(sc.outcome || "")}</div></div>` : ""}</div></div>`);
 }
 function safe(f) { try { return f(); } catch (e) { return false; } }
 function dirClick(ev) {
@@ -306,6 +311,7 @@ function dirClick(ev) {
 
 /* ===================================================================== boot ===================== */
 function boot() {
+  document.documentElement.lang = "ar"; document.documentElement.dir = "rtl";
   TW.boot();
   applyTheme(TW.store.get("twaa-os-theme") || "system");
   root = document.getElementById("os");
@@ -314,7 +320,7 @@ function boot() {
   osbarEl.addEventListener("click", (e) => { const b = e.target.closest("[data-nav]"); if (b) TW.nav(b.dataset.nav); if (e.target.closest("[data-dir]")) { dir.open ? (dir.min = false) : (dir.open = true); renderDirector(); } if (e.target.closest("[data-theme-btn]")) TW.cycleTheme(); });
   directorEl.addEventListener("click", dirClick);
   tooltips();
-  window.addEventListener("hashchange", route);
+  window.addEventListener("hashchange", onHash); window.addEventListener("popstate", onHash);
   TW.on((reason) => {
     if (reason === "clock") { instances.forEach((i) => i.el.isConnected && updateTimers(i.el)); document.querySelectorAll(".sb-time").forEach((e) => (e.textContent = TW.clock(Date.now()).replace(" ص", "").replace(" م", ""))); return; }
     schedule(); renderOsbar(); if (dir.open) renderDirector();
