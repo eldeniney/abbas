@@ -469,7 +469,7 @@ TW.act = (name, payload = {}, actor) => {
   actor = actor || TW.actor.system();
   let res;
   try { res = fn(payload, actor) || { ok: true }; } catch (e) { console.error(e); res = { ok: false, error: e.message }; }
-  if (res.ok !== false) { recomputeAll(); emit(name); }
+  if (res.ok !== false || res.blocked) { recomputeAll(); emit(name); }
   return res;
 };
 const fail = (error, extra) => ({ ok: false, error, ...extra });
@@ -704,7 +704,7 @@ A["fo.reject"] = ({ foId, reason }, actor) => {
   const o = find(S.orders, f.orderId); ev(o, "MERCHANT_REJECTED", `${m.ar} رفض: ${reason} (EX-MER-002)`, actor.kind);
   audit(actor, f.id, "رفض طلب", "AWAITING_ACCEPT", "REJECTED", reason);
 };
-A["fo.mark"] = ({ foId, key, mark, subSkuId }) => { const f = find(TW.S.fos, foId); const it = f.items.find((x) => x.key === key); it.mark = mark; it.subSkuId = subSkuId || null; };
+A["fo.mark"] = ({ foId, key, mark, subSkuId }) => { const f = find(TW.S.fos, foId); if (!f || f.status !== "PREPARING") return fail("الطلب مش في مرحلة التجهيز"); const it = f.items.find((x) => x.key === key); it.mark = mark; it.subSkuId = subSkuId || null; };
 A["fo.ready"] = ({ foId }, actor) => {
   const S = TW.S, f = find(S.fos, foId), o = find(S.orders, f.orderId);
   if (f.status !== "PREPARING") return fail("الطلب مش في مرحلة التجهيز");
@@ -725,7 +725,7 @@ A["fo.handover"] = ({ foId, code }, actor) => {
 A["mcat.add"] = ({ merchantId, items }, actor) => {
   const S = TW.S, map = (S.msku[merchantId] = S.msku[merchantId] || {});
   const flagged = [];
-  items.forEach(({ skuId, price, stock }) => { const s = find(S.skus, skuId); const p = Number(price) || s.refPrice; const out = Math.abs(p - s.refPrice) / s.refPrice > S.rules.priceTolerance / 100; map[skuId] = { price: out ? s.refPrice : p, available: !out, stock: stock === "" || stock == null ? null : Number(stock), prep: find(S.merchants, merchantId).prep, updatedAt: now(), pendingPrice: out ? p : null }; if (out) { flagged.push(s.ar); approval("price", { kind: "msku", merchantId, skuId }, actor, `سعر ${s.ar} ${money(p)} (المرجعي ${money(s.refPrice)})`, Math.abs(p - s.refPrice), "إضافة صنف جديد للمحل", `${p > s.refPrice ? "+" : ""}${Math.round(((p - s.refPrice) / s.refPrice) * 100)}% عن المرجعي`, "category"); } });
+  items.forEach(({ skuId, price, stock, available }) => { const s = find(S.skus, skuId); const p = Number(price) || s.refPrice; const out = Math.abs(p - s.refPrice) / s.refPrice > S.rules.priceTolerance / 100; map[skuId] = { price: out ? s.refPrice : p, available: !out && available !== false, stock: stock === "" || stock == null ? null : Number(stock), prep: find(S.merchants, merchantId).prep, updatedAt: now(), pendingPrice: out ? p : null }; if (out) { flagged.push(s.ar); approval("price", { kind: "msku", merchantId, skuId }, actor, `سعر ${s.ar} ${money(p)} (المرجعي ${money(s.refPrice)})`, Math.abs(p - s.refPrice), "إضافة صنف جديد للمحل", `${p > s.refPrice ? "+" : ""}${Math.round(((p - s.refPrice) / s.refPrice) * 100)}% عن المرجعي`, "category"); } });
   audit(actor, find(S.merchants, merchantId).ar, "إضافة أصناف من الكتالوج", null, `${items.length} صنف`, null);
   return { ok: true, added: items.length, flagged };
 };
@@ -748,10 +748,11 @@ A["mcat.request"] = ({ merchantId, name, barcode, catGuess, photo }, actor) => {
   TW.S.catReqs.unshift(r); approval("new_sku", { kind: "catreq", id: r.id }, actor, `طلب إضافة منتج: ${name}`, 0, `${barcode ? "باركود " + barcode : "بدون باركود"}${photo ? " · صورة مرفقة" : ""}`, "منع التكرار والتسمية العشوائية", "category");
   return { ok: true, id: r.id };
 };
-A["merchant.register"] = ({ name, type, zoneId, owner, phone, hours }, actor) => {
+A["merchant.register"] = ({ name, type, zoneId, owner, phone, hours, landmark, payout, cats }, actor) => {
   const S = TW.S, id = `m${S.merchants.length + 1}`;
   const z = find(S.zones, zoneId);
   S.merchants.push({ id, ar: name, type, zoneId, owner, phone, commission: type === "restaurant" ? 0.17 : type === "pharmacy" ? 0.1 : 0.11, prep: 10, rating: 0, health: "new", status: "pending", mode: "closed", since: null, x: z.x + 6, y: z.y - 4, landmark: "", autopilot: true, acceptRate: 1, prepOnTime: 1, cancelAfterAccept: 0, availAcc: 1, subRate: 0, complaintRate: 0, gmv30: 0, orders30: 0, acceptSec: 0, hours });
+  Object.assign(S.merchants[S.merchants.length - 1], { landmark: landmark || "", payout: payout || null, cats: cats || [] });
   S.msku[id] = {};
   S.leads.unshift({ id: `L-${S.seq.lead++}`, ar: name, owner, type, zoneId, stage: 5, assortment: "—", opportunity: "تسجيل ذاتي من تطبيق التاجر", competitors: "—", commission: S.merchants[S.merchants.length - 1].commission, merchantId: id, history: [{ at: now(), stage: 5, by: "تسجيل ذاتي" }] });
   approval("merchant_activation", { kind: "merchant", id }, actor, `تفعيل تاجر جديد: ${name}`, 0, "مستندات مرفوعة من التطبيق", `${D.merchantTypes[type]} في ${z.ar}`, "merchops");
@@ -783,7 +784,7 @@ function pickupScan(t, sourceId, { code, count, damaged }, actor) {
   const expected = Math.max(1, f.packages.length || 1);
   if (count != null && Number(count) < expected) { t.pickupIssue = { type: "طرد ناقص", at: now(), expected, got: Number(count) }; const o = find(S.orders, t.orderId); ev(o, "PICKUP_BLOCKED", `طرد ناقص عند الاستلام (${count}/${expected}) — المغادرة ممنوعة (EX-PKP-001)`, actor.kind); return fail(`عدد الطرود ناقص (${count} من ${expected}) — مينفعش تمشي قبل ما المشكلة تتحل`, { blocked: true }); }
   if (damaged) { t.pickupIssue = { type: "طرد تالف", at: now() }; const o = find(S.orders, t.orderId); ev(o, "PICKUP_DAMAGED", "طرد تالف عند الاستلام — رجع لإعادة التغليف (EX-PKP-002)", actor.kind); f.status = f.sourceType === "hub" ? "PICKING" : "PREPARING"; f.repack = true; return fail("الطرد رجع لإعادة التغليف — استنى لحد ما يجهز تاني", { blocked: true }); }
-  p.scanned = true; p.at = now(); p.packages = expected; f.status = "HANDED_OVER"; f.handedAt = now();
+  p.scanned = true; p.at = now(); p.packages = expected; f.status = "HANDED_OVER"; f.handedAt = now(); t.pickupIssue = null;
   /* chain of custody */
   const o = find(S.orders, t.orderId); ev(o, "CUSTODY", `حيازة: ${f.name} ← ${find(S.riders, t.riderId).ar} · ${expected} طرد · ${TW.clock(now())}`, actor.kind);
   if (t.pickups.every((x) => x.scanned)) { t.status = "PICKED_UP"; t.pickedAt = now(); t.leg = "drop"; t.prog = 0; const r = find(S.riders, t.riderId); t.from = { x: r.x, y: r.y }; notify(`customer:${o.customerId}`, "طلبك خرج", `المندوب في الطريق — كود الاستلام ${o.otp}`, { orderId: o.id }); }
@@ -812,7 +813,7 @@ A["task.deliver"] = ({ taskId, otp }, actor) => {
   if (t.cod > 0 && t.collected == null) return fail("لازم تسجّل الكاش اللي استلمته قبل التسليم (BR-COD-004)");
   t.status = "DELIVERED"; t.deliveredAt = now(); t.pod = { otp: true, at: now(), gps: true };
   t.foIds.forEach((fid) => (find(S.fos, fid).status = "DELIVERED"));
-  r.task = null; r.status = "online"; r.jobsToday++; r.earnToday += t.earn;
+  r.task = (r.route || []).find((id) => id !== t.id && ["ASSIGNED", "AT_PICKUP", "PICKED_UP", "ARRIVED"].includes((find(S.tasks, id) || {}).status)) || null; r.status = r.task ? "busy" : "online"; r.jobsToday++; r.earnToday += t.earn;
   const rs = S.rsettle.find((x) => x.riderId === r.id); if (rs) { rs.missions++; rs.fees += t.earn; }
   if (t.cod > 0) {
     const c = { id: uid("COD"), orderId: o.id, taskId: t.id, riderId: r.id, expected: t.cod, collected: t.collected, variance: +(t.collected - t.cod).toFixed(2), at: now(), status: "HELD", varReason: t.varReason };
@@ -1398,7 +1399,7 @@ function tick() {
         if (!tk.readySince) tk.readySince = t;
         if (tk.attempts >= S.rules.riderOfferRetries) { tk.status = "NO_RIDER"; ev(o, "NO_RIDER", `${tk.attempts} محاولات عرض بدون قبول — تدخل الكنترول (EX-RID-002)`); changed = true; return; }
         const tried = new Set(tk.offers.map((x) => x.riderId));
-        let cands = TW.riderCandidates(tk).filter((c) => c.el.ok && !c.r.task && !tried.has(c.r.id));
+        let cands = TW.riderCandidates(tk).filter((c) => c.el.ok && !c.r.task && !tried.has(c.r.id) && !S.tasks.some((x) => x.status === "OFFERED" && x.offer && x.offer.riderId === c.r.id));
         if (S.sim.preferDemo) { const demo = cands.find((c) => c.r.demo); const demoCust = find(S.customers, o.customerId).demo || o.demoRoute; if (demo && demoCust) cands = [demo, ...cands.filter((c) => c !== demo)]; }
         const c = cands[0];
         if (c) { tk.offer = { riderId: c.r.id, at: t, until: t + S.rules.riderOfferSec * 1000, km: c.km }; tk.status = "OFFERED"; tk.attempts++; notify(`rider:${c.r.id}`, "مهمة جديدة!", `${money(tk.earn)} · ${tk.pickups.length} استلام · ${tk.km} كم`, { taskId: tk.id, alert: true }); changed = true; }
