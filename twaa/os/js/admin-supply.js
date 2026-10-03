@@ -304,7 +304,7 @@ TW.page("purchasing", {
       <select class="input" data-model="spPoSup" aria-label="المورد">${SUPPLIERS.map((x) => `<option ${ui(inst, "spPoSup", SUPPLIERS[0]) === x ? "selected" : ""}>${esc(x)}</option>`).join("")}</select>
       ${TW.btn("حدد العاجل (< يومين)", "sp-po-urgent", { cls: "sm" })}${gbtn(canPO() && picked.length, canPO() ? "اختار أصناف الأول" : "يحتاج صلاحية المشتريات أو المخزون", "اطلب موافقة شراء", "sp-po-request", { cls: "primary", icon: "check" })}</div>`;
     const poCols = [
-      { k: "id", label: "الأمر", render: (p) => `<b class="mono">${esc(p.id)}</b><span class="sub">${esc(p.supplier)}</span>` },
+      { k: "id", label: "الأمر", render: (p) => `<b class="mono sp-id">${esc(p.id)}</b><span class="sub">${esc(p.supplier)}</span>` },
       { k: "l", label: "البنود", render: (p) => `${p.lines.map(([id, q]) => `${esc(skuOf(id).ar)} × ${num(q)}`).slice(0, 3).join("<br>")}${p.lines.length > 3 ? `<span class="sub">+${p.lines.length - 3} أصناف</span>` : ""}` },
       { k: "v", label: "القيمة", num: true, render: (p) => money(poValue(p)) },
       { k: "st", label: "الحالة", render: (p) => `${poChip(p.status)}${p.discrepancy ? `<span class="sub" style="color:var(--bad)">${esc(p.discrepancy)}</span>` : ""}` },
@@ -498,7 +498,7 @@ TW.page("returns", {
     const list = f === "open" ? rts.filter((r) => ["IN_TRANSIT", "INSPECTION"].includes(r.status)) : f === "closed" ? rts.filter((r) => !["IN_TRANSIT", "INSPECTION"].includes(r.status)) : rts;
     const canIns = hubOk() || TW.can("inventory.adjust");
     const cols = [
-      { k: "id", label: "المرتجع", render: (r) => `<b class="mono">${esc(r.id)}</b><span class="sub">${clock(r.at)} · ${r.status === "IN_TRANSIT" || r.status === "INSPECTION" ? `<span class="timer" data-since="${r.at}"></span>` : TW.dateAr(r.at)}</span>` },
+      { k: "id", label: "المرتجع", render: (r) => `<b class="mono sp-id">${esc(r.id)}</b><span class="sub">${clock(r.at)} · ${r.status === "IN_TRANSIT" || r.status === "INSPECTION" ? `<span class="timer" data-since="${r.at}"></span>` : TW.dateAr(r.at)}</span>` },
       { k: "o", label: "الطلب", render: (r) => (orderOf(r.orderId) ? A.orderLink(r.orderId) : `<span class="mono">${esc(r.orderId)}</span>`) },
       { k: "src", label: "المصدر", render: (r) => (r.source === "h1" ? chip("هب توّا", "brand", "building") : esc(A.merchant(r.source))) },
       { k: "l", label: "البنود", render: (r) => `${returnLines(r).map((l) => `${esc(l.name)} × ${l.q} ${hChip(l.handling)}`).join("<br>")}` },
@@ -619,7 +619,7 @@ TW.page("rider", {
     const pill = (label, v, sub) => `<div class="sp-pillar"><div class="row between"><b>${label}</b>${scoreChip(v)}</div>${meter(v, 1, v >= 0.88 ? "ok" : v >= 0.78 ? "warn" : "bad")}<small class="muted">${sub}</small></div>`;
     const curCard = cur ? (() => { const o = orderOf(cur.orderId); return `<dl class="kv"><dt>المهمة</dt><dd><span class="mono">${esc(cur.id)}</span> ${A.st("task", cur.status)} ${A.orderLink(cur.orderId)}</dd><dt>الاستلام</dt><dd>${cur.pickups.map((pp) => `${esc(pp.name)} ${pp.scanned ? chip("اتسلّم", "ok") : chip("لسه", "neutral")}`).join(" ")}</dd><dt>التسليم</dt><dd>${esc(cur.drop.name)} — ${esc(cur.drop.landmark)}</dd><dt>كاش مطلوب</dt><dd class="num">${money(cur.cod)}</dd><dt>الوعد</dt><dd>${o && o.mode !== "scheduled" ? `<span class="timer" data-until="${o.etaAt}"></span>` : esc(cur.window || "رحلة مجدولة")}</dd>${r.route ? `<dt>الرحلة</dt><dd>${r.route.length} طلبات (${r.route.map((x) => esc(x)).join("، ")})</dd>` : ""}</dl>`; })() : `<p class="muted">مفيش مهمة حالية.</p>`;
     const tCols = [
-      { k: "id", label: "المهمة", render: (t) => `<span class="mono">${esc(t.id)}</span><span class="sub">${clock(t.createdAt)}</span>` },
+      { k: "id", label: "المهمة", render: (t) => `<span class="mono sp-id">${esc(t.id)}</span><span class="sub">${clock(t.createdAt)}</span>` },
       { k: "o", label: "الطلب", render: (t) => A.orderLink(t.orderId) },
       { k: "s", label: "الحالة", render: (t) => (t.riderId === r.id ? A.st("task", t.status) : chip("عُرضت عليه", "neutral")) },
       { k: "of", label: "رده على العرض", render: (t) => { const x = t.offers.filter((y) => y.riderId === r.id).pop(); return x ? `${chip({ accept: "قبل", reject: "رفض", timeout: "لم يرد" }[x.resp], x.resp === "accept" ? "ok" : x.resp === "reject" ? "warn" : "bad")} <span class="muted">${x.rt} ث</span>${x.reason ? `<span class="sub">${esc(x.reason)}</span>` : ""}` : t.manual ? chip("إسناد يدوي", "warn") : t.route ? chip("رحلة مجدولة", "info") : "—"; } },
@@ -658,6 +658,7 @@ const KIT = {
   motorbike: { bag: "صندوق حراري 45 لتر", items: ["خوذة", "سترة عاكسة", "كيس تبريد", "حامل موبايل"], cap: "حتى 25 كجم · حتى 10 كم", thermal: "صندوق حراري + كيس تبريد للمبرد والمجمد" },
   tricycle: { bag: "صندوق معزول 150 لتر + ثلاجة كولمان", items: ["سترة عاكسة", "حبال تثبيت", "ثلج جاف", "ميزان"], cap: "حتى 120 كجم · رحلات القرى المجمّعة", thermal: "صندوق معزول كبير للرحلات المجدولة" },
 };
+const TARGET_OPH = 2.5; /* planning productivity per rider-hour with batching (town core ~20-24 min cycle) */
 TW.page("fleet", {
   render(inst) {
     const S = TW.S, types = Object.keys(D.vehicles);
@@ -665,13 +666,13 @@ TW.page("fleet", {
     const online = S.riders.filter((r) => r.status !== "offline" && !r.suspended).length;
     const hrs = (S.hist.hourlyY || []).map((v, h) => ({ h, v })).filter((x) => x.h >= 8 && x.h <= 23);
     const cur = new Date().getHours();
-    const series = hrs.map((x) => { const need = Math.ceil(x.v / Math.max(0.5, avgOph)); return { label: String(x.h), value: need, tone: need > online ? "bad" : x.h === cur ? "accent" : "brand" }; });
+    const series = hrs.map((x) => { const need = Math.ceil(x.v / TARGET_OPH); return { label: String(x.h), value: need, tone: need > online ? "bad" : x.h === cur ? "accent" : "brand" }; });
     const typeCard = (t) => {
       const rs = S.riders.filter((r) => r.vehicle === t), on = rs.filter((r) => r.status !== "offline" && !r.suspended), busy = rs.filter((r) => r.task);
       const zs = S.zones.filter((z) => z.riderType.includes(t)), k = KIT[t];
       return `<div class="card"><div class="hd"><h3>${ic(VIC[t], "ic sm")} ${esc(D.vehicles[t])}</h3>${chip(`${rs.length} مركبة`, "brand")}</div>
         <div class="sp-minis">${mini("في الوردية", num(on.length))}${mini("في مهمة", num(busy.length))}${mini("الاستغلال", pct(on.length ? busy.length / on.length : 0), "في مهمة ÷ في الوردية")}${mini("كم اليوم", num(sum(rs, (r) => r.km)))}</div>
-        <dl class="kv" style="margin-top:10px"><dt>مسموح في</dt><dd>${zs.map((z) => `${esc(z.ar)}${z.active ? "" : " (غير مفعّلة)"}`).join("، ")}</dd><dt>السعة</dt><dd>${esc(k.cap)}</dd><dt>الحرارة</dt><dd>${esc(k.thermal)}</dd><dt>العدّة</dt><dd>${esc(k.bag)} · ${k.items.map(esc).join("، ")}</dd><dt>اللوحات</dt><dd class="mono">${rs.map((r) => esc(r.plate)).join(" · ")}</dd></dl></div>`;
+        <dl class="kv" style="margin-top:10px"><dt>مسموح في</dt><dd>${zs.map((z) => `${esc(z.ar)}${z.active ? "" : " (غير مفعّلة)"}`).join("، ")}</dd><dt>السعة</dt><dd>${esc(k.cap)}</dd><dt>الحرارة</dt><dd>${esc(k.thermal)}</dd><dt>العدّة</dt><dd>${esc(k.bag)} · ${k.items.map(esc).join("، ")}</dd><dt>اللوحات</dt><dd><div class="row wrap gap4">${rs.map((r) => `<span class="sp-binx">${esc(r.plate === "—" ? "بدون لوحة" : r.plate)}</span>`).join("")}</div></dd></dl></div>`;
     };
     const flags = S.riders.filter((r) => r.incidents || r.fails >= 2);
     const cols = [
@@ -688,7 +689,7 @@ TW.page("fleet", {
     ];
     return `${A.head("الأسطول", "المركبات حسب النوع، المناطق المسموحة لكل نوع، الاستغلال، الإتاحة مقابل الطلب، والصيانة والعدّة", TW.btn("المناديب", "go", { cls: "sm", icon: "bike", data: { to: "/admin/riders" } }))}
       <div class="grid g3">${types.map(typeCard).join("")}</div>
-      <div class="grid sp-g21">${card("الإتاحة مقابل الطلب حسب الساعة", "bars", `${TW.bars(series, { h: 190, label: "مناديب مطلوبين في الساعة", fmt: (v) => `${v} مندوب` })}${TW.legend([["مطلوب ≤ المتاح الآن", "brand"], ["الساعة الحالية", "accent"], ["عجز عن المتاح الآن", "bad"]])}<p class="muted" style="font-size:12px;margin-top:6px">المطلوب = طلبات الساعة (منحنى الأسبوع اللي فات) ÷ متوسط ${num(avgOph, 1)} طلب لكل مندوب/ساعة · المتاح الآن ${online} مندوب.</p>`)}
+      <div class="grid sp-g21">${card("الإتاحة مقابل الطلب حسب الساعة", "bars", `${TW.bars(series, { h: 190, label: "مناديب مطلوبين في الساعة", fmt: (v) => `${v} مندوب` })}${TW.legend([["مطلوب ≤ المتاح الآن", "brand"], ["الساعة الحالية", "accent"], ["عجز عن المتاح الآن", "bad"]])}<p class="muted" style="font-size:12px;margin-top:6px">المطلوب = طلبات الساعة (منحنى الأسبوع اللي فات) ÷ إنتاجية مستهدفة ${num(TARGET_OPH, 1)} طلب/مندوب/ساعة (الفعلي اليوم ${num(avgOph, 1)}) · المتاح الآن ${online} مندوب.</p>`)}
       ${card("تنبيهات الصيانة والسلامة", "alert", flags.length ? `<div class="list">${flags.map((r) => `<div class="li">${ic(VIC[r.vehicle], "ic sm")}<div class="grow"><b>${esc(r.ar)}</b> <span class="mono muted">${esc(r.plate)}</span><span class="sub muted">${r.incidents ? `${r.incidents} حادث مسجّل — فحص المركبة والعدّة قبل الوردية الجاية` : `${r.fails} حالات فشل — مراجعة مع المشرف`}</span></div>${TW.btn("افتح", "open-rider", { cls: "sm", data: { id: r.id } })}</div>`).join("")}</div>` : TW.empty("لا تنبيهات", "", "check"))}</div>
       <div class="card" style="padding:0">${TW.table(cols, S.riders)}</div>`;
   },
@@ -814,7 +815,7 @@ TW.page("dispatch-queue", {
     const freeRiders = S.riders.filter((r) => r.status !== "offline" && !r.suspended && !r.task);
     const sched = S.tasks.filter((t) => t.status === "SCHEDULED").length;
     const cols = [
-      { k: "id", label: "المهمة", render: (t) => `<b class="mono">${esc(t.id)}</b><span class="sub">من <span class="timer" data-since="${t.createdAt}"></span></span>` },
+      { k: "id", label: "المهمة", render: (t) => `<b class="mono sp-id">${esc(t.id)}</b><span class="sub">من <span class="timer" data-since="${t.createdAt}"></span></span>` },
       { k: "o", label: "الطلب", render: (t) => `${A.orderLink(t.orderId)}<span class="sub">${esc(A.zone(t.drop.zoneId))} · ${num(t.km, 1)} كم</span>` },
       { k: "p", label: "الاستلام والجاهزية", render: (t) => t.pickups.map((p) => { const fo = find(S.fos, p.foId); return `${esc(p.name)} ${fo ? A.st("fo", fo.status) : ""}`; }).join("<br>") },
       { k: "s", label: "الحالة", render: (t) => `${A.st("task", t.status)}${t.offer ? `<span class="sub">معروض على ${esc(A.rider(t.offer.riderId))} · <span class="timer" data-until="${t.offer.until}" data-soon="15000"></span></span>` : t.riderId ? `<span class="sub">${esc(A.rider(t.riderId))}${t.manual ? " · يدوي" : ""}</span>` : ""}` },

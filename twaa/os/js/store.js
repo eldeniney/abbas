@@ -215,7 +215,7 @@ function seedLive(S, rnd, t0) {
   Object.values(S.inv.h1).forEach((iv) => (iv.reserved = 0));
   S.fos.filter((f) => f.sourceType === "hub" && ["QUEUED", "PICKING"].includes(f.status)).forEach((f) => { const o = find(S.orders, f.orderId); o.lines.filter((l) => l.foId === f.id && l.state === "ok").forEach((l) => { if (S.inv.h1[l.skuId]) S.inv.h1[l.skuId].reserved += l.qty; }); });
   /* cash already held by riders today */
-  S.riders.forEach((r) => { if (r.cash > 0 && !S.cod.some((c) => c.riderId === r.id)) S.cod.push({ id: uid("COD"), orderId: "متعدد (اليوم)", taskId: null, riderId: r.id, expected: r.cash, collected: r.cash, variance: 0, at: t0 - 2 * 3600000, status: "HELD" }); });
+  S.riders.forEach((r) => { const held = sum(S.cod.filter((c) => c.riderId === r.id && c.status === "HELD"), (c) => c.collected); if (r.cash > held) S.cod.push({ id: uid("COD"), orderId: "رصيد افتتاحي (اليوم)", taskId: null, riderId: r.id, expected: r.cash - held, collected: r.cash - held, variance: 0, at: t0 - 2 * 3600000, status: "HELD" }); else r.cash = held; });
 }
 
 function renameOrder(S, o, id) {
@@ -566,7 +566,7 @@ A["cart.applyChanges"] = ({ customerId }) => {
 A["order.place"] = ({ customerId, pay, when, window, idem, changeFor, notes, addressId }, actor) => {
   const S = TW.S;
   const dup = S.orders.find((o) => o.idem && o.idem === idem);
-  if (dup) return { ok: true, order: dup, duplicate: true };
+  if (dup) { S.idemHits = (S.idemHits || 0) + 1; audit(actor, dup.id, "منع طلب مكرر (Idempotency)", null, idem, "نفس مفتاح الدفع خلال النافذة — نفس النتيجة بدون خصم جديد (BR-PAY-001)"); return { ok: true, order: dup, duplicate: true }; }
   const v = TW.validateCart(customerId, { pay, addressId });
   if (!v.ok) return fail(v.issues.filter((i) => i.level === "block").map((i) => i.text).join(" · ") || "السلة فاضية");
   if (v.changes.length) return fail("فيه تغييرات في السلة لازم توافق عليها الأول", { changes: v.changes });
@@ -972,20 +972,21 @@ A["fo.cancel"] = ({ foId, reason }, actor) => {
   audit(actor, f.id, "إلغاء مكوّن", f.status, "CANCELLED", reason);
 };
 A["payment.reconcile"] = ({ paymentId, result }, actor) => {
+  { const d = need("finance.close", actor); if (d) return d; }
   const S = TW.S, p = find(S.payments, paymentId), o = find(S.orders, p.orderId);
   if (result === "success") { p.status = "SUCCESS"; p.reconciled = true; p.gwState = "CAPTURED"; o.hold = false; o.fin = "PAID"; S.fos.filter((f) => f.orderId === o.id).forEach((f) => { if (f.status === "QUEUED" && f.sourceType === "merchant") f.status = "AWAITING_ACCEPT"; f.createdAt = now(); if (f.sourceType === "merchant") f.acceptBy = now() + S.rules.merchantAcceptSec * 1000; }); ev(o, "PAY_CONFIRMED", "البوابة أكدت الخصم — الطلب اتحرر للتجهيز", "admin"); notify(`customer:${o.customerId}`, "تم تأكيد الدفع", `طلب ${o.id} بيتجهز دلوقتي`, { orderId: o.id }); }
   else { p.status = "FAILED"; p.reconciled = true; o.hold = false; cancelOrder(o, "الدفع لم يكتمل — لم يتم خصم أي مبلغ", actor); o.fin = "VOID"; }
   audit(actor, p.id, "مطابقة دفع معلّق", "PENDING", p.status, result === "success" ? "تأكيد من البوابة" : "البوابة: لم يتم الخصم");
 };
 A["cod.resolve"] = ({ codId, party, reason }, actor) => {
-  const d = needReason(reason); if (d) return d;
+  const d = need("finance.close", actor) || needReason(reason); if (d) return d;
   const S = TW.S, c = find(S.cod, codId), o = find(S.orders, c.orderId);
-  c.varianceResolved = { party, reason, by: actor.name, at: now() }; if (o) o.fin = "SETTLEMENT_PENDING";
+  c.varianceResolved = { party, reason, by: actor.name, at: now() }; if (o) o.fin = c.status === "HELD" ? "COD_COLLECTED" : c.status === "RECONCILED" ? "RECONCILED" : "SETTLEMENT_PENDING";
   if (party === "rider") { const rs = S.rsettle.find((x) => x.riderId === c.riderId); if (rs) rs.codVariance = (rs.codVariance || 0) + c.variance; }
   (S.cases.filter((x) => x.orderId === c.orderId && x.type === "فرق في الكاش")).forEach((cs) => { cs.status = "RESOLVED"; cs.resolution = `فرق الكاش على ${TW.PARTY[party]}`; cs.resolvedAt = now(); });
   audit(actor, `${c.orderId} (كاش)`, "تسوية فرق كاش", money(c.variance), TW.PARTY[party], reason);
 };
-A["deposit.verify"] = ({ depositId }, actor) => { const S = TW.S, dp = find(S.deposits, depositId); dp.status = "VERIFIED"; dp.verifiedBy = actor.name; dp.verifiedAt = now(); S.cod.filter((c) => c.depositId === depositId).forEach((c) => { c.status = "RECONCILED"; const o = find(S.orders, c.orderId); if (o && o.fin === "SETTLEMENT_PENDING") o.fin = "RECONCILED"; }); audit(actor, dp.id, "تأكيد استلام كاش", "PENDING_VERIFY", "VERIFIED", null); notify(`rider:${dp.riderId}`, "المالية أكدت التوريد", `${money(dp.amount)} اتطابقت`, {}); };
+A["deposit.verify"] = ({ depositId }, actor) => { { const d = need("finance.close", actor); if (d) return d; } const S = TW.S, dp = find(S.deposits, depositId); dp.status = "VERIFIED"; dp.verifiedBy = actor.name; dp.verifiedAt = now(); S.cod.filter((c) => c.depositId === depositId).forEach((c) => { c.status = "RECONCILED"; const o = find(S.orders, c.orderId); if (o && o.fin === "SETTLEMENT_PENDING") o.fin = "RECONCILED"; }); audit(actor, dp.id, "تأكيد استلام كاش", "PENDING_VERIFY", "VERIFIED", null); notify(`rider:${dp.riderId}`, "المالية أكدت التوريد", `${money(dp.amount)} اتطابقت`, {}); };
 
 /* ---------------- support, refunds, compensation ---------------- */
 A["case.assign"] = ({ caseId }, actor) => { const cs = find(TW.S.cases, caseId); cs.owner = actor.name; if (cs.status === "OPEN") cs.status = "INVESTIGATING"; };
@@ -1019,7 +1020,7 @@ function completeRefund(rf, actor) {
   ev(o, "REFUNDED", `استرداد ${money(rf.amount)} ${rf.method === "wallet" ? "لمحفظة توّا" : "لوسيلة الدفع"} — ${rf.reason}`, actor.kind);
   notify(`customer:${o.customerId}`, "رجعنالك فلوسك", `${money(rf.amount)} ${rf.method === "wallet" ? "في محفظة توّا" : "هتوصل لوسيلة الدفع خلال 3–5 أيام"}`, { orderId: o.id });
 }
-A["refund.process"] = ({ refundId, result }, actor) => { const rf = find(TW.S.refunds, refundId); rf.status = result === "fail" ? "FAILED" : "COMPLETED"; rf.doneAt = now(); audit(actor, rf.id, "تنفيذ استرداد عبر البوابة", "SUBMITTED", rf.status, null); };
+A["refund.process"] = ({ refundId, result }, actor) => { { const d = need("finance.close", actor); if (d) return d; } const rf = find(TW.S.refunds, refundId); rf.status = result === "fail" ? "FAILED" : "COMPLETED"; rf.doneAt = now(); audit(actor, rf.id, "تنفيذ استرداد عبر البوابة", "SUBMITTED", rf.status, null); };
 A["comp.issue"] = ({ caseId, amount, reason }, actor) => {
   const S = TW.S, cs = find(S.cases, caseId); const d = need("comp.issue", actor) || needReason(reason); if (d) return d;
   const amt = Number(amount);
@@ -1057,7 +1058,7 @@ function onDecision(ap, ok, actor) {
   if (ap.type === "merchant_activation" && ok) { const m = find(S.merchants, r.id); m.status = "active"; m.mode = "open"; m.since = new Date().toISOString().slice(0, 10); m.health = "new"; if (!Object.keys(S.msku[m.id] || {}).length) { S.msku[m.id] = {}; S.skus.filter((s) => (D.typeDepts[m.type] || []).includes(s.dept) && !s.regulated).slice(0, 24).forEach((s) => (S.msku[m.id][s.id] = { price: s.refPrice, available: true, stock: null, prep: m.prep, updatedAt: now() })); } const lead = S.leads.find((l) => l.merchantId === m.id); if (lead) { lead.stage = Math.max(lead.stage, 8); lead.history.push({ at: now(), stage: 8, by: actor.name }); } notify(`merchant:${m.id}`, "مبروك! محلك اتفعّل على توّا", "تقدر تستقبل طلبات دلوقتي", {}); }
   if (ap.type === "new_sku") { const cr = find(S.catReqs, r.id); cr.status = ok ? "APPROVED" : "REJECTED"; if (!ok) notify(`merchant:${cr.merchantId}`, "طلب المنتج اترفض", `${cr.name}: ${ap.note}`, {}); }
   if (ap.type === "writeoff" && ok) { /* already moved; approval documents the loss */ }
-  if (ap.type === "rider_adjust" && ok) { const rs = S.rsettle.find((x) => x.riderId === r.id); if (rs) rs.deductions -= ap.amount; }
+  if (ap.type === "rider_adjust" && ok) { const rs = S.rsettle.find((x) => x.riderId === r.id); if (rs) rs.deductions += r.amount != null ? r.amount : -ap.amount; }
   if (ap.type === "po") { const po = find(S.pos, r.id); po.status = ok ? "APPROVED" : "REJECTED"; po.approvedBy = ok ? actor.name : null; if (ok) po.lines.forEach(([id, q]) => { if (S.inv.h1[id]) S.inv.h1[id].incoming += q; }); }
   if (ap.type === "promo") { const p = find(S.promos, r.id); p.status = ok ? "active" : "rejected"; p.approval = { by: actor.name, at: now(), ok }; }
   if (ap.type === "compensation" && ok) { const cs = find(S.cases, r.id); find(S.customers, cs.customerId).wallet += ap.amount; cs.comp = (cs.comp || 0) + ap.amount; }
@@ -1087,10 +1088,10 @@ A["merchant.status"] = ({ merchantId, status, reason }, actor) => { const d = ne
 A["merchant.commission"] = ({ merchantId, pct, reason }, actor) => { const d = need("merchant.commission", actor) || needReason(reason); if (d) return d; const m = find(TW.S.merchants, merchantId); const old = m.commission; m.commission = Number(pct) / 100; audit(actor, m.ar, "تعديل عمولة", `${Math.round(old * 100)}%`, `${pct}%`, reason); };
 A["rider.suspend"] = ({ riderId, reason, on = true }, actor) => { const d = need("rider.manage", actor) || needReason(reason); if (d) return d; const r = find(TW.S.riders, riderId); r.suspended = on; if (on) r.status = "offline"; audit(actor, r.ar, on ? "إيقاف مندوب" : "إعادة تفعيل مندوب", null, null, reason); };
 A["rider.limit"] = ({ riderId, limit, reason }, actor) => { const d = need("rider.manage", actor) || needReason(reason); if (d) return d; const r = find(TW.S.riders, riderId); const old = r.limit; r.limit = Number(limit); audit(actor, r.ar, "تعديل حد الكاش", old, limit, reason); };
-A["rider.adjust"] = ({ riderId, amount, reason }, actor) => { const d = needReason(reason); if (d) return d; approval("rider_adjust", { kind: "rider", id: riderId }, actor, `${Number(amount) < 0 ? "خصم" : "إضافة"} ${money(Math.abs(amount))} — ${find(TW.S.riders, riderId).ar}: ${reason}`, Math.abs(Number(amount)), reason, "تسوية المندوب", "ops"); return { ok: true, pending: true }; };
+A["rider.adjust"] = ({ riderId, amount, reason }, actor) => { const d = (actor.kind === "admin" && !TW.can("settlement.adjust", actor.id) && TW.roleOf(actor.id).id !== "ops" ? fail("تعديل مستحقات المندوب للمالية أو مدير العمليات بس") : null) || needReason(reason); if (d) return d; if (!Number(amount)) return fail("المبلغ لازم يكون رقم غير صفر"); approval("rider_adjust", { kind: "rider", id: riderId, amount: Number(amount) }, actor, `${Number(amount) < 0 ? "خصم" : "إضافة"} ${money(Math.abs(amount))} — ${find(TW.S.riders, riderId).ar}: ${reason}`, Math.abs(Number(amount)), reason, "تسوية المندوب", "ops"); return { ok: true, pending: true }; };
 A["settlement.pay"] = ({ settlementId }, actor) => { const d = need("settlement.adjust", actor); if (d) return d; const st = find(TW.S.msettle, settlementId); if (st.lines.some((l) => l.status === "disputed")) return fail("فيه بند متنازع عليه — لازم يتحل قبل الصرف (EX-SET-002)"); st.status = "PAID"; st.paidAt = now(); st.ref = `INSTA-${Math.round(Math.random() * 1e6)}`; audit(actor, st.id, "صرف تسوية تاجر", "DUE", money(st.net), st.ref); notify(`merchant:${st.merchantId}`, "اتحولت مستحقاتك", `${money(st.net)} — مرجع ${st.ref}`, {}); };
 A["settlement.resolveLine"] = ({ settlementId, lineId, keep, reason }, actor) => { const d = need("settlement.adjust", actor) || needReason(reason); if (d) return d; const st = find(TW.S.msettle, settlementId), l = st.lines.find((x) => x.id === lineId); l.status = "final"; l.resolution = `${keep ? "الخصم ثابت" : "الخصم اتلغى"} — ${reason}`; if (!keep) { st.net -= l.amount; l.amount = 0; } audit(actor, `${st.id}/${l.id}`, "حسم نزاع تسوية", "disputed", keep ? "ثابت" : "ملغي", reason); notify(`merchant:${st.merchantId}`, "تم الرد على اعتراضك", l.resolution, {}); };
-A["settlement.adjust"] = ({ settlementId, amount, reason }, actor) => { const d = need("settlement.adjust", actor) || needReason(reason); if (d) return d; const st = find(TW.S.msettle, settlementId); approval("settlement_adjust", { kind: "msettle", id: settlementId, amount: Number(amount) }, actor, `تعديل تسوية ${find(TW.S.merchants, st.merchantId).ar}: ${money(amount)} — ${reason}`, Math.abs(Number(amount)), reason, "يغيّر صافي المستحق للتاجر", "finance"); return { ok: true, pending: true }; };
+A["settlement.adjust"] = ({ settlementId, amount, reason }, actor) => { const d = need("settlement.adjust", actor) || needReason(reason); if (d) return d; if (!Number(amount)) return fail("المبلغ لازم يكون رقم غير صفر"); const st = find(TW.S.msettle, settlementId); approval("settlement_adjust", { kind: "msettle", id: settlementId, amount: Number(amount) }, actor, `تعديل تسوية ${find(TW.S.merchants, st.merchantId).ar}: ${money(amount)} — ${reason}`, Math.abs(Number(amount)), reason, "يغيّر صافي المستحق للتاجر", "finance"); return { ok: true, pending: true }; };
 A["rsettle.pay"] = ({ id }, actor) => { const d = need("settlement.adjust", actor); if (d) return d; const rs = find(TW.S.rsettle, id); rs.status = "PAID"; rs.paidAt = now(); audit(actor, rs.id, "صرف مستحقات مندوب", "OPEN", "PAID", null); };
 
 /* ---------------- growth: promotions, campaigns, segments, leads, expansion ---------------- */

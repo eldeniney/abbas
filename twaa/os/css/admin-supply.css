@@ -153,3 +153,4 @@
 .sp-win.tgt { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 1px var(--accent); }
 .sp-skucell { min-width: 190px; }
 .sp-binx { white-space: nowrap; }
+.sp-id { white-space: nowrap; }

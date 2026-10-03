@@ -172,7 +172,8 @@ textarea.input { min-height: 80px; resize: vertical; }
 /* charts */
 .chart { width: 100%; height: auto; display: block; }
 .chart .grid { stroke: var(--line); stroke-width: 1; } .chart .ax { fill: var(--muted); font-size: 11px; font-family: var(--f-data); }
-.chart .bar { fill: var(--c1); } .chart .bar:hover, .chart .bar:focus { opacity: 0.8; outline: none; }
+.chart .bar { fill: var(--c1); }
+.chart .bar.b-bad { fill: var(--bad); } .chart .bar.b-warn { fill: var(--warn); } .chart .bar.b-ok { fill: var(--ok); } .chart .bar.b-accent { fill: var(--c2); } .chart .bar.b-teal { fill: var(--c3); } .chart .bar.b-gold { fill: var(--c4); } .chart .bar.b-muted { fill: var(--line-2); } .chart .bar:hover, .chart .bar:focus { opacity: 0.8; outline: none; }
 .b-brand { background: var(--c1); fill: var(--c1); } .b-accent { background: var(--c2); fill: var(--c2); } .b-teal { background: var(--c3); fill: var(--c3); } .b-gold { background: var(--c4); fill: var(--c4); } .b-ok { background: var(--ok); fill: var(--ok); } .b-warn { background: var(--warn); fill: var(--warn); } .b-bad { background: var(--bad); fill: var(--bad); } .b-muted { background: var(--line-2); fill: var(--line-2); }
 .chart .ln { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .l-brand { stroke: var(--c1); fill: var(--c1); } .l-accent { stroke: var(--c2); fill: var(--c2); } .l-teal { stroke: var(--c3); fill: var(--c3); } .l-gold { stroke: var(--c4); fill: var(--c4); } .l-muted { stroke: var(--line-2); fill: var(--line-2); }

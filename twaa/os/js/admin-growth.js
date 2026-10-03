@@ -219,7 +219,7 @@ const ON = {
     const note = (inst.ui.gLnNote || "").trim();
     const r = inst.act("zone.launch", { zoneId: z.id, reason: `${uiv(inst, "LnReason", LAUNCH_REASONS[0])}${note ? " — " + note : ""}` });
     if (r && r.ok !== false) {
-      const ph = S().leads.find((l) => l.zoneId === z.id && l.type === "pharmacy");
+      const ph = S().leads.filter((l) => l.zoneId === z.id && l.type === "pharmacy").sort((x, y) => (before.has(x.id) ? 0 : -1) - (before.has(y.id) ? 0 : -1) || y.stage - x.stage)[0];
       inst.ui.gLaunch = { zoneId: z.id, notified: r.notified || 0, leadId: ph ? ph.id : null, created: ph ? !before.has(ph.id) : false, at: Date.now(), by: TW.actor.admin().name };
       inst.ui.modal = null; TW.toast(`${z.ar} بقت منطقة خدمة تجريبية — ${num(r.notified || 0)} عميل في قائمة الانتظار هيتبلغوا`, "ok"); inst.render();
     }
@@ -540,7 +540,7 @@ page("acquisition", (inst) => {
 /* ======================================================================= GROWTH · Location expansion ===================== */
 A.modals["g-launch"] = (inst, mo) => {
   const z = byId(S().zones, mo.zoneId); const m = zoneMetrics(z);
-  const phLead = S().leads.find((l) => l.zoneId === z.id && l.type === "pharmacy");
+  const phLead = S().leads.filter((l) => l.zoneId === z.id && l.type === "pharmacy").sort((x, y) => y.stage - x.stage)[0];
   return TW.modalWrap(`إطلاق منطقة خدمة تجريبية — ${esc(z.ar)}`, `${banner(`<b>اللي هيحصل:</b><ul class="g-list" style="margin-top:4px"><li>${esc(z.ar)} تتفعّل كمنطقة رحلات مجدولة (${esc((z.windows || []).join(" · ") || "نوافذ تتحدد")}) بسعة مبدئية 20 طلب/يوم، رسوم ${money(z.fee)} وحد أدنى ${money(z.min)}.</li><li>${phLead ? `مهمة استقطاب الصيدلية موجودة في الخط: <b>${esc(phLead.id)} ${esc(phLead.ar)}</b> («${esc(D.leadStages[phLead.stage])}») — مش هتتكرر.` : "هتتعمل مهمة استقطاب صيدلية تلقائياً (فجوة صيدلية في المنطقة)."}</li><li>إشعار لـ <b>${num(m.users)}</b> عميل في قائمة الانتظار.</li><li>الجاهزية تبقى «تجريبية» والقرار يتسجّل في سجل التدقيق.</li></ul>`, "brand", "map")}
     <div class="grid g3">${kpi("طلب متوقع/يوم", num(m.demand), `التعادل ${m.be ? num(m.be) : "—"}`)}${kpi("تكلفة توصيل/طلب", money(m.cpo), "رحلات مجدولة")}${kpi("مساهمة/طلب متوقعة", smoney(m.cmOrder), "قبل الكثافة", { tone: m.cmOrder < 0 ? "bad" : "ok" })}</div>
     ${field("السبب (قائمة محكومة)", sel("LnReason", uiv(inst, "LnReason", LAUNCH_REASONS[0]), LAUNCH_REASONS.map((r) => [r, r])))}
