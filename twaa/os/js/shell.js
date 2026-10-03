@@ -89,7 +89,7 @@ function wire(inst) {
     if (t.tagName === "A" && t.getAttribute("href") && !t.dataset.to) return;
     const act = t.dataset.act; const d = t.dataset;
     if (t.disabled || t.getAttribute("aria-disabled") === "true") return;
-    ev.preventDefault();
+    if (!(t.tagName === "INPUT" && /checkbox|radio/.test(t.type))) ev.preventDefault();
     if (act === "go") return inst.go(d.to);
     if (act === "back") return inst.back();
     if (act === "ui") { inst.ui[d.k] = d.v === "null" ? null : d.v; return inst.render(); }

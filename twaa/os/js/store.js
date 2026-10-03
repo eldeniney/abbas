@@ -235,7 +235,7 @@ function advanceSeed(S, o, target, t0, agoMin, rnd, opt = {}) {
   const at = t0 - agoMin * MIN;
   const fos = S.fos.filter((f) => f.orderId === o.id), tasks = S.tasks.filter((t) => t.orderId === o.id);
   const ev = (code, text, t = at) => o.events.push({ at: t, code, text, who: "system" });
-  const ready = (f, t) => { o.events.push({ at: t, code: f.sourceType === "hub" ? "PACKED" : "READY", text: `${f.name}: جاهز`, who: "system" }); if (f.sourceType === "hub") { f.status = "PACKED"; f.pickStart = t - 5 * MIN; f.lines = f.lines; o.lines.filter((l) => l.foId === f.id).forEach((l) => (l.picked = true)); } else { f.status = "READY"; f.acceptedAt = t - 12 * MIN; } f.readyAt = t; };
+  const ready = (f, t) => { o.events.push({ at: t, code: f.sourceType === "hub" ? "PACKED" : "READY", text: `${f.name}: جاهز`, who: "system" }); if (f.sourceType === "hub") { f.status = "PACKED"; f.pickStart = t - 5 * MIN; f.packages = [{ id: `${f.id}-P1`, code: f.pickupCode, handling: "normal" }]; f.lines = f.lines; o.lines.filter((l) => l.foId === f.id).forEach((l) => (l.picked = true)); } else { f.status = "READY"; f.acceptedAt = t - 12 * MIN; } f.readyAt = t; };
   const assign = (t, rid, when) => { const r = find(S.riders, rid); t.riderId = rid; t.status = "ASSIGNED"; t.assignedAt = when; t.offers.push({ riderId: rid, at: when - 20000, resp: "accept", rt: 18 }); r.status = "busy"; r.task = t.id; t.leg = "pickup"; t.prog = 0.4; o.events.push({ at: when, code: "RIDER_ASSIGNED", text: `${r.ar} قبل المهمة`, who: "rider" }); };
   const deliver = (t, when, rid) => { assign(t, rid, when - 25 * MIN); t.status = "DELIVERED"; t.pickedAt = when - 15 * MIN; t.deliveredAt = when; t.pod = { otp: o.otp, at: when, gps: true }; t.pickups.forEach((p) => { p.scanned = true; p.at = t.pickedAt; }); const r = find(S.riders, rid); r.status = r.demo || r.id === "r2" || r.id === "r3" ? "online" : r.status; r.task = null; r.x = o.address.x; r.y = o.address.y; };
   if (target === "CLOSED" || target === "DELIVERED") {
@@ -813,7 +813,7 @@ A["task.deliver"] = ({ taskId, otp }, actor) => {
   if (t.cod > 0 && t.collected == null) return fail("لازم تسجّل الكاش اللي استلمته قبل التسليم (BR-COD-004)");
   t.status = "DELIVERED"; t.deliveredAt = now(); t.pod = { otp: true, at: now(), gps: true };
   t.foIds.forEach((fid) => (find(S.fos, fid).status = "DELIVERED"));
-  r.task = (r.route || []).find((id) => id !== t.id && ["ASSIGNED", "AT_PICKUP", "PICKED_UP", "ARRIVED"].includes((find(S.tasks, id) || {}).status)) || null; r.status = r.task ? "busy" : "online"; r.jobsToday++; r.earnToday += t.earn;
+  r.task = (r.route || []).find((id) => id !== t.id && ["ASSIGNED", "AT_PICKUP", "PICKED_UP", "ARRIVED"].includes((find(S.tasks, id) || {}).status)) || null; r.status = r.task ? "busy" : "online"; if (!r.task) r.route = null; else { const nx = find(S.tasks, r.task); nx.from = { x: r.x, y: r.y }; nx.prog = 0; } r.jobsToday++; r.earnToday += t.earn;
   const rs = S.rsettle.find((x) => x.riderId === r.id); if (rs) { rs.missions++; rs.fees += t.earn; }
   if (t.cod > 0) {
     const c = { id: uid("COD"), orderId: o.id, taskId: t.id, riderId: r.id, expected: t.cod, collected: t.collected, variance: +(t.collected - t.cod).toFixed(2), at: now(), status: "HELD", varReason: t.varReason };
@@ -857,7 +857,7 @@ A["rider.deposit"] = ({ riderId, amount, at = "الهب" }, actor) => {
 };
 
 /* ---------------- hub / picker / inventory ---------------- */
-A["hub.start"] = ({ foId }, actor) => { const f = find(TW.S.fos, foId); if (f.status !== "QUEUED") return; f.status = "PICKING"; f.pickStart = now(); f.picker = actor.name; };
+A["hub.start"] = ({ foId }, actor) => { const f = find(TW.S.fos, foId); if (find(TW.S.orders, f.orderId).hold) return fail("بانتظار تأكيد الدفع"); if (f.status !== "QUEUED") return; f.status = "PICKING"; f.pickStart = now(); f.picker = actor.name; };
 A["hub.pick"] = ({ foId, key, result, code }, actor) => {
   const S = TW.S, f = find(S.fos, foId), o = find(S.orders, f.orderId), l = o.lines.find((x) => x.key === key);
   if (result === "picked") { const s = find(S.skus, l.skuId); if (code && code !== s.barcode) return fail("الباركود مش مطابق (BR-PCK-001)"); if (S.inv.h1[l.skuId] && S.inv.h1[l.skuId].shelfEmpty) return fail("النظام بيقول الصنف ده رفّه فاضي — سجّل «الرف فاضي»"); l.picked = true; return; }
@@ -889,7 +889,7 @@ A["hub.pack"] = ({ foId, count }, actor) => {
   const ls = o.lines.filter((l) => l.foId === f.id && l.state !== "removed");
   if (ls.some((l) => l.state === "sub_pending")) return fail("فيه صنف بانتظار قرار العميل على البديل");
   if (ls.some((l) => !l.picked)) return fail("لسه فيه أصناف متجمعتش (EX-PCK-001)");
-  const needSplit = ls.some((l) => l.handling === "frozen" || l.handling === "chilled") && ls.some((l) => l.handling === "separate");
+  const needSplit = ls.some((l) => l.handling === "separate") && ls.some((l) => l.handling !== "separate");
   f.packages = [{ id: `${f.id}-P1`, code: f.pickupCode, handling: "normal" }];
   if (ls.some((l) => ["chilled", "frozen"].includes(l.handling))) f.packages.push({ id: `${f.id}-P2`, code: f.pickupCode, handling: "chilled" });
   if (needSplit) f.packages.push({ id: `${f.id}-P3`, code: f.pickupCode, handling: "separate" });
@@ -905,17 +905,20 @@ A["inv.adjust"] = ({ skuId, field = "onHand", value, reason, evidence }, actor) 
   audit(actor, `${find(S.skus, skuId).ar} (مخزون)`, `تسوية ${field}`, before, value, reason);
   if (field === "onHand" && Number(value) < before && (before - Number(value)) * iv.cost > 300) approval("writeoff", { kind: "inventory", skuId }, actor, `شطب ${before - Number(value)} وحدة من ${find(S.skus, skuId).ar}`, Math.round((before - Number(value)) * iv.cost), evidence || "—", "خسارة هالك", "ops");
 };
-A["po.create"] = ({ lines, supplier }, actor) => { const S = TW.S; const po = { id: `PO-${S.seq.po++}`, supplier: supplier || "مورد معتمد", status: "PENDING_APPROVAL", lines, createdAt: now(), eta: now() + 20 * 3600000 }; S.pos.unshift(po); approval("po", { kind: "po", id: po.id }, actor, `أمر شراء ${po.id} — ${lines.length} أصناف`, Math.round(sum(lines, (l) => l[1] * l[2])), "توصية الشراء من الطلب الفعلي", "يربط كاش في المخزون", "finance"); return { ok: true, id: po.id }; };
+A["po.create"] = ({ lines, supplier }, actor) => { if (actor.kind === "admin" && !TW.can("inventory.adjust", actor.id) && !TW.can("po.approve", actor.id)) return fail("إنشاء أوامر الشراء للمشتريات أو الهب"); const S = TW.S; const po = { id: `PO-${S.seq.po++}`, supplier: supplier || "مورد معتمد", status: "PENDING_APPROVAL", lines, createdAt: now(), eta: now() + 20 * 3600000 }; S.pos.unshift(po); approval("po", { kind: "po", id: po.id }, actor, `أمر شراء ${po.id} — ${lines.length} أصناف`, Math.round(sum(lines, (l) => l[1] * l[2])), "توصية الشراء من الطلب الفعلي", "يربط كاش في المخزون", "finance"); return { ok: true, id: po.id }; };
 A["po.receive"] = ({ poId, received }, actor) => {
+  { const d = need("inventory.adjust", actor); if (d) return d; }
   const S = TW.S, po = find(S.pos, poId); if (po.status !== "RECEIVING" && po.status !== "APPROVED") return fail("أمر الشراء مش جاهز للاستلام");
-  po.receivedLines = po.lines.map(([id, q], i) => [id, Number(received[i])]);
+  po.receivedLines = po.lines.map(([id, q], i) => [id, Math.max(0, Math.min(Number(received[i]) || 0, q))]);
   const short = po.receivedLines.filter(([id, q], i) => q < po.lines[i][1]);
   po.receivedLines.forEach(([id, q]) => { const iv = S.inv.h1[id]; const before = iv.onHand; iv.onHand += q; iv.incoming = Math.max(0, iv.incoming - q); S.moves.unshift({ id: `MV-${S.seq.mv++}`, at: now(), skuId: id, type: "استلام", qty: q, before, after: iv.onHand, reason: po.id, user: actor.name, evidence: "باركود + فاتورة المورد" }); });
   po.status = "RECEIVED"; po.discrepancy = short.length ? `عجز في ${short.length} صنف — مطالبة للمورد` : null;
   audit(actor, po.id, "استلام أمر شراء", null, po.discrepancy || "مطابق", null);
 };
 A["return.inspect"] = ({ returnId, outcome, reason }, actor) => {
-  const S = TW.S, rt = find(S.returns, returnId); const d = needReason(reason); if (d) return d;
+  const S = TW.S, rt = find(S.returns, returnId); const d = need("inventory.adjust", actor) || needReason(reason); if (d) return d;
+  if (rt.status !== "INSPECTION") return fail("المرتجع مش في مرحلة الفحص");
+  if (outcome !== "waste" && rt.hot) return fail("أكل سخن — لازم يتسجل هالك (BR-RTO-001)");
   rt.status = outcome === "restock" ? "RESTOCKED" : outcome === "quarantine" ? "QUARANTINED" : "WASTE"; rt.inspectedBy = actor.name; rt.inspectedAt = now(); rt.outcome = reason;
   rt.lines.forEach(([id, q]) => { const iv = S.inv.h1[id]; if (!iv) return; if (outcome === "restock") iv.onHand += q; else if (outcome === "quarantine") iv.quarantine += q; else iv.damaged += q; });
   audit(actor, rt.id, "فحص مرتجع", "INSPECTION", rt.status, reason);
@@ -935,10 +938,14 @@ A["dispatch.assign"] = ({ taskId, riderId, reason }, actor) => {
   audit(actor, t.id, "إسناد يدوي", prev, r.ar, reason);
 };
 A["dispatch.reoffer"] = ({ taskId }, actor) => { const t = find(TW.S.tasks, taskId); t.status = "WAITING"; t.attempts = 0; t.offer = null; audit(actor, t.id, "إعادة عرض على المناديب", "NO_RIDER", "WAITING", "تدخل الكنترول"); };
-A["route.depart"] = ({ zoneId, riderId, reason }, actor) => {
+A["route.depart"] = ({ zoneId, riderId, reason, window }, actor) => {
+  const d = need("dispatch.assign", actor) || needReason(reason); if (d) return d;
   const S = TW.S, r = find(S.riders, riderId);
-  const ts = S.tasks.filter((t) => t.status === "SCHEDULED" && t.drop.zoneId === zoneId);
+  const ts = S.tasks.filter((t) => t.status === "SCHEDULED" && t.drop.zoneId === zoneId && (!window || t.window === window));
   if (!ts.length) return fail("مفيش طلبات على الرحلة دي");
+  if (r.task) return fail(`${r.ar} في مهمة حالية`);
+  const bad = ts.map((t) => riderEligibility(r, { ...t, cod: 0 })).find((e) => !e.ok); if (bad) return fail(`المندوب غير مؤهل: ${bad.why}`);
+  const routeCod = sum(ts, (t) => t.cod); if (r.cash + routeCod > r.limit) return fail(`كاش الرحلة ${money(routeCod)} + اللي معاه ${money(r.cash)} أكبر من حده ${money(r.limit)}`);
   if (!ts.every((t) => t.foIds.every((fid) => ["PACKED", "READY"].includes(find(S.fos, fid).status)))) return fail("فيه طلبات لسه مش جاهزة على الرحلة");
   ts.forEach((t, i) => { t.riderId = riderId; t.status = i === 0 ? "ASSIGNED" : "ASSIGNED"; t.route = { zoneId, seq: i + 1, of: ts.length }; t.assignedAt = now(); t.leg = "pickup"; t.prog = 0; t.from = { x: r.x, y: r.y }; ev(find(S.orders, t.orderId), "ROUTE", `اتحمّل على رحلة ${find(S.zones, zoneId).ar} (${i + 1}/${ts.length}) مع ${r.ar}`, "admin"); });
   r.status = "busy"; r.task = ts[0].id; r.route = ts.map((t) => t.id);
@@ -1408,6 +1415,7 @@ function tick() {
     /* movement */
     if (["ASSIGNED", "PICKED_UP"].includes(tk.status) || tk.status === "RTO") {
       const r = find(S.riders, tk.riderId); if (!r) return;
+      if (r.task && r.task !== tk.id && tk.status !== "RTO") return;
       const target = tk.status === "PICKED_UP" ? tk.drop : tk.status === "RTO" ? tk.pickups[0] : tk.pickups.find((p) => !p.scanned) || tk.pickups[0];
       const from = tk.from || { x: r.x, y: r.y };
       const step = (r.vehicle === "bicycle" ? 0.045 : 0.06) * (S.sim.speed || 1);
