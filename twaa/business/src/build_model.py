@@ -612,6 +612,11 @@ D["A31"] = "How to use this model"; D["A30"].font = font(PLUM, True)
 notes = ["1. Change inputs only on the Assumptions sheet (blue text; yellow = key levers).", f"2. Switch scenario on Assumptions!C{AR['scen']}: 1 Conservative · 2 Base · 3 Optimistic.", "3. Model = monthly engine (Oct 2026 – Dec 2031). Annual, Unit Economics and Revenue Streams roll it up.", "4. Colours: blue input · black formula · green link to another sheet. All values nominal EGP ex-VAT."]
 for j, t in enumerate(notes): D[f"A{32 + j}"] = t; D[f"A{32 + j}"].font = font(size=9)
 
+if __import__("os").environ.get("TWAA_LANG") == "ar":
+    import os as _os; sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    import translate_ar
+    _miss = translate_ar.apply(wb)
+    if _miss: print("untranslated labels:", sorted(_miss))
 wb.save(OUT)
 import json
 json.dump({"AR": AR, "R": R, "YR": YR, "first": FIRST, "last": LAST, "N": N, "rs_total": RS_TOTAL}, open(OUT + ".map.json", "w"))
