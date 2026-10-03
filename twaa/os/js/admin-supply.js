@@ -709,7 +709,7 @@ function zoneEcon(z) {
   return { ...s, kmPer, cpk: s.cpo / kmPer, density: s.opt / (s.km * s.opt + s.dead), day: s.cm * s.orders, subsidy: s.cpo - z.fee, loss: s.cm < 0 };
 }
 const zoneHub = (z) => find(TW.S.hubs, z.hub || "h1");
-const zVal = (z, f) => (f === "sla" ? `${z.sla[0]}–${z.sla[1]} د` : f === "windows" ? (z.windows.length ? z.windows.join("، ") : "—") : f === "riderType" ? z.riderType.map((v) => D.vehicles[v]).join("، ") : f === "route" ? ROUTE_AR[z.route] || z.route : f === "active" ? (z.active ? "مفعّلة" : "غير مفعّلة") : f === "hub" ? zoneHub(z).ar : f === "fee" || f === "min" ? money(z[f]) : String(z[f]));
+const zVal = (z, f) => (f === "sla" ? `${z.sla[0]} إلى ${z.sla[1]} د` : f === "windows" ? (z.windows.length ? z.windows.join("، ") : "—") : f === "riderType" ? z.riderType.map((v) => D.vehicles[v]).join("، ") : f === "route" ? ROUTE_AR[z.route] || z.route : f === "active" ? (z.active ? "مفعّلة" : "غير مفعّلة") : f === "hub" ? zoneHub(z).ar : f === "fee" || f === "min" ? money(z[f]) : String(z[f]));
 TW.page("zones", {
   render(inst) {
     const S = TW.S, zid = ui(inst, "spZone", "hadeen"), z = find(S.zones, zid) || S.zones[0], e = zoneEcon(z);
@@ -721,7 +721,7 @@ TW.page("zones", {
       { k: "h", label: "الهب", render: (x) => esc(zoneHub(x).ar.split(" — ")[0]) },
       { k: "fee", label: "الرسوم", num: true, render: (x) => money(x.fee) },
       { k: "min", label: "حد أدنى", num: true, render: (x) => money(x.min) },
-      { k: "sla", label: "الوعد", num: true, render: (x) => `${x.sla[0]}–${x.sla[1]} د` },
+      { k: "sla", label: "الوعد", num: true, render: (x) => `${x.sla[0]} إلى ${x.sla[1]} د` },
       { k: "hrs", label: "الساعات", render: (x) => esc(x.hours) },
       { k: "cap", label: "السعة", num: true, render: (x) => num(x.cap) },
       { k: "w", label: "النوافذ", render: (x) => (x.windows.length ? x.windows.map((w) => `<span class="mono">${esc(w)}</span>`).join("<br>") : "—") },
@@ -734,7 +734,7 @@ TW.page("zones", {
     const sched = S.tasks.filter((t) => t.status === "SCHEDULED" && t.drop.zoneId === z.id).length;
     const eligRiders = S.riders.filter((r) => z.riderType.includes(r.vehicle) && r.status !== "offline" && !r.suspended).length;
     const fields = ["fee", "min", "sla", "hours", "cap", "windows", "riderType", "route", "active", "hub"];
-    const cfg = `<div class="list">${fields.map((f) => `<div class="li"><span class="lbl" style="min-width:150px">${ZF[f]}</span><span class="grow">${esc(zVal(z, f))}</span>${A.permBtn("zones.edit", "تعديل", "sp-ze-open", { cls: "sm ghost", icon: "edit", data: { zone: z.id, field: f } })}</div>`).join("")}</div>`;
+    const cfg = `<div class="list">${fields.map((f) => `<div class="li"><span class="lbl" style="min-width:150px">${ZF[f]}</span><span class="grow">${f === "windows" ? z.windows.map((w) => `<span class="mono sp-id">${esc(w)}</span>`).join(" · ") || "—" : esc(zVal(z, f))}</span>${A.permBtn("zones.edit", "تعديل", "sp-ze-open", { cls: "sm ghost", icon: "edit", data: { zone: z.id, field: f } })}</div>`).join("")}</div>`;
     const econ = e ? `<div class="sp-minis">${mini("تكلفة/طلب", money(e.cpo), `الرسوم ${money(z.fee)}`, e.cpo > z.fee ? "warn" : "")}${mini("تكلفة/كم", money(e.cpk, 1), `${num(e.kmPer, 1)} كم/طلب`)}${mini("طلبات/رحلة", num(e.opt, 1))}${mini("كثافة المسار", num(e.density, 2), "طلب لكل كم رحلة")}${mini("انتظار", `${num(e.wait, 1)} د`, "عند الاستلام")}${mini("كم فاضي (deadhead)", num(e.dead, 1), "لكل رحلة")}${mini("مساهمة/طلب", money(e.cm, 1), "", e.loss ? "bad" : "ok")}${mini("مساهمة/يوم", money(e.day), `${num(e.orders)} طلب/يوم`, e.loss ? "bad" : "ok")}${mini("في الموعد", pct(e.onTime))}</div>
       ${e.loss ? `<div class="banner bad" style="margin-top:10px">${ic("alert", "ic sm")}<div><b>المنطقة خسرانة (Guardrail B):</b> مساهمة ${money(e.cm, 1)} لكل طلب — دعم توصيل ${money(e.subsidy)} على كل طلب. الحلول بالترتيب: ارفع الحد الأدنى للسلة (كل +${money(Math.ceil(-e.cm / 0.15 / 5) * 5)} سلة بتغطي العجز بهامش 15%)، قلّل النوافذ لتجميع ${num(e.opt + 1, 1)}+ طلب/رحلة، أو ارفع رسوم التوصيل.</div></div>` : e.subsidy > 0 ? `<div class="banner warn" style="margin-top:10px">${ic("info", "ic sm")}<div>رسوم التوصيل أقل من تكلفة الطلب بـ ${money(e.subsidy)} — الهامش من المنتجات بيغطيها حالياً.</div></div>` : `<div class="banner ok" style="margin-top:10px">${ic("check", "ic sm")}<div>اقتصاديات التوصيل سليمة.</div></div>`}` : `<p class="muted">المنطقة غير مفعّلة — مفيش بيانات تشغيل. قرار الإطلاق من <button class="btn sm ghost" data-act="go" data-to="/admin/expansion" style="padding:0 4px">التوسع الجغرافي</button>.</p>`;
     return `${A.head("مناطق الخدمة والعناقيد", "محافظة ← مركز ← مدينة/قرية ← منطقة خدمة ← عنقود رحلات · الوعد واقعي حسب المنطقة — مفيش «15 دقيقة» للكل", TW.btn("تخطيط الرحلات", "go", { cls: "sm", icon: "route", data: { to: "/admin/routes" } }))}

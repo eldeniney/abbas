@@ -311,6 +311,7 @@ function seedAdmin(S, rnd, t0) {
   S.seq.po = 73;
   /* catalogue requests from merchants */
   S.catReqs = [{ id: `CR-${S.seq.req++}`, merchantId: "m14", name: "شاحن سامسونج 25 وات أصلي", barcode: "8806094523612", catGuess: "electronics/chargers", photo: true, status: "PENDING", at: t0 - 3 * 3600000 }];
+  ap("new_sku", { kind: "catreq", id: S.catReqs[0].id }, { name: "موبايلات النجم", role: "merchant" }, "طلب إضافة منتج: شاحن سامسونج 25 وات أصلي", 0, "باركود 8806094523612 · صورة مرفقة", "منع التكرار والتسمية العشوائية", "category", 180);
   /* returns awaiting inspection */
   S.returns = [{ id: "RT-31", orderId: "TW-0989", source: "h1", lines: [["SKU-10111", 1]], reason: "العميل رفض الاستلام", status: "INSPECTION", at: t0 - 50 * MIN }];
   /* audit seed */
@@ -382,7 +383,7 @@ function buildOrder(S, input, at = now()) {
   lines.filter((l) => l.sourceType === "hub").forEach((l) => { const iv = S.inv.h1[l.skuId]; if (iv) iv.reserved += l.qty; });
   if (input.pay === "wallet") c.wallet = Math.max(0, c.wallet - total);
   if (promo) { const p = find(S.promos, promo); p.redemptions++; p.spent += discount; }
-  c.orders++; c.last = 0;
+  c.orders++; c.last = 0; c.ltv = (c.ltv || 0) + total;
   return { ok: true, order };
 }
 
@@ -1072,7 +1073,7 @@ A["catalog.createFromRequest"] = ({ reqId, ar, en, brand, dept, cat, size, price
   const dup = S.skus.find((s) => TW.norm(s.ar) === TW.norm(ar) || (barcode && s.barcode === barcode));
   if (dup) return fail(`فيه SKU مطابق موجود: ${dup.ar} (${dup.id}) — اربط الطلب بيه بدل التكرار`, { dup: dup.id });
   const id = `SKU-${10001 + S.skus.length}`;
-  const sku = { id, ar, en: en || ar, brand: brand || "—", dept, cat, sub: ar.split(" ")[0], family: ar, size, unit: "عبوة", pack: 1, barcode: barcode || `622${Date.now() % 1e10}`, aliases: [cr.name], temp: "a", fragile: false, regulated: false, ageR: 0, shelfLife: 30, subGroup: null, refPrice: Number(price), price: Number(price), oldPrice: null, weightVar: false, local: false, hub: false, handling: "normal", diet: [], tax: 0.14, weightKg: 0.5, active: true, desc: `${ar} — ${size}`, createdFrom: cr.id };
+  const sku = { id, ar, en: en || ar, brand: brand || "—", dept, cat, sub: ar.split(" ")[0], family: ar, size, unit: "عبوة", pack: 1, barcode: barcode || `622${String(Date.now() % 1e10).padStart(10, "0")}`, aliases: [cr.name], temp: "a", fragile: false, regulated: false, ageR: 0, shelfLife: 30, subGroup: null, refPrice: Number(price), price: Number(price), oldPrice: null, weightVar: false, local: false, hub: false, handling: "normal", diet: [], tax: 0.14, weightKg: 0.5, active: true, desc: `${ar} — ${size}`, createdFrom: cr.id };
   S.skus.push(sku);
   S.msku[cr.merchantId] = S.msku[cr.merchantId] || {}; S.msku[cr.merchantId][id] = { price: Number(price), available: true, stock: null, prep: find(S.merchants, cr.merchantId).prep, updatedAt: now() };
   cr.status = "APPROVED"; cr.skuId = id;
@@ -1082,8 +1083,16 @@ A["catalog.createFromRequest"] = ({ reqId, ar, en, brand, dept, cat, size, price
   audit(actor, id, "إنشاء SKU معتمد", null, ar, `من طلب ${cr.id}`);
   return { ok: true, skuId: id };
 };
-A["catalog.linkRequest"] = ({ reqId, skuId }, actor) => { const S = TW.S, cr = find(S.catReqs, reqId); cr.status = "LINKED"; cr.skuId = skuId; S.msku[cr.merchantId][skuId] = { price: find(S.skus, skuId).refPrice, available: true, stock: null, prep: 10, updatedAt: now() }; const ap = S.approvals.find((a) => a.ref.kind === "catreq" && a.ref.id === reqId && a.status === "PENDING"); if (ap) { ap.status = "APPROVED"; ap.approver = actor.name; ap.decidedAt = now(); ap.note = `ربط بـ ${skuId}`; } notify(`merchant:${cr.merchantId}`, "المنتج موجود في الكتالوج", `${find(S.skus, skuId).ar} اتضاف لمحلك`, {}); audit(actor, cr.id, "ربط طلب بمنتج موجود", null, skuId, "منع التكرار"); };
-A["sku.update"] = ({ skuId, field, value, reason }, actor) => { const d = need(field === "price" || field === "refPrice" ? "price.override" : "catalog.edit", actor) || needReason(reason); if (d) return d; const s = find(TW.S.skus, skuId); const old = s[field]; s[field] = field === "price" || field === "refPrice" ? Number(value) : value; audit(actor, skuId, `تعديل ${field}`, old, value, reason); };
+A["catalog.linkRequest"] = ({ reqId, skuId }, actor) => { const d = need("catalog.approve", actor); if (d) return d; const S = TW.S, cr = find(S.catReqs, reqId); if (!cr || cr.status !== "PENDING") return fail("الطلب اتاخد فيه قرار"); S.msku[cr.merchantId] = S.msku[cr.merchantId] || {}; cr.status = "LINKED"; cr.skuId = skuId; S.msku[cr.merchantId][skuId] = { price: find(S.skus, skuId).refPrice, available: true, stock: null, prep: 10, updatedAt: now() }; const ap = S.approvals.find((a) => a.ref.kind === "catreq" && a.ref.id === reqId && a.status === "PENDING"); if (ap) { ap.status = "APPROVED"; ap.approver = actor.name; ap.decidedAt = now(); ap.note = `ربط بـ ${skuId}`; } notify(`merchant:${cr.merchantId}`, "المنتج موجود في الكتالوج", `${find(S.skus, skuId).ar} اتضاف لمحلك`, {}); audit(actor, cr.id, "ربط طلب بمنتج موجود", null, skuId, "منع التكرار"); };
+A["sku.update"] = ({ skuId, field, value, reason }, actor) => {
+  const d = need(field === "price" || field === "refPrice" ? "price.override" : "catalog.edit", actor) || needReason(reason); if (d) return d;
+  const s = find(TW.S.skus, skuId); const old = s[field];
+  let v = value;
+  if (typeof old === "number") { v = Number(value); if (isNaN(v)) return fail("القيمة لازم تكون رقم"); }
+  else if (typeof old === "boolean") v = value === true || value === "true" || value === "1";
+  else if (Array.isArray(old)) v = Array.isArray(value) ? value : String(value).split(/[,،]/).map((x) => x.trim()).filter(Boolean);
+  if (field === "barcode" && TW.S.skus.some((x) => x.id !== skuId && x.barcode === String(v))) return fail("الباركود ده مستخدم لصنف تاني");
+  s[field] = v; value = v; audit(actor, skuId, `تعديل ${field}`, old, value, reason); };
 A["merchant.status"] = ({ merchantId, status, reason }, actor) => { const d = need("merchant.activate", actor) || needReason(reason); if (d) return d; const m = find(TW.S.merchants, merchantId); const old = m.health; m.health = status; if (status === "suspended") { m.mode = "closed"; } audit(actor, m.ar, "تغيير تصنيف التاجر", old, status, reason); notify(`merchant:${m.id}`, "تحديث حالة حسابك", `${{ watch: "تحت المراقبة", restricted: "مقيّد", suspended: "موقوف", healthy: "سليم" }[status] || status} — ${reason}`, {}); };
 A["merchant.commission"] = ({ merchantId, pct, reason }, actor) => { const d = need("merchant.commission", actor) || needReason(reason); if (d) return d; const m = find(TW.S.merchants, merchantId); const old = m.commission; m.commission = Number(pct) / 100; audit(actor, m.ar, "تعديل عمولة", `${Math.round(old * 100)}%`, `${pct}%`, reason); };
 A["rider.suspend"] = ({ riderId, reason, on = true }, actor) => { const d = need("rider.manage", actor) || needReason(reason); if (d) return d; const r = find(TW.S.riders, riderId); r.suspended = on; if (on) r.status = "offline"; audit(actor, r.ar, on ? "إيقاف مندوب" : "إعادة تفعيل مندوب", null, null, reason); };
@@ -1108,7 +1117,7 @@ TW.promoImpact = (p) => {
 A["promo.create"] = (p, actor) => {
   const S = TW.S; const d = need("promo.create", actor); if (d) return d;
   if (!p.name || !p.funding) return fail("اسم العرض وجهة التمويل إلزاميين (Guardrail C)");
-  const promo = { id: `PR-${S.seq.promo++}`, code: p.code || null, name: p.name, type: p.type, value: Number(p.value) || 0, cap: Number(p.cap) || null, minBasket: Number(p.minBasket) || 0, scope: p.scope || "all", funding: p.funding, share: p.funding === "shared" ? 0.5 : p.funding === "twaa" ? 1 : 0, budget: Number(p.budget) || 0, spent: 0, redemptions: 0, limitPerCustomer: Number(p.limit) || 1, segment: p.segment || "all", zones: p.zones || "all", start: now(), end: now() + (Number(p.days) || 7) * 864e5, goal: p.goal || "basket increase", status: "draft" };
+  const promo = { id: `PR-${S.seq.promo++}`, code: p.code || null, name: p.name, type: p.type, value: Number(p.value) || 0, cap: Number(p.cap) || null, minBasket: Number(p.minBasket) || 0, scope: p.scope || "all", funding: p.funding, share: p.funding === "shared" ? clamp(Number(p.share) || 0.5, 0, 1) : p.funding === "twaa" ? 1 : 0, kind: p.kind || p.type, window: p.window || null, budget: Number(p.budget) || 0, spent: 0, redemptions: 0, limitPerCustomer: Number(p.limit) || 1, segment: p.segment || "all", zones: p.zones || "all", start: now(), end: now() + (Number(p.days) || 7) * 864e5, goal: p.goal || "basket increase", status: "draft" };
   const imp = TW.promoImpact(promo); promo.incContribution = imp.incremental; promo.impact = imp;
   S.promos.unshift(promo);
   if (imp.belowGuard || promo.budget > 30000) { promo.status = "pending_approval"; approval("promo", { kind: "promo", id: promo.id }, actor, `${promo.name} — مساهمة متوقعة ${num(imp.cmPerOrder, 1)} ج.م/طلب${imp.belowGuard ? ` (تحت الحد ${S.rules.minContribution})` : ""}`, promo.budget, `تمويل: ${{ twaa: "توّا", merchant: "التاجر", shared: "مشترك" }[promo.funding]} · خصم متوقع ${num(imp.disc, 1)} ج.م`, `Expected incremental contribution ${num(imp.incremental, 1)} ج.م/طلب`, "gm"); }
@@ -1116,16 +1125,16 @@ A["promo.create"] = (p, actor) => {
   audit(actor, promo.id, "إنشاء عرض", null, promo.status, promo.name);
   return { ok: true, promo };
 };
-A["promo.toggle"] = ({ promoId }, actor) => { const p = find(TW.S.promos, promoId); if (p.status === "pending_approval") return fail("العرض بانتظار الموافقة"); const old = p.status; p.status = p.status === "active" ? "paused" : "active"; audit(actor, p.id, "تغيير حالة عرض", old, p.status, null); };
+A["promo.toggle"] = ({ promoId }, actor) => { const d = need("promo.create", actor); if (d) return d; const p = find(TW.S.promos, promoId); if (p.status === "pending_approval") return fail("العرض بانتظار الموافقة"); if (!["active", "paused"].includes(p.status)) return fail("لا يمكن تغيير حالة هذا العرض"); const old = p.status; p.status = p.status === "active" ? "paused" : "active"; audit(actor, p.id, "تغيير حالة عرض", old, p.status, null); };
 A["campaign.create"] = (c, actor) => { const S = TW.S; const d = need("promo.create", actor); if (d) return d; const cp = { id: `CP-${S.seq.camp++}`, name: c.name, audience: c.audience, offer: c.offer || null, channel: c.channel, schedule: c.schedule, budget: Number(c.budget) || 0, guard: c.guard !== false, goal: c.goal, status: "scheduled", sent: 0, opened: 0, ordered: 0, incContribution: 0 }; const seg = find(S.segments, cp.audience); cp.size = seg ? seg.size : 0; S.campaigns.unshift(cp); audit(actor, cp.id, "إنشاء حملة", null, cp.name, null); return { ok: true, campaign: cp }; };
-A["campaign.launch"] = ({ id }, actor) => { const cp = find(TW.S.campaigns, id); const p = cp.offer && find(TW.S.promos, cp.offer); if (cp.guard && p && p.status !== "active") return fail("العرض المرتبط مش مفعّل (بانتظار موافقة أو متوقف)"); cp.status = "running"; cp.sent = cp.size || 0; cp.opened = Math.round(cp.sent * 0.42); cp.ordered = Math.round(cp.sent * 0.08); cp.incContribution = Math.round(cp.ordered * (p ? p.incContribution : 8)); audit(actor, cp.id, "إطلاق حملة", "scheduled", "running", null); };
-A["segment.create"] = ({ name, rule, size }, actor) => { TW.S.segments.push({ id: uid("sg"), ar: name, rule, size: Number(size) || 0 }); audit(actor, name, "إنشاء شريحة", null, rule, null); };
+A["campaign.launch"] = ({ id }, actor) => { const d = need("promo.create", actor); if (d) return d; const cp = find(TW.S.campaigns, id); const p = cp.offer && find(TW.S.promos, cp.offer); if (cp.guard && p && p.status !== "active") return fail("العرض المرتبط مش مفعّل (بانتظار موافقة أو متوقف)"); cp.status = "running"; cp.sent = cp.size || 0; cp.opened = Math.round(cp.sent * 0.42); cp.ordered = Math.round(cp.sent * 0.08); cp.incContribution = Math.round(cp.ordered * (p ? p.incContribution : 8)); audit(actor, cp.id, "إطلاق حملة", "scheduled", "running", null); };
+A["segment.create"] = ({ name, rule, size }, actor) => { const d = need("promo.create", actor); if (d) return d; if (!name) return fail("اسم الشريحة إلزامي"); TW.S.segments.push({ id: uid("sg"), ar: name, rule, size: Number(size) || 0 }); audit(actor, name, "إنشاء شريحة", null, rule, null); };
 A["lead.move"] = ({ leadId, stage, note }, actor) => {
   const S = TW.S, l = find(S.leads, leadId); const old = l.stage; l.stage = clamp(stage, 0, D.leadStages.length - 1); l.history.push({ at: now(), stage: l.stage, by: actor.name, note });
   if (l.stage >= 6 && l.merchantId && find(S.merchants, l.merchantId) && !Object.keys(S.msku[l.merchantId] || {}).length) { const m = find(S.merchants, l.merchantId); S.msku[m.id] = {}; S.skus.filter((s) => (D.typeDepts[m.type] || []).includes(s.dept) && !s.regulated).slice(0, 24).forEach((s) => (S.msku[m.id][s.id] = { price: s.refPrice, available: true, stock: null, prep: m.prep, updatedAt: now() })); }
   audit(actor, l.ar, "تحريك في خط المبيعات", D.leadStages[old], D.leadStages[l.stage], note || null);
 };
-A["lead.create"] = (l, actor) => { const S = TW.S; const lead = { id: `L-${S.seq.lead++}`, ar: l.name, owner: l.owner || "—", type: l.type, zoneId: l.zoneId, stage: 0, assortment: "—", opportunity: l.opportunity || "—", competitors: "—", commission: l.type === "restaurant" ? 0.17 : 0.1, history: [{ at: now(), stage: 0, by: actor.name }] }; S.leads.unshift(lead); audit(actor, lead.ar, "عميل محتمل جديد", null, D.merchantTypes[l.type], l.opportunity); return { ok: true, lead }; };
+A["lead.create"] = (l, actor) => { if (actor.kind === "admin" && !["founder", "gm", "sales", "merchops", "category", "marketing", "ops"].includes(TW.roleOf(actor.id).id)) return fail("إنشاء عميل محتمل للمبيعات أو عمليات التجار"); const S = TW.S; const lead = { id: `L-${S.seq.lead++}`, ar: l.name, owner: l.owner || "—", type: l.type, zoneId: l.zoneId, stage: 0, assortment: "—", opportunity: l.opportunity || "—", competitors: "—", commission: l.type === "restaurant" ? 0.17 : 0.1, history: [{ at: now(), stage: 0, by: actor.name }] }; S.leads.unshift(lead); audit(actor, lead.ar, "عميل محتمل جديد", null, D.merchantTypes[l.type], l.opportunity); return { ok: true, lead }; };
 A["zone.update"] = ({ zoneId, field, value, reason }, actor) => { const d = need("zones.edit", actor) || needReason(reason); if (d) return d; const z = find(TW.S.zones, zoneId); const old = z[field]; z[field] = ["fee", "min", "cap"].includes(field) ? Number(value) : value; audit(actor, `منطقة ${z.ar}`, `تعديل ${field}`, Array.isArray(old) ? old.join("–") : old, Array.isArray(value) ? value.join("–") : value, reason); };
 A["zone.launch"] = ({ zoneId, reason }, actor) => {
   const S = TW.S; const d = need("zones.edit", actor) || needReason(reason); if (d) return d;
