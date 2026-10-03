@@ -1,1 +1,107 @@
-/* admin-commerce — module styles (tokens only) */
+/* admin-commerce — module styles (tokens only). Prefix: cm- */
+
+/* search box + chip buttons used in every filter row */
+.cm-q { position: relative; display: inline-flex; align-items: center; flex: 1 1 220px; min-width: 0; max-width: 360px; }
+.cm-q .ic { position: absolute; inset-inline-start: 10px; color: var(--muted); pointer-events: none; }
+.cm-q .input, .filters .cm-q .input { width: 100%; padding-inline-start: 34px; }
+.cm-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-width: 0; }
+.cm-chips .lbl { margin-inline-end: 2px; }
+.cm-cb { border: 1px solid transparent; cursor: pointer; font: inherit; font-size: 12px; font-weight: 700; line-height: 22px; }
+.cm-cb:hover { border-color: currentColor; }
+.cm-cb.on { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+.cm-cb b { font-weight: 800; opacity: 0.8; }
+.cm-lnk { padding: 0 4px; min-height: 24px; font-weight: 700; color: var(--ink); max-width: 100%; white-space: normal; text-align: start; }
+.cm-note { font-size: 12px; line-height: 1.6; }
+
+/* numbers */
+.cm-neg { color: var(--bad); font-weight: 700; }
+.cm-pos { color: var(--ok); font-weight: 700; }
+.cm-warn { color: var(--warn); font-weight: 700; }
+.cm-d { direction: ltr; unicode-bidi: isolate; font-family: var(--f-data); font-weight: 700; color: var(--ink-2); }
+.cm-d.bad { color: var(--bad); } .cm-d.ok { color: var(--ok); }
+.cm-big { font-size: 28px; font-weight: 800; font-family: var(--f-data); line-height: 1.2; }
+
+/* tables */
+.tbl tfoot .cm-tot td { font-weight: 800; background: var(--surface-2); border-top: 1px solid var(--line-2); }
+.tbl tr.cm-sub td { background: var(--surface-2); font-size: 12.5px; }
+.tbl tr.cm-selrow td { background: var(--brand-soft); }
+.tbl tr.cm-selrow td:first-child { box-shadow: inset -4px 0 0 var(--accent); }
+.cm-qty { width: 84px; min-height: 32px; padding: 2px 8px; text-align: center; }
+
+/* catalogue hierarchy browser */
+.cm-hier { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.cm-col { border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); padding: 6px; max-height: 280px; overflow: auto; min-width: 0; }
+.cm-col > b { display: block; font-size: 11.5px; color: var(--muted); padding: 4px 8px; position: sticky; top: -6px; background: var(--surface-2); }
+.cm-col > p { padding: 6px 8px; }
+.cm-col button { display: flex; width: 100%; align-items: center; gap: 8px; border: 0; background: transparent; padding: 6px 8px; border-radius: 8px; text-align: start; cursor: pointer; color: var(--ink-2); font-weight: 600; font-size: 13px; }
+.cm-col button:hover { background: var(--surface-3); color: var(--ink); }
+.cm-col button.on { background: var(--brand-soft); color: var(--brand); font-weight: 800; }
+:root[data-theme="dark"] .cm-col button.on { color: var(--ink); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cm-col button.on { color: var(--ink); } }
+.cm-col button .n { margin-inline-start: auto; font-size: 11.5px; color: var(--muted); font-family: var(--f-data); }
+@media (max-width: 760px) { .cm-hier { grid-template-columns: minmax(0, 1fr); } .cm-col { max-height: 190px; } }
+
+/* catalogue approval queue */
+.cm-req { border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; background: var(--surface); min-width: 0; }
+.cm-req .sub, .cm-dup .sub { display: block; font-size: 11.5px; color: var(--muted); }
+.cm-dup { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 10px; background: var(--surface-2); flex-wrap: wrap; min-width: 0; }
+.cm-dup.exact { background: var(--bad-bg); }
+.cm-dup .grow { min-width: 160px; }
+.cm-score { font-family: var(--f-data); font-weight: 800; min-width: 46px; text-align: center; border-radius: 8px; padding: 2px 6px; background: var(--surface-3); color: var(--ink); }
+.cm-dup.exact .cm-score { background: var(--bad); color: var(--brand-ink); }
+.cm-found { background: var(--surface-2); border-radius: 10px; padding: 2px 4px 2px 10px; font-size: 12.5px; flex-wrap: wrap; }
+.cm-det summary { cursor: pointer; font-weight: 700; color: var(--ink-2); margin-top: 10px; }
+.cm-det .list { margin-top: 6px; }
+
+/* forms (new SKU, promo builder) */
+.cm-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(170px, 100%), 1fr)); gap: 10px; }
+.cm-form .wide { grid-column: 1 / -1; }
+.cm-ro { display: flex; align-items: center; color: var(--muted); background: var(--surface-2); }
+
+/* promotions builder + live preview */
+.cm-pb { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 1180px) { .cm-pb { grid-template-columns: minmax(0, 1fr); } }
+.cm-pv { display: flex; flex-direction: column; gap: 10px; position: sticky; top: 64px; min-width: 0; }
+@media (max-width: 1180px) { .cm-pv { position: static; } }
+.cm-pvrow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 13px; padding: 5px 0; border-bottom: 1px dashed var(--line); }
+.cm-pvrow.bad b { color: var(--bad); }
+.cm-guard { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); padding: 8px 0 2px; }
+.cm-inc { display: flex; flex-direction: column; gap: 2px; margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); }
+.cm-inc .sub { font-size: 11.5px; }
+
+/* merchant scorecard */
+.cm-metrics { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr)); gap: 8px; }
+.cm-met { background: var(--surface-2); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.cm-met .v { font-size: 19px; font-weight: 800; font-family: var(--f-data); line-height: 1.25; }
+.cm-met .v small { font-size: 12px; font-weight: 600; }
+.cm-met .sub { font-size: 11.5px; }
+.cm-coach { border-inline-start: 3px solid var(--warn); background: var(--warn-bg); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 2px; }
+.cm-coach.bad { border-color: var(--bad); background: var(--bad-bg); }
+.cm-coach.ok { border-color: var(--ok); background: var(--ok-bg); }
+.cm-coach span { font-size: 12.5px; color: var(--ink-2); }
+
+/* customer 360 lifecycle rail */
+.cm-life { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; }
+.cm-life span { flex: 1 1 80px; text-align: center; font-size: 11.5px; font-weight: 700; padding: 4px 6px; border-radius: 8px; background: var(--surface-3); color: var(--muted); }
+.cm-life span.on { background: var(--accent); color: var(--brand-ink); }
+
+/* category coverage matrix */
+.cm-cov { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(130px, 100%), 1fr)); gap: 6px; margin-top: 4px; }
+.cm-cov > div { border-radius: 10px; padding: 6px 10px; background: var(--surface-2); font-size: 12.5px; display: flex; justify-content: space-between; gap: 6px; }
+.cm-cov > .gap { background: var(--bad-bg); color: var(--bad); }
+
+/* CRM automations */
+.cm-autos { display: flex; flex-direction: column; }
+.cm-auto { display: grid; grid-template-columns: auto minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.1fr) auto; gap: 14px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.cm-auto:last-child { border-bottom: 0; }
+.cm-auto .sub { display: block; font-size: 12px; color: var(--muted); }
+.cm-auto .sub b { color: var(--ink-2); }
+.cm-auto.off > div:not(.x) { opacity: 0.6; }
+.cm-auto .toggle[disabled] { opacity: 0.45; cursor: not-allowed; }
+@media (max-width: 980px) { .cm-auto { grid-template-columns: auto minmax(0, 1fr); } .cm-auto > :nth-child(n + 3) { grid-column: 2; } }
+
+/* inline edit affordance in the SKU drawer */
+.cm-ed { min-height: 24px; flex: none; }
+.btn.icon.sm.cm-ed { width: 26px; min-height: 26px; }
+.cm-ed.lockd { display: inline-flex; align-items: center; justify-content: center; width: 26px; color: var(--muted); }
+.kv.cm-kv dd .row { min-width: 0; }

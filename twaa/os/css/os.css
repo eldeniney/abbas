@@ -320,6 +320,7 @@ textarea.input { min-height: 80px; resize: vertical; }
 .map .zl { fill: var(--ink-2); font-size: 13px; font-weight: 700; font-family: var(--f-body); }
 .map .hubm { fill: var(--brand); stroke: var(--surface); stroke-width: 3; } .map .merm { fill: var(--c3); stroke: var(--surface); stroke-width: 2; } .map .custm { fill: var(--accent); stroke: var(--surface); stroke-width: 3; }
 .map .rid { fill: var(--ink); stroke: var(--surface); stroke-width: 2.5; } .map .rid.busy { fill: var(--accent); } .map .rid.off { fill: var(--muted); } .map .rid.bad { fill: var(--bad); }
+.map .rid.sel { stroke: var(--accent); stroke-width: 4; }
 .map .route { stroke: var(--accent); stroke-width: 3; fill: none; stroke-dasharray: 7 6; }
 .map .mlbl { font-size: 11px; font-weight: 700; fill: var(--ink); font-family: var(--f-body); paint-order: stroke; stroke: var(--map-land); stroke-width: 3px; }
 .map [data-act] { cursor: pointer; }

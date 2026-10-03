@@ -129,6 +129,8 @@ function seed() {
   seedLive(S, rnd, t0);
   seedAdmin(S, rnd, t0);
   S.orders.forEach((o) => o.events.sort((a, b) => a.at - b.at));
+  /* riders: "busy" only when they actually hold a task */
+  S.riders.forEach((r) => { const t = S.tasks.find((x) => x.riderId === r.id && ["ASSIGNED", "AT_PICKUP", "PICKED_UP", "ARRIVED"].includes(x.status)); r.task = t ? t.id : null; if (r.status !== "offline") r.status = t ? "busy" : "online"; });
   recomputeAll();
   return S;
 }
@@ -136,7 +138,7 @@ function jitter(z, rnd) { return { x: z.x + Math.round((rnd() - 0.5) * z.pr * 0.
 
 function buildHistory(rnd, t0) {
   const h = {};
-  const curH = Math.min(22, Math.max(13, new Date(t0).getHours()));
+  const curH = Math.min(22, Math.max(8, new Date(t0).getHours()));
   const shape = [0, 0, 0, 0, 0, 0, 0, 0.2, 0.6, 0.9, 1.1, 1.2, 1.4, 1.5, 1.3, 1.1, 1.0, 1.1, 1.4, 1.7, 1.8, 1.5, 1.0, 0.5];
   h.hourly = shape.map((s, hr) => (hr <= curH ? Math.round(s * (14 + rnd() * 4)) : null));
   h.hourlyY = shape.map((s) => Math.round(s * (13 + rnd() * 3)));
@@ -286,10 +288,11 @@ function seedAdmin(S, rnd, t0) {
   const o26 = find(S.orders, "TW-1026");
   const cs = { id: `CS-${S.seq.case++}`, orderId: "TW-1026", customerId: "c8", type: "صنف تالف", status: "PENDING_APPROVAL", owner: "دينا كمال", channel: "whatsapp", createdAt: t0 - 40 * MIN, slaAt: t0 + 200 * MIN, priority: "high", notes: [{ at: t0 - 38 * MIN, who: "دينا كمال", text: "العميلة بعتت صورة: 2 علبة قشطة مفتوحين وسايحين في الشنطة." }], recommendation: { party: "hub", resolution: "استرداد قيمة القشطة + 20 ج.م تعويض", maxComp: 50, approval: "مشرف خدمة العملاء" } };
   S.cases.push(cs); o26.caseIds = [cs.id];
-  const rf = { id: `RF-${S.seq.refund++}`, orderId: "TW-1026", caseId: cs.id, lines: [o26.lines[1].key], amount: 80, comp: 20, reason: "صنف تالف", party: "hub", evidence: "صورة العميل + سجل التغليف (القشطة لم تُعزل في كيس بارد)", method: "wallet", status: "PENDING_APPROVAL", at: t0 - 36 * MIN, by: "دينا كمال" };
+  const rf = { id: `RF-${S.seq.refund++}`, orderId: "TW-1026", caseId: cs.id, lines: [o26.lines[1].key], amount: 80, items: 60, comp: 20, reason: "صنف تالف", party: "hub", evidence: "صورة العميل + سجل التغليف (القشطة لم تُعزل في كيس بارد)", method: "wallet", status: "PENDING_APPROVAL", at: t0 - 36 * MIN, by: "دينا كمال" };
   S.refunds.push(rf);
   ap("refund", { kind: "refund", id: rf.id, orderId: "TW-1026" }, { name: "دينا كمال", role: "support" }, "استرداد 60 ج.م + تعويض 20 ج.م — قشطة تالفة (طلب TW-1026)", 80, "صورة العميل · سجل التغليف", "يتحمّله الهب · خسارة هالك 60 ج.م", "supsup", 35);
   rf.approvalId = S.approvals[S.approvals.length - 1].id;
+  S.audit.push({ id: uid("AU"), at: t0 - 36 * MIN, who: "دينا كمال", role: "support", obj: rf.id, action: "طلب استرداد", old: "—", nw: money(80), reason: "صنف تالف · المسؤول: الهب — فوق حد الموظف ⇒ موافقة المشرف", src: "Control Center · ويب" });
   /* other cases */
   S.cases.push({ id: `CS-${S.seq.case++}`, orderId: "TW-1017", customerId: "c10", type: "التوصيل اتأخر", status: "OPEN", owner: "دينا كمال", channel: "app", createdAt: t0 - 12 * MIN, slaAt: t0 + 228 * MIN, priority: "medium", notes: [], recommendation: { party: "merchant", resolution: "متابعة التاجر + كوبون 20 ج.م لو تجاوز 60 دقيقة", maxComp: 20, approval: "لا يحتاج" } });
   S.cases.push({ id: `CS-${S.seq.case++}`, orderId: "TW-1020", customerId: "c6", type: "فرق في الكاش", status: "INVESTIGATING", owner: "نهى عبد الرازق", channel: "call", createdAt: t0 - 45 * MIN, slaAt: t0 + 24 * 60 * MIN, priority: "medium", notes: [{ at: t0 - 44 * MIN, who: "نظام", text: "المحصّل 300 والمتوقع 325 — المندوب سجّل: «العميلة قالت فيه خصم 25 من العرض»" }], recommendation: { party: "rider", resolution: "مراجعة العرض المطبّق — لا يوجد عرض على الطلب ⇒ فرق على المندوب بعد المراجعة", maxComp: 0, approval: "المالية" } });
@@ -667,7 +670,7 @@ A["support.report"] = ({ orderId, type, keys = [], note, photo }, actor) => {
   cs.keys = keys;
   if (keys.length) { cs.claim = sum(o.lines.filter((l) => keys.includes(l.key)), (l) => (l.sub ? l.sub.price : l.unitPrice) * l.qty); }
   ev(o, "CASE_OPENED", `اتفتحت حالة دعم ${cs.id}: ${type}`, actor.kind);
-  notify(`customer:${o.customerId}`, "استلمنا مشكلتك", `حالة ${cs.id} — هنراجعها خلال دقايق`, { orderId: o.id });
+  if (actor.kind !== "admin") notify(`customer:${o.customerId}`, "استلمنا مشكلتك", `حالة ${cs.id} — هنراجعها خلال دقايق`, { orderId: o.id });
   return { ok: true, caseId: cs.id };
 };
 

@@ -17,6 +17,7 @@ for (let i = 0; i < args.length; i++) { const a = args[i]; if (a === "--out") op
   p.on("console", (m) => { if (m.type() === "error" && !/fonts\.g|net::|ERR_/.test(m.text())) errs.push("CONSOLE " + m.text()); if (m.type() === "warning" && /no handler/.test(m.text())) errs.push("WARN " + m.text()); });
   const file = "file://" + path.resolve(__dirname, "../index.html");
   await p.goto(file + "#home"); await p.waitForTimeout(600);
+  const bootErrs = errs.slice(); if (bootErrs.length) console.log("FAIL boot\n     " + bootErrs.join("\n     "));
   let list = hashes;
   if (!list.length) {
     const nav = await p.evaluate(() => window.TW.A.NAV.flatMap(([g, ga, items]) => items.map((x) => "admin" + (x[0] ? "." + x[0] : ""))));
@@ -35,5 +36,5 @@ for (let i = 0; i < args.length; i++) { const a = args[i]; if (a === "--out") op
     console.log(`${ok ? "ok  " : "FAIL"} ${h.padEnd(34)} overflowX=${ov} text=${txt}${crashed ? " RENDER-ERROR" : ""}${errs.length ? "\n     " + errs.join("\n     ") : ""}`);
   }
   await b.close();
-  process.exit(bad ? 1 : 0);
+  process.exit(bad || bootErrs.length ? 1 : 0);
 })();

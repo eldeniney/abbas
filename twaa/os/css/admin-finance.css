@@ -129,3 +129,14 @@
 
 @media (max-width: 1100px) { .fa-top { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 760px) { .fa-gr { grid-template-columns: minmax(0, 1fr); } .fa-arrow { display: none; } .fa-big { font-size: 32px; } .fa-wr { grid-template-columns: minmax(84px, 1fr) 1.4fr auto; gap: 6px; } .fa-sel .input { max-width: 100%; } .fa-sel { flex: 1 1 140px; } .fa-mx td:first-child { min-width: 130px; } }
+
+/* polish */
+.fa-t .mono, .fa-nw { white-space: nowrap; }
+.fa-t .sub.mono { text-align: right; }
+.fa-aps { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 12px; align-items: start; }
+/* bar tones: the shared ".chart .bar" fill outranks ".b-*" — scoped override for this module's charts */
+.fa-chart .chart .bar.b-bad { fill: var(--bad); } .fa-chart .chart .bar.b-warn { fill: var(--warn); } .fa-chart .chart .bar.b-brand { fill: var(--c1); }
+.fa-sel { max-width: 100%; }
+.fa-sel .input { min-width: 0; }
+@media (max-width: 760px) { .fa-sel .input { width: 100%; flex: 1; } }
+.fa-bl li > .grow { flex: 1 1 220px; }

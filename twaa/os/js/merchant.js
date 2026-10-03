@@ -42,6 +42,8 @@ function coaching(m) {
 
 /* ----------------------------------------------------------------- small atoms */
 const tile = (dept, size = "") => { const d = deptOf(dept); return `<span class="tile tone-${d.tone} mc-tile ${size}">${ic(d.icon, "ic sm")}</span>`; };
+const sm = (n) => (n < 0 ? `<span class="ltr">−${num(-n)}</span> ج.م` : money(n));
+const deptIdx = (id) => { const i = D.depts.findIndex((d) => d.id === id); return i < 0 ? 99 : i; };
 const timer = (until, soon = 30000) => `<span class="timer" data-until="${until}" data-soon="${soon}">${dur(until - Date.now())}</span>`;
 const topBar = (inst, m, title, opts = {}) => {
   const [ml, mt] = modeMeta[m.mode] || modeMeta.closed;
@@ -213,8 +215,8 @@ function mineView(inst, m, map) {
   const q = TW.norm(inst.ui.mq || ""), dept = inst.ui.mdept || "";
   const all = Object.entries(map).map(([id, x]) => ({ s: find(S.skus, id), x })).filter((r) => r.s);
   const off = all.filter((r) => !r.x.available).length, rev = all.filter((r) => r.x.pendingPrice).length;
-  const depts = [...new Set(all.map((r) => r.s.dept))];
-  const rows = all.filter((r) => (!dept || r.s.dept === dept) && (!q || TW.norm(`${r.s.ar} ${r.s.brand} ${r.s.aliases.join(" ")}`).includes(q))).sort((a, b) => (b.x.pendingPrice ? 1 : 0) - (a.x.pendingPrice ? 1 : 0) || a.s.dept.localeCompare(b.s.dept) || a.s.ar.localeCompare(b.s.ar, "ar"));
+  const depts = [...new Set(all.map((r) => r.s.dept))].sort((a, b) => deptIdx(a) - deptIdx(b));
+  const rows = all.filter((r) => (!dept || r.s.dept === dept) && (!q || TW.norm(`${r.s.ar} ${r.s.brand} ${r.s.aliases.join(" ")}`).includes(q))).sort((a, b) => (b.x.pendingPrice ? 1 : 0) - (a.x.pendingPrice ? 1 : 0) || deptIdx(a.s.dept) - deptIdx(b.s.dept) || a.s.ar.localeCompare(b.s.ar, "ar"));
   const lim = inst.ui.mlim || 30, stop = !!inst.ui.stopMode, sel = inst.ui.stopSel || {};
   const nSel = Object.keys(sel).filter((k) => sel[k]).length;
   const head = `<div class="mc-sum"><span>${chip(`${all.length - off} شغال`, "ok")} ${chip(`${off} موقوف`, "neutral")} ${rev ? chip(`${rev} قيد المراجعة`, "warn", "clock") : ""}</span></div>
@@ -288,12 +290,12 @@ function financeView(inst, m) {
   const due = TW.sum(sts.filter((s) => s.status === "DUE"), (s) => s.net), paid = sts.filter((s) => s.status === "PAID").sort((a, b) => b.paidAt - a.paidAt)[0];
   if (!sts.length) return `${TW.empty("لسه مفيش كشوف حساب", m.status === "active" ? "أول كشف بيطلع بعد أول أسبوع بيع." : "الكشوف بتبدأ بعد تفعيل المحل وأول طلب.", "wallet")}`;
   let firstWhy = true;
-  const lineRow = (st, l) => { const hl = firstWhy && l.amount < 0; if (hl) firstWhy = false; return `<div class="mc-fl ded"><span class="grow">${esc({ responsibility: "خصم مسؤولية", promo: "عرض ممول منك", penalty: "غرامة", adjust: "تسوية" }[l.kind] || "خصم")}<small>${esc(l.order)} · ${esc(l.event)}</small>${l.status === "disputed" ? `<small>${chip("اعتراضك قيد المراجعة", "warn", "clock")}</small>` : l.status === "resolved" ? `<small>${chip("اتراجع", "ok")}</small>` : ""}</span><span class="num neg">${money(l.amount)}</span><button class="btn sm mc-why" data-act="why" data-st="${st.id}" data-line="${l.id}" ${hl ? 'data-hl="merch-why"' : ""}>${ic("help", "ic xs")}ليه اتخصم المبلغ ده؟</button></div>`; };
+  const lineRow = (st, l) => { const hl = firstWhy && l.amount < 0; if (hl) firstWhy = false; return `<div class="mc-fl ded"><span class="grow">${esc({ responsibility: "خصم مسؤولية", promo: "عرض ممول منك", penalty: "غرامة", adjust: "تسوية" }[l.kind] || "خصم")}<small>${esc(l.order)} · ${esc(l.event)}</small>${l.status === "disputed" ? `<small>${chip("اعتراضك قيد المراجعة", "warn", "clock")}</small>` : l.status === "resolved" ? `<small>${chip("اتراجع", "ok")}</small>` : ""}</span><span class="num neg">${sm(l.amount)}</span><button class="btn sm mc-why" data-act="why" data-st="${st.id}" data-line="${l.id}" ${hl ? 'data-hl="merch-why"' : ""}>${ic("help", "ic xs")}ليه اتخصم المبلغ ده؟</button></div>`; };
   const stCard = (st) => `<article class="card mc-st"><div class="hd"><h3>${esc(st.period)}</h3>${st.status === "PAID" ? chip("اتحوّل", "ok", "check") : chip("مستحق", "warn", "clock")}</div>
     <div class="mc-sm muted">${TW.dateAr(st.from)} – ${TW.dateAr(st.to)}${st.paidAt ? ` · اتحوّل ${TW.dateAr(st.paidAt)} · <span class="mono">${esc(st.ref)}</span>` : " · التحويل يوم الأحد الجاي"}</div>
     <div class="mc-fls"><div class="mc-fl"><span class="grow">المبيعات</span><span class="num">${money(st.sales)}</span></div>
-      <div class="mc-fl ded"><span class="grow">عمولة توّا (${pct(m.commission)})<small>حسب العقد</small></span><span class="num neg">${money(-st.commission)}</span><button class="btn sm mc-why ghost" data-act="why" data-st="${st.id}" data-line="_comm">${ic("help", "ic xs")}ليه؟</button></div>
-      ${st.refunds ? `<div class="mc-fl ded"><span class="grow">مرتجعات على المحل<small>أصناف اترجعت فلوسها للعميل</small></span><span class="num neg">${money(-st.refunds)}</span><button class="btn sm mc-why ghost" data-act="why" data-st="${st.id}" data-line="_ref">${ic("help", "ic xs")}ليه؟</button></div>` : ""}
+      <div class="mc-fl ded"><span class="grow">عمولة توّا (${pct(m.commission)})<small>حسب العقد</small></span><span class="num neg">${sm(-st.commission)}</span><button class="btn sm mc-why ghost" data-act="why" data-st="${st.id}" data-line="_comm">${ic("help", "ic xs")}ليه؟</button></div>
+      ${st.refunds ? `<div class="mc-fl ded"><span class="grow">مرتجعات على المحل<small>أصناف اترجعت فلوسها للعميل</small></span><span class="num neg">${sm(-st.refunds)}</span><button class="btn sm mc-why ghost" data-act="why" data-st="${st.id}" data-line="_ref">${ic("help", "ic xs")}ليه؟</button></div>` : ""}
       ${st.lines.map((l) => lineRow(st, l)).join("")}
       <div class="mc-fl net"><span class="grow">صافي ليك</span><b class="num">${money(st.net)}</b></div></div>
     <button class="btn sm" data-act="stmt" data-st="${st.id}">${ic("doc", "ic xs")}كشف الحساب</button></article>`;
@@ -398,7 +400,7 @@ function sheetView(inst, m) {
     if (sh.line === "_ref") l = { synthetic: true, amount: -st.refunds, order: "مرتجعات الفترة", event: "أصناف اترجعت فلوسها للعميل وكانت مسؤولية المحل", evidence: "سجل التجهيز (موجود/غير موجود) ومسح الطرد عند الاستلام", policy: "سياسة المسؤولية: الصنف الناقص أو الغلط بعد تأكيد المحل يتحمله المحل" };
     if (!l) return "";
     const disp = l.status === "disputed";
-    return TW.sheet("ليه اتخصم المبلغ ده؟", `<div class="mc-whyamt"><b class="num neg">${money(l.amount)}</b><span>${esc(st.period)}</span></div>
+    return TW.sheet("ليه اتخصم المبلغ ده؟", `<div class="mc-whyamt"><b class="num neg">${sm(l.amount)}</b><span>${esc(st.period)}</span></div>
       <div class="steps">${[["الطلب", l.order, "receipt"], ["إيه اللي حصل", l.event, "info"], ["الدليل", l.evidence, "eye"], ["السياسة", l.policy, "book"]].map(([k, t, i]) => `<div class="st done"><span class="bul">${ic(i, "ic xs")}</span><div><b class="mc-sm">${k}</b><div>${esc(t)}</div></div></div>`).join("")}</div>
       ${l.synthetic ? `<p class="lock">${ic("lock", "ic xs")} ${sh.line === "_comm" ? "العمولة حسب العقد ومش قابلة للاعتراض من التطبيق — كلّم مدير حسابك." : "لو في مرتجع مش مقتنع بيه، كلّم خط التجار برقم الطلب."}</p>`
         : disp ? `<div class="banner warn">${ic("clock", "ic sm")}<div><b>اعتراضك اتسجّل</b>${l.dispute ? ` <span data-ago="${l.dispute.at}">${ago(l.dispute.at)}</span> — «${esc(l.dispute.note || "")}»` : ""}. فريق المالية هيرد خلال 48 ساعة والمبلغ مش هيتخصم نهائي قبل القرار.</div></div>`
@@ -409,7 +411,7 @@ function sheetView(inst, m) {
     const st = find(S.msettle, sh.st); if (!st) return "";
     const rows = [["المبيعات", st.sales], [`عمولة توّا ${pct(m.commission)}`, -st.commission], ["مرتجعات", -st.refunds], ...st.lines.map((l) => [`${l.order} — ${l.event}`, l.amount])];
     return TW.sheet(`كشف حساب — ${st.period}`, `<div class="mc-stmt"><div class="row between"><b>${esc(m.ar)}</b><span class="mono">${esc(st.id)}</span></div><div class="mc-sm muted">${TW.dateAr(st.from)} – ${TW.dateAr(st.to)} · العمولة ${pct(m.commission)}</div>
-      ${TW.table([{ k: "l", label: "البند" }, { k: "v", label: "المبلغ", num: true, render: (r) => `<span class="${r.v < 0 ? "neg" : ""}">${money(r.v)}</span>` }], rows.map(([l, v], i) => ({ id: i, l, v })))}
+      ${TW.table([{ k: "l", label: "البند" }, { k: "v", label: "المبلغ", num: true, render: (r) => `<span class="${r.v < 0 ? "neg" : ""}">${sm(r.v)}</span>` }], rows.map(([l, v], i) => ({ id: i, l, v })))}
       <div class="mc-fl net"><span class="grow">الصافي</span><b class="num">${money(st.net)}</b></div><div class="mc-sm">${st.status === "PAID" ? `اتحوّل ${TW.dateAr(st.paidAt)} · مرجع التحويل <span class="mono">${esc(st.ref)}</span>` : "مستحق — التحويل يوم الأحد"}</div></div>
       <p class="mc-sm muted">${ic("info", "ic xs")} ده عرض للكشف جوه التطبيق. النسخة الـ PDF بتوصلك على الواتساب كل أحد مع التحويل.</p>`, `<button class="btn grow" data-act="sheet-close">قفل</button>`);
   }

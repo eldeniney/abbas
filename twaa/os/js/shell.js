@@ -157,7 +157,7 @@ function route() {
   const seg = p.split("/").filter(Boolean);
   const view = seg[0] && (TW.apps[seg[0]] || seg[0] === "live" || seg[0] === "home") ? seg[0] : "home";
   const path = seg.length ? p : "/home";
-  if (view === curView && curApp && (view !== "live" && view !== "home")) { curApp.setPath(path); curApp.render(); renderOsbar(); return; }
+  if (view === curView && curApp && (view !== "live" && view !== "home")) { const changed = curApp.path !== path; curApp.setPath(path); curApp.render(); renderOsbar(); if (changed) { const sc = curApp.el.querySelector(".cc-main, .app-scroll"); if (sc) sc.scrollTop = 0; window.scrollTo(0, 0); } return; }
   curView = view; viewEl.innerHTML = ""; unmountAll(viewEl); for (const i of [...instances]) if (!i.el.isConnected) instances.delete(i);
   if (view === "home") { const host = document.createElement("div"); viewEl.appendChild(host); curApp = mount("home", host, { primary: true, path }); }
   else if (view === "live") layoutLive();
