@@ -480,7 +480,7 @@ function skuView(inst, id) {
   const tools = `${s.active ? gbtn("catalog.edit", "أوقف الـ SKU", "sku-edit", { cls: "sm", icon: "power", data: { id: s.id, f: "active" } }) : gbtn("catalog.edit", "أعد التفعيل", "sku-edit", { cls: "sm", icon: "power", data: { id: s.id, f: "active" } })}`;
   return { title: `${esc(s.ar)} <span class="mono muted" style="font-size:13px">${esc(s.id)}</span>`, html, tools };
 }
-A.drawers["commerce-sku"] = (inst, d) => { const v = skuView(inst, d.id); return v ? TW.drawerWrap(v.title, `<div class="row"><button type="button" class="btn sm ghost" data-act="go" data-to="/admin/sku/${esc(d.id)}">${ic("eye", "ic xs")}افتح كصفحة كاملة</button></div>${v.html}`, v.tools) : ""; };
+A.drawers["commerce-sku"] = (inst, d) => { const v = skuView(inst, d.id); return v ? TW.drawerWrap(v.title, pg(`<div class="row"><button type="button" class="btn sm ghost" data-act="go" data-to="/admin/sku/${esc(d.id)}">${ic("eye", "ic xs")}افتح كصفحة كاملة</button></div>${v.html}`), v.tools) : ""; };
 TW.page("sku", {
   render(inst, [id]) { const v = skuView(inst, id); if (!v) return `<div class="card">${TW.empty("الـ SKU مش موجود", id, "box")}</div>`; return `<div class="cc-top"><button type="button" class="btn sm" data-act="go" data-to="/admin/catalog">${ic("arrowR", "ic xs")}الكتالوج</button><h1>${v.title}</h1>${v.tools}</div>${v.html}`; },
   on: {},
@@ -501,7 +501,7 @@ A.modals["commerce-newsku"] = (inst, m) => {
       <label class="field"><span>الفئة *</span><select class="input" data-model="ns_cat">${cats.map(([c, a]) => opt(c, a, u(inst, "ns_cat", cats[0] && cats[0][0]))).join("")}</select></label>
       ${fld("ns_size", "الحجم / المواصفة *", "text", "25 وات")}${fld("ns_price", "السعر المرجعي (ج.م) *", "number", "0")}${fld("ns_barcode", "الباركود", "text", "8–14 رقم", true)}</div>
     <div><div class="lbl">${ic("search", "ic xs")} فحص التكرار المباشر</div>${cands.length ? `<div class="col gap4">${cands.map((c) => `<div class="cm-dup${c.exact ? " exact" : ""}"><span class="cm-score">${num(c.score)}%</span><span class="grow">${esc(c.s.ar)} <span class="muted">${esc(c.s.size)}</span><span class="sub mono">${esc(c.s.id)} · ${esc(c.why.join(" · "))}</span></span>${gbtn("catalog.approve", "اربط بدل الإنشاء", "req-link", { cls: "sm", icon: "link", data: { req: cr.id, sku: c.s.id } })}</div>`).join("")}</div>${exact ? `<p class="cm-note cm-neg">${ic("alert", "ic xs")} مطابق تماماً — الإنشاء هيترفض من النظام.</p>` : ""}` : `<p class="muted cm-note">${ic("check", "ic xs")} مفيش تشابه — الاسم ده جديد على الكتالوج.</p>`}</div>`;
-  return TW.modalWrap(`إنشاء SKU معتمد من طلب تاجر`, body, `<button type="button" class="btn primary" data-act="ns-submit">${ic("check", "ic sm")}أنشئ واعتمد</button><button type="button" class="btn" data-act="modal-close">إلغاء</button>`, { wide: true });
+  return TW.modalWrap(`إنشاء SKU معتمد من طلب تاجر`, pg(body), `<button type="button" class="btn primary" data-act="ns-submit">${ic("check", "ic sm")}أنشئ واعتمد</button><button type="button" class="btn" data-act="modal-close">إلغاء</button>`, { wide: true });
 };
 
 /* ===================================================================== CATEGORIES ===================== */
@@ -552,10 +552,10 @@ TW.page("categories", {
 A.modals["commerce-po"] = (inst, m) => {
   const S = TW.S, lines = (m.lines || []);
   const tot = sum(lines, (l) => Number(u(inst, `po_${l.id}`, l.qty)) * l.cost);
-  return TW.modalWrap(`زيادة مخزون الهب — ${esc(deptAr(m.dept))}`, `<div class="banner">${ic("info", "ic sm")}<div>الكمية المقترحة = (سرعة البيع × 7 أيام + حد إعادة الطلب) − (المتاح + الوارد). أمر الشراء بيروح لموافقة المالية قبل ما يتحول للمورد.</div></div>
+  return TW.modalWrap(`زيادة مخزون الهب — ${esc(deptAr(m.dept))}`, pg(`<div class="banner">${ic("info", "ic sm")}<div>الكمية المقترحة = (سرعة البيع × 7 أيام + حد إعادة الطلب) − (المتاح + الوارد). أمر الشراء بيروح لموافقة المالية قبل ما يتحول للمورد.</div></div>
     <div class="tw"><table class="tbl"><thead><tr><th>الصنف</th><th class="n">متاح</th><th class="n">وارد</th><th class="n">/يوم</th><th class="n">الكمية</th><th class="n">التكلفة</th></tr></thead><tbody>${lines.map((l) => `<tr><td>${esc(l.ar)}</td><td class="n num">${num(l.avail)}</td><td class="n num">${num(l.incoming)}</td><td class="n num">${num(l.vel, 1)}</td><td class="n"><input class="input cm-qty" type="number" min="0" data-model="po_${l.id}" data-live value="${esc(u(inst, `po_${l.id}`, l.qty))}" aria-label="كمية ${esc(l.ar)}"></td><td class="n num">${money(Number(u(inst, `po_${l.id}`, l.qty)) * l.cost)}</td></tr>`).join("")}</tbody></table></div>
     <label class="field"><span>المورد</span><select class="input" data-model="po_sup">${["مورد معتمد — دمنهور", "موزع جهينة — دمنهور", "شركة الضحى للأغذية", "تاجر جملة — أبو المطامير"].map((x) => opt(x, x, u(inst, "po_sup", "مورد معتمد — دمنهور"))).join("")}</select></label>
-    <div class="row between card flat"><span>إجمالي أمر الشراء</span><b class="num">${money(tot)}</b></div>`, `<button type="button" class="btn primary" data-act="po-submit" ${tot > 0 ? "" : "disabled"}>${ic("cart", "ic sm")}ابعت أمر الشراء للموافقة</button><button type="button" class="btn" data-act="modal-close">إلغاء</button>`, { wide: true });
+    <div class="row between card flat"><span>إجمالي أمر الشراء</span><b class="num">${money(tot)}</b></div>`), `<button type="button" class="btn primary" data-act="po-submit" ${tot > 0 ? "" : "disabled"}>${ic("cart", "ic sm")}ابعت أمر الشراء للموافقة</button><button type="button" class="btn" data-act="modal-close">إلغاء</button>`, { wide: true });
 };
 
 /* ===================================================================== PRICING ===================== */
@@ -831,7 +831,8 @@ const ON = {
   "camp-launch"(inst, d) { const r = inst.act("campaign.launch", { id: d.id }); if (r.ok !== false) TW.toast(`${d.id} اتطلقت`, "ok"); },
   "crm-seg"(inst, d) { inst.ui.cu_seg = d.id; inst.go("/admin/customers"); },
 };
-["orders", "customers", "customer", "merchants", "merchant", "catalog", "sku", "categories", "pricing", "promotions", "crm"].forEach((k) => { if (TW.adminPages[k]) TW.adminPages[k].on = ON; });
+/* bind handlers + scope every commerce page in .cm-page (display: contents) so module CSS never leaks into other modules */
+["orders", "customers", "customer", "merchants", "merchant", "catalog", "sku", "categories", "pricing", "promotions", "crm"].forEach((k) => { const d = TW.adminPages[k]; if (!d) return; d.on = ON; const r = d.render; d.render = (inst, params) => pg(r(inst, params)); });
 
 /* ===================================================================== module actions (validated wrappers around shared store actions) ===================== */
 const ACT = TW.actions;

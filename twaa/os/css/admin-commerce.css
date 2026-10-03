@@ -10,7 +10,7 @@
 .cm-cb:hover { border-color: currentColor; }
 .cm-cb.on { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
 .cm-cb b { font-weight: 800; opacity: 0.8; }
-.cm-lnk { padding: 0 4px; min-height: 24px; font-weight: 700; color: var(--ink); max-width: 100%; white-space: normal; text-align: start; }
+.cm-lnk { padding: 0 4px; min-height: 24px; font-weight: 700; color: var(--ink); max-width: 100%; text-align: start; }
 .cm-note { font-size: 12px; line-height: 1.6; }
 
 /* numbers */
@@ -105,3 +105,13 @@
 .btn.icon.sm.cm-ed { width: 26px; min-height: 26px; }
 .cm-ed.lockd { display: inline-flex; align-items: center; justify-content: center; width: 26px; color: var(--muted); }
 .kv.cm-kv dd .row { min-width: 0; }
+
+/* page scope (display: contents keeps the .cc-main flex/gap layout) */
+.cm-page { display: contents; }
+.cm-page .sub { display: block; font-size: 11.5px; color: var(--muted); font-weight: 500; }
+.cm-page .kpi .sub { display: inline; }
+.cm-nw { white-space: nowrap; }
+.cm-ltr { direction: ltr; unicode-bidi: isolate; }
+.cm-hdsel .input { width: auto; min-height: 34px; padding: 4px 10px; }
+.cm-guard { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+.cm-page .modal .mb, .cm-page .drawer .db { min-width: 0; }
