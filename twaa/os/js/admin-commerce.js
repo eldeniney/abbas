@@ -703,7 +703,7 @@ TW.page("promotions", {
           <p class="cm-note muted">${ic("shield", "ic xs")} حماية من الاحتيال: حد للعميل، أقصى نسبة 60%، كود فريد، والاستخدام مربوط بالموبايل والعنوان. العروض اللي ميزانيتها فوق 30,000 ج.م أو مساهمتها تحت ${money(R.minContribution)}/طلب بتروح للمدير العام.</p></div>
         <div class="cm-pv"><div class="card flat">
           <div class="lbl">معاينة الأثر المالي — لكل طلب يستخدم العرض</div>
-          ${row("متوسط السلة المفترض", money(Math.max(265, d.minBasket)))}${row("الخصم المتوقع", money(imp.disc, 1))}${row("تكلفة توّا", money(imp.twaaCost, 1))}${row("تكلفة التاجر", money(imp.disc - imp.twaaCost, 1))}
+          ${row("متوسط السلة المفترض", money(imp.basket || Math.max(265, d.minBasket)))}${imp.baseCm != null ? row("مساهمة الطلب قبل العرض", cmv(imp.baseCm)) : ""}${row("الخصم المتوقع", money(imp.disc, 1))}${row("تكلفة توّا", money(imp.twaaCost, 1))}${row("تكلفة التاجر", money(imp.disc - imp.twaaCost, 1))}
           ${row("مساهمة الطلب بعد العرض", cmv(imp.cmPerOrder), imp.belowGuard ? "bad" : "")}
           <div class="cm-guard">${chip(`حد المساهمة ${money(R.minContribution)}/طلب (Guardrail A)`, "neutral", "shield")}${chip(imp.belowGuard ? `أقل من الحد بـ ${num(R.minContribution - imp.cmPerOrder, 1)} ج.م` : `أعلى من الحد بـ ${num(imp.cmPerOrder - R.minContribution, 1)} ج.م`, imp.belowGuard ? "bad" : "ok", imp.belowGuard ? "alert" : "check")}</div>
           <div class="cm-inc"><span class="lbl">Expected Incremental Contribution / طلب</span><span class="cm-big ${imp.incremental < 0 ? "cm-neg" : "cm-pos"}">${mny(imp.incremental, 1)}</span><span class="sub muted">نسبة الطلبات الإضافية المتوقعة ${pct(imp.uplift)} حسب الهدف</span></div>

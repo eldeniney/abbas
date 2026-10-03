@@ -154,3 +154,11 @@
 .sp-skucell { min-width: 190px; }
 .sp-binx { white-space: nowrap; }
 .sp-id { white-space: nowrap; }
+.sp-en { display: block; font-size: 10.5px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+@media (max-width: 640px) { .sp-wh > .grow { flex-basis: 100%; } .sp-tablet { border-radius: 16px; } .sp-work { padding: 12px 10px 14px; } }
+.sp-route .list > .li { flex-wrap: wrap; }
+.sp-route .mono { white-space: nowrap; }
+.map .rid.sp-me { stroke: var(--accent); stroke-width: 5; }
+.sp-kmeter { display: block; margin: 4px 0 2px; }
+.sp-vacts { display: flex; flex-direction: column; gap: 4px; align-items: stretch; }
+.sp-vacts .btn { justify-content: center; }

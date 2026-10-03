@@ -69,7 +69,7 @@
 .g-heat { border-collapse: separate; border-spacing: 2px; width: 100%; min-width: 560px; font-size: 11.5px; font-family: var(--f-data); }
 .g-heat th { font-weight: 700; color: var(--muted); padding: 2px 4px; white-space: nowrap; text-align: center; }
 .g-heat tbody th { text-align: right; color: var(--ink-2); }
-.g-heat td { height: 26px; border-radius: 4px; min-width: 22px; }
+.g-heat td { height: 26px; border-radius: 4px; min-width: 22px; position: relative; }
 .g-heat td:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
 .g-heat td.n { background: none; text-align: left; padding: 0 6px; color: var(--ink-2); font-weight: 700; }
 .g-tri td.g-na { color: var(--muted); text-align: center; background: var(--surface-2); }
@@ -150,3 +150,6 @@
 .g-flags .chip { white-space: normal; line-height: 1.4; padding-block: 2px; margin-block: 1px; }
 .g-code { min-width: 150px; }
 .g-bud { min-width: 160px; }
+@media (max-width: 640px) { .grid.g-k2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .grid.g-k2 .kpi-v { font-size: 19px; } }
+.g-cptbl td:first-child { min-width: 190px; }
+.g-cptbl td:nth-child(2), .g-cptbl td:nth-child(3), .g-cptbl td:nth-child(4) { min-width: 110px; }

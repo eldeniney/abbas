@@ -115,3 +115,8 @@
 .cm-hdsel .input { width: auto; min-height: 34px; padding: 4px 10px; }
 .cm-guard { flex-direction: row; flex-wrap: wrap; gap: 6px; }
 .cm-page .modal .mb, .cm-page .drawer .db { min-width: 0; }
+@media (max-width: 640px) {
+  .cm-page .grid:has(> .kpi) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .cm-page .kpi { padding: 10px 12px; }
+  .cm-page .kpi-v { font-size: 18px; }
+}

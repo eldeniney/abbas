@@ -204,6 +204,7 @@ button.mc-kpi:hover { border-color: var(--line-2); box-shadow: var(--shadow-1); 
 .mc-reasons button.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-strong); }
 .mc-stmt { border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 6px; background: var(--surface-2); }
 .mc-stmt .tbl td { white-space: normal; }
+.mc-stmt .tbl td.n { white-space: nowrap; }
 
 /* account + onboarding */
 .mc-prof { display: flex; flex-direction: column; gap: 10px; padding: 12px; }
@@ -419,3 +420,4 @@ button.mc-kpi:hover { border-color: var(--line-2); box-shadow: var(--shadow-1); 
 .live .mc-tiles .mc-kpi b, .live .rd-today b { font-size: 15px; }
 .live .rd-cod > b { font-size: 44px; }
 .live .rd-earn b { font-size: 30px; }
+.mc .toggle:disabled { opacity: 0.45; cursor: not-allowed; }

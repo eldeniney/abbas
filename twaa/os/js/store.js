@@ -1131,10 +1131,12 @@ A["zone.launch"] = ({ zoneId, reason }, actor) => {
   const S = TW.S; const d = need("zones.edit", actor) || needReason(reason); if (d) return d;
   const z = find(S.zones, zoneId); z.active = true; z.cap = 20; z.hours = "رحلات مجدولة"; S.expansion[zoneId] = "pilot";
   const w = S.waitlist[zoneId];
-  if (!S.leads.some((l) => l.zoneId === zoneId && l.type === "pharmacy")) S.leads.unshift({ id: `L-${S.seq.lead++}`, ar: `صيدلية مطلوبة — ${z.ar}`, owner: "—", type: "pharmacy", zoneId, stage: 0, assortment: "—", opportunity: `فجوة: طلب صيدلية في ${z.ar} بدون صيدلية مفعّلة`, competitors: "—", commission: 0.1, history: [{ at: now(), stage: 0, by: actor.name, note: "مهمة استقطاب من لوحة التوسع" }] });
+  const exLead = S.leads.find((l) => l.zoneId === zoneId && l.type === "pharmacy");
+  if (exLead) { exLead.stage = Math.max(exLead.stage, 1); exLead.priority = true; exLead.history.push({ at: now(), stage: exLead.stage, by: actor.name, note: `أولوية: مرتبط بإطلاق منطقة ${z.ar}` }); }
+  else S.leads.unshift({ id: `L-${S.seq.lead++}`, ar: `صيدلية مطلوبة — ${z.ar}`, owner: "—", type: "pharmacy", zoneId, stage: 0, assortment: "—", opportunity: `فجوة: طلب صيدلية في ${z.ar} بدون صيدلية مفعّلة`, competitors: "—", commission: 0.1, history: [{ at: now(), stage: 0, by: actor.name, note: "مهمة استقطاب من لوحة التوسع" }] });
   S.customers.filter((c) => c.waitlist.includes(zoneId)).forEach((c) => notify(`customer:${c.id}`, `توّا وصلت ${z.ar}!`, "اطلب دلوقتي على رحلات التوصيل المجدولة", {}));
   audit(actor, `منطقة ${z.ar}`, "إطلاق منطقة خدمة (تجريبي)", "غير مفعّلة", "Pilot", reason);
-  return { ok: true, notified: w ? w.users : 0 };
+  return { ok: true, notified: w ? w.users : 0, leadId: (S.leads.find((l) => l.zoneId === zoneId && l.type === "pharmacy") || {}).id };
 };
 A["expansion.status"] = ({ zoneId, status }, actor) => { const old = TW.S.expansion[zoneId]; TW.S.expansion[zoneId] = status; audit(actor, zoneId, "تحديث جاهزية التوسع", old, status, null); };
 
@@ -1272,7 +1274,7 @@ TW.ledger = (o) => {
 /* executive KPIs = seeded history for the day so far + live orders */
 TW.kpis = () => {
   const S = TW.S, todays = S.orders.filter((o) => now() - o.createdAt < 18 * 3600000 && new Date(o.createdAt).getDate() === new Date().getDate());
-  const base = { orders: sum(S.hist.hourly.filter((x) => x != null)) - S.orders.filter((o) => now() - o.createdAt < 4 * 3600000).length, aov: 262 };
+  const base = { orders: Math.max(0, sum(S.hist.hourly.filter((x) => x != null)) - S.orders.filter((o) => now() - o.createdAt < 4 * 3600000).length), aov: 262 };
   const live = todays.filter((o) => o.status !== "CANCELLED");
   const ledg = live.map((o) => TW.ledger(o));
   const liveGmv = sum(ledg, (l) => l.gmv);
@@ -1289,7 +1291,7 @@ TW.kpis = () => {
   const codExposure = sum(S.riders, (r) => r.cash);
   const refundPending = sum(S.refunds.filter((r) => ["PENDING_APPROVAL", "REQUESTED", "SUBMITTED"].includes(r.status)), (r) => r.amount);
   const cashDiscrepancy = sum(S.cod.filter((c) => c.variance && !c.varianceResolved), (c) => Math.abs(c.variance));
-  return { orders, gmv, netRev, cm, aov: gmv / orders, delivered, deliveredPct: delivered / orders, ontime, cancelPct: cancelled / orders, activeCust, activeMerch, activeRiders, codExposure, refundPending, cashDiscrepancy, live: live.length };
+  return { orders, gmv, netRev, cm, aov: orders ? gmv / orders : 0, delivered, deliveredPct: orders ? Math.min(1, delivered / orders) : 0, ontime, cancelPct: orders ? cancelled / orders : 0, activeCust, activeMerch, activeRiders, codExposure, refundPending, cashDiscrepancy, live: live.length };
 };
 
 /* Control Tower: only items that need action. severity → closest SLA → money at risk */

@@ -3,7 +3,7 @@
 .cu .cu-ell { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .cu .cu-ell2 { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-width: 0; }
 .cu .cu-small { font-size: 12.5px; }
-.cu .ok { color: var(--ok); } .cu .warn { color: var(--warn); } .cu .bad { color: var(--bad); }
+.cu .tc-ok { color: var(--ok); } .cu .tc-warn { color: var(--warn); } .cu .tc-bad { color: var(--bad); }
 .cu .warn-t { color: var(--warn); font-weight: 700; }
 .cu-pad { padding-inline: 16px; }
 .cu-pad-t { padding-top: 14px; }
@@ -277,7 +277,6 @@
 .cu-change { margin: -2px 0 2px; padding: 8px 12px 10px; border-radius: 12px; background: var(--surface-2); display: flex; flex-direction: column; gap: 6px; }
 .cu-change small { font-size: 12px; color: var(--ink-2); font-weight: 700; }
 .cu-tot { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
-.cu-tot .ok { color: var(--ok); }
 .cu-tot-t { font-size: 16px; padding-top: 8px; margin-top: 2px; border-top: 1px dashed var(--line-2); }
 .cu-changes { border-color: color-mix(in srgb, var(--warn) 45%, var(--line)); background: var(--warn-bg); }
 .cu-changes ul { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 8px; }

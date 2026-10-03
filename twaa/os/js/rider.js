@@ -102,10 +102,11 @@ function offerCard(inst, r, t, first = true) {
 function homeView(inst, r) {
   const rs = settle(r), t = curTask(r), offers = myOffers(r), offer = offers[0], online = r.status !== "offline";
   const next = t ? nextStep(t) : null;
-  return `${offers.map((o, i) => offerCard(inst, r, o, i === 0)).join("")}
+  const stop = r.cash >= r.limit;
+  return `${stop ? cashMeter(r) : ""}${offers.map((o, i) => offerCard(inst, r, o, i === 0)).join("")}
     ${!online ? `<section class="rd-off">${ic("power", "ic xl")}<h3>إنت أوفلاين</h3><p>ابدأ الوردية عشان المهام توصلك.</p><button class="btn rd-cta ok" data-act="online">${ic("power", "ic")}ابدأ الوردية</button></section>` : ""}
     ${t ? `<button class="rd-active" data-act="go" data-to="/rider/job/${t.id}"><span class="rd-active-i">${ic(next.icon, "ic lg")}</span><span class="grow"><small>مهمة شغالة · <span class="mono">${esc(t.orderId)}</span></small><b>${esc(next.title)}</b><small>${esc(next.sub)}</small></span>${ic("chevE", "ic")}</button>` : online && !offer ? `<section class="rd-wait">${ic("bike", "ic lg")}<div><b>مستني مهمة جديدة</b><p class="rd-sm">خليك قريب من وسط ${esc(zoneAr(r.zoneId))} — العروض بتوصل للأقرب.</p></div></section>` : ""}
-    ${cashMeter(r)}
+    ${stop ? "" : cashMeter(r)}
     <section class="rd-today" aria-label="النهارده"><div><span>أرباح النهارده</span><b class="num">${money(gross(rs))}</b></div><div><span>مهام خلصت</span><b class="num">${num(rs.missions)}</b></div><div><span>المنطقة</span><b>${esc(zoneAr(r.zoneId))}</b></div></section>
     <p class="rd-motto">${ic("zap", "ic xs")} استلم، وصّل، واتحاسب — الأرباح والكاش منفصلين، شوف كل واحد في صفحته.</p>`;
 }
@@ -197,7 +198,7 @@ function jobView(inst, r, t) {
     return { body, dock };
   }
   if (t.status === "FAILED") {
-    body = `${steps}<section class="rd-card rd-wait2">${ic("clock", "ic xl")}<h3>سجّلت: ${esc(t.failReason)}</h3><p>الدعم بيقرر دلوقتي: نحاول تاني ولا نرجّع الطلب للمصدر. خليك في مكانك وخلي الطلب معاك — متسيبهوش لحد.</p><p class="rd-sm">${t.contact.length} محاولات تواصل اتسجلت · <span data-ago="${t.failedAt}">${ago(t.failedAt)}</span></p></section>${codBox}`;
+    body = `${steps}<section class="rd-card rd-wait2">${ic("clock", "ic xl")}<h3>سجّلت: ${esc(t.failReason)}</h3><p>الدعم بيقرر دلوقتي: نحاول تاني ولا نرجّع الطلب للمصدر. خليك في مكانك وخلي الطلب معاك — متسيبهوش لحد.</p><p class="rd-sm">${t.contact.length} محاولات تواصل اتسجلت · <span data-ago="${t.failedAt}">${ago(t.failedAt)}</span></p></section>${t.cod > 0 ? `<div class="banner warn">${ic("cash", "ic sm")}<div>${t.collected != null ? `معاك ${money(t.collected)} من الطلب ده — متتصرفش فيهم لحد قرار الدعم.` : `متحصّلش الـ ${money(t.cod)} — الطلب لسه معاك ومتسلّمش.`}</div></div>` : ""}`;
     return { body, dock: `<div class="rd-dock"><p class="rd-hint">${ic("lock", "ic xs")} المندوب مش بيلغي طلب — القرار عند الدعم.</p></div>` };
   }
   if (t.status === "RTO") {
@@ -244,7 +245,7 @@ function cashView(inst, r) {
   const st = { HELD: ["معاك", "warn"], DEPOSITED: ["اتورّد", "info"], RECONCILED: ["اتطابق", "ok"] };
   return `${cashMeter(r)}
     ${pend.length ? `<div class="banner">${ic("clock", "ic sm")}<div><b>${money(TW.sum(pend, (d) => d.amount))} بانتظار تأكيد المالية</b> — اتسجل التوريد، والمالية بتأكد الاستلام من أمين الخزينة.</div></div>` : ""}
-    <section class="rd-card"><div class="rd-lbl">${ic("receipt", "ic sm")} تحصيلات الكاش</div>${cods.length ? cods.slice(0, 12).map((c) => { const [l, tn] = st[c.status] || [c.status, "neutral"]; return `<div class="rd-el"><span class="grow"><span class="mono">${esc(c.orderId)}</span><small>${clock(c.at)} · المطلوب ${money(c.expected)}${c.variance ? ` · <span class="neg">فرق ${money(c.variance)}</span>${c.varReason ? ` (${esc(c.varReason)})` : ""}` : ""}</small></span><b class="num">${money(c.collected)}</b>${chip(l, tn)}</div>`; }).join("") : `<p class="rd-sm">مفيش تحصيلات.</p>`}</section>
+    <section class="rd-card"><div class="rd-lbl">${ic("receipt", "ic sm")} تحصيلات الكاش</div>${cods.length ? cods.slice(0, 12).map((c) => { const [l, tn] = st[c.status] || [c.status, "neutral"]; return `<div class="rd-el"><span class="grow">${/^TW-/.test(c.orderId) ? `<span class="mono">${esc(c.orderId)}</span>` : `<b>${esc(c.orderId)}</b>`}<small>${clock(c.at)} · المطلوب ${money(c.expected)}${c.variance ? ` · <span class="neg">فرق ${money(c.variance)}</span>${c.varReason ? ` (${esc(c.varReason)})` : ""}` : ""}</small></span><b class="num">${money(c.collected)}</b>${chip(l, tn)}</div>`; }).join("") : `<p class="rd-sm">مفيش تحصيلات.</p>`}</section>
     <section class="rd-card"><div class="rd-lbl">${ic("building", "ic sm")} التوريدات</div>${deps.length ? deps.map((d) => `<div class="rd-el"><span class="grow"><span class="mono">${esc(d.id)}</span><small>${clock(d.at)} · ${esc(d.place)} · ${esc(d.receiver || "")}</small></span><b class="num">${money(d.amount)}</b>${d.status === "VERIFIED" ? chip("اتأكد", "ok", "check") : chip("بانتظار تأكيد المالية", "warn", "clock")}</div>`).join("") : `<p class="rd-sm">لسه مورّدتش النهارده.</p>`}</section>
     <p class="rd-motto">${ic("shield", "ic xs")} الكاش بيتورّد في الهب لأمين الخزينة وبياخد رقم إيصال. محدش يطلب منك كاش برّه الهب.</p>`;
 }
