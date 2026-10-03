@@ -1,0 +1,1 @@
+TW.apps.rider = { kind: "phone", actorKind: "rider", title: "المندوب", render(inst) { return `<div class="app"><div class="app-top"><h2>العميل ${TW.esc(inst.path)}</h2></div><div class="app-scroll" style="padding:16px">placeholder</div>${TW.inappToast(inst)}</div>`; }, on: {} };
