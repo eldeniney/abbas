@@ -480,6 +480,7 @@ const needReason = (r) => (!r || !String(r).trim() ? fail("السبب إلزام
 A["cust.setAddress"] = ({ customerId, addressId }) => { find(TW.S.customers, customerId).addr = addressId; };
 A["cust.addAddress"] = ({ customerId, zoneId, label, landmark, street, x, y }, actor) => {
   const c = find(TW.S.customers, customerId), z = find(TW.S.zones, zoneId);
+  if (!z || !z.active) return fail("لسه موصلناش المنطقة دي — سجّل في قائمة الانتظار");
   if (!landmark) return fail("اكتب علامة مميزة عشان المندوب يوصلك");
   const a = { id: uid(`${customerId}-a`), label: label || "عنوان", zoneId, landmark, street: street || "", x: x || z.x, y: y || z.y };
   c.addresses.push(a); c.addr = a.id; return { ok: true, address: a };
@@ -492,9 +493,12 @@ A["search.log"] = ({ q, results, zoneId }) => { TW.S.demand.searches++; if (!res
 A["cust.notifyMe"] = ({ customerId, skuId }) => { const c = find(TW.S.customers, customerId); if (!c.notifyMe.includes(skuId)) c.notifyMe.push(skuId); TW.S.demand.notify.push({ skuId, customerId, at: now() }); };
 function cart(customerId) { return (TW.S.carts[customerId] = TW.S.carts[customerId] || { lines: [], promo: null, subPref: find(TW.S.customers, customerId).subPref }); }
 TW.cart = cart;
+const readCart = (cid) => TW.S.carts[cid] || { lines: [], promo: null, subPref: (find(TW.S.customers, cid) || {}).subPref };
+TW.readCart = readCart;
 A["cart.add"] = ({ customerId, skuId, sourceType, sourceId, qty = 1 }) => {
   const s = find(TW.S.skus, skuId);
   if (s.regulated) return fail("المنتج ده محتاج روشتة وتحقق من صيدلي قبل البيع — مش متاح للإضافة المباشرة.", { regulated: true });
+  if (sourceType === "merchant") { const m = find(TW.S.merchants, sourceId); if (!m || m.mode === "closed" || !TW.merchantServes(m, TW.zoneOfCustomer(customerId).id)) return fail("المحل ده مش متاح لمنطقتك دلوقتي"); }
   const ct = cart(customerId);
   const ex = ct.lines.find((l) => l.skuId === skuId && l.sourceId === sourceId);
   const avail = sourceType === "hub" ? hubAvail(skuId) : merchantAvail(sourceId, skuId);
@@ -519,7 +523,7 @@ A["cart.promo"] = ({ customerId, code }) => {
 };
 A["cart.reorder"] = ({ customerId, orderId }) => { const o = find(TW.S.orders, orderId); let skipped = 0; o.lines.forEach((l) => { const r = l.kind === "menu" ? A["cart.addMenu"]({ customerId, merchantId: l.sourceId, menuItemId: l.menuItemId, mods: l.mods, qty: l.qty }) : A["cart.add"]({ customerId, skuId: l.skuId, sourceType: l.sourceType, sourceId: l.sourceId, qty: l.qty }); if (r && r.ok === false) skipped++; }); return { ok: true, skipped }; };
 function cartLines(customerId) {
-  return cart(customerId).lines.map((l) => {
+  return readCart(customerId).lines.map((l) => {
     if (l.menuItemId) { const it = TW.S.menus[l.merchantId].find((x) => x.id === l.menuItemId); return { ...l, name: it.name, unitPrice: it.price + sum(l.mods || [], (x) => x.p), dept: "food" }; }
     const s = find(TW.S.skus, l.skuId); return { ...l, name: s.ar, unitPrice: priceAt(l.skuId, l.sourceType, l.sourceId), dept: s.dept };
   });
@@ -527,7 +531,7 @@ function cartLines(customerId) {
 TW.cartLines = cartLines;
 /* full pre-checkout validation (P04): location, serviceability, price, availability, qty, merchant status/capacity, delivery capacity, ETA, promo, min basket, restricted */
 TW.validateCart = (customerId, opts = {}) => {
-  const S = TW.S, c = find(S.customers, customerId), addr = c.addresses.find((a) => a.id === (opts.addressId || c.addr)), zone = find(S.zones, addr.zoneId), ct = cart(customerId);
+  const S = TW.S, c = find(S.customers, customerId), addr = c.addresses.find((a) => a.id === (opts.addressId || c.addr)), zone = find(S.zones, addr.zoneId), ct = readCart(customerId);
   const issues = [], changes = [];
   if (!zone.active) issues.push({ level: "block", code: "EX-LOC-003", text: `لسه موصلناش ${zone.ar}. سجّل في قائمة الانتظار وهنبلغك.` });
   const lines = cartLines(customerId);
@@ -548,12 +552,13 @@ TW.validateCart = (customerId, opts = {}) => {
   if (zone.cap && busy >= zone.cap) issues.push({ level: "warn", code: "EX-VAL-003", text: "الضغط عالي في منطقتك — التوصيل ممكن ياخد وقت أطول" });
   let promo = null;
   if (ct.promo) { const r = evalPromo(S, ct.promo, lines, items, zone, c); if (!r.ok) changes.push({ kind: "promo", text: `الكود ${ct.promo}: ${r.error}`, code: "EX-VAL-002" }); else promo = r; }
-  if (opts.pay === "cod") { const total = items + zone.fee + 3; if (total > S.rules.codOrderMax) issues.push({ level: "block", code: "BR-COD-001", text: `الكاش متاح للطلبات لحد ${money(S.rules.codOrderMax)} — ادفع أونلاين` }); if (c.codFails >= S.rules.codFailBlock) issues.push({ level: "block", code: "BR-COD-002", text: "الدفع كاش متوقف على حسابك مؤقتاً بسبب طلبات سابقة اترفضت — ادفع أونلاين" }); }
+  if (opts.pay === "cod") { if (c.codFails >= S.rules.codFailBlock) issues.push({ level: "block", code: "BR-COD-002", text: "الدفع كاش متوقف على حسابك مؤقتاً بسبب طلبات سابقة اترفضت — ادفع أونلاين" }); }
   const groups = Object.values(TW.groupBy(lines, (l) => l.sourceId)).map((ls) => { const sid = ls[0].sourceId; const isHub = sid === "h1"; const m = !isHub && find(S.merchants, sid); const prep = isHub ? S.rules.pickSlaMin : m.prep; return { sourceId: sid, sourceType: isHub ? "hub" : "merchant", name: isHub ? "توّا" : m.ar, lines: ls, subtotal: sum(ls, (l) => l.unitPrice * l.qty), eta: [Math.max(zone.sla[0], prep + 10), Math.max(zone.sla[1], prep + 20)] }; });
   let delivery = zone.fee; if (items >= (zone.type === "core" ? 300 : 400)) delivery = 0;
   let discount = promo ? promo.discount + (promo.freeDelivery ? delivery : 0) : 0;
   const service = lines.length ? 3 : 0;
   const total = Math.max(0, items + delivery + service - discount);
+  if (opts.pay === "cod" && total > S.rules.codOrderMax) issues.push({ level: "block", code: "BR-COD-001", text: `الكاش متاح للطلبات لحد ${money(S.rules.codOrderMax)} — ادفع أونلاين` });
   const readyIn = groups.map((g) => (g.sourceType === "hub" ? S.rules.pickSlaMin : find(S.merchants, g.sourceId).prep));
   const split = groups.length > 1 && Math.max(...readyIn) - Math.min(...readyIn) > S.rules.splitDelayMin;
   return { ok: !issues.some((i) => i.level === "block") && lines.length > 0, issues, changes, lines, groups, zone, address: addr, totals: { items, delivery, service, discount, total }, promo, split, eta: zone.route === "scheduled" ? null : [Math.max(...groups.map((g) => g.eta[0]), 0), Math.max(...groups.map((g) => g.eta[1]), 0)], windows: zone.windows };
@@ -1383,6 +1388,7 @@ function tick() {
   /* dispatch */
   S.tasks.forEach((tk) => {
     const o = find(S.orders, tk.orderId); if (!o || o.hold || ["CANCELLED"].includes(o.status)) return;
+    if (tk.status === "SCHEDULED" && tk.window && find(S.zones, tk.drop.zoneId).route !== "scheduled") { const d = new Date(); if (parseInt(tk.window, 10) * 60 - (d.getHours() * 60 + d.getMinutes()) <= 30) { tk.status = "WAITING"; changed = true; } }
     if (tk.status === "WAITING" || tk.status === "OFFERED") {
       const fos = tk.foIds.map((id) => find(S.fos, id));
       const readyish = fos.every((f) => ["PACKED", "READY"].includes(f.status) || (f.status === "PREPARING" && f.prepBy && f.prepBy - t < 4 * MIN && S.sim.auto) || (f.status === "PICKING" && S.sim.auto && f.sourceType === "hub" && !f.blocked && !f.exception));
